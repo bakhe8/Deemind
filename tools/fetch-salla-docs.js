@@ -22,6 +22,7 @@ const URLS = [
   'https://docs.salla.dev/422556m0',
   "https://docs.salla.dev/422610m0#sdk's-main-apis"
   , 'https://docs.salla.dev/422690m0'
+  , 'https://docs.salla.dev/422553m0#configuration'
 ];
 
 const OUT = path.resolve('configs', 'knowledge', 'salla-docs.json');
