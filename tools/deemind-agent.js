@@ -23,7 +23,7 @@ import { execSync } from 'child_process';
 import { Octokit } from 'octokit';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
 const BRANCH = 'auto-agent';
@@ -33,6 +33,8 @@ const AUDIT_LOG_PATH = 'logs/deemind_audit_report.json';
 const TASKS_PATH = 'codex-tasks.json';
 const PROGRESS_LOG = 'logs/codex-progress.log';
 const STATUS_PATH = 'logs/codex-status.json';
+const TELEMETRY_DIR = 'logs/telemetry';
+const REPORTS_DIR = 'reports';
 
 function getRepo() {
   const envRepo = process.env.GITHUB_REPOSITORY;
@@ -106,6 +108,155 @@ async function executeCodexTask(taskName) {
   return 'done';
 }
 
+// Deep evaluation and self-improvement helpers
+function sh(cmd, opts = {}) {
+  try {
+    const started = Date.now();
+    const out = execSync(cmd, { encoding: 'utf8', stdio: ['ignore','pipe','pipe'], ...opts });
+    const ms = Date.now() - started;
+    return { ok: true, ms, out };
+  } catch (e) {
+    return { ok: false, ms: 0, out: e?.stdout?.toString?.() || '', err: e?.stderr?.toString?.() || String(e) };
+  }
+}
+
+function dirSizeBytes(dir) {
+  let total = 0;
+  const walk = (d) => {
+    if (!fs.existsSync(d)) return;
+    for (const name of fs.readdirSync(d)) {
+      const p = path.join(d, name);
+      const st = fs.statSync(p);
+      if (st.isDirectory()) walk(p); else total += st.size;
+    }
+  };
+  walk(dir);
+  return total;
+}
+
+function countLOC(root = '.') {
+  let files = [];
+  const walk = (d) => {
+    for (const n of fs.readdirSync(d)) {
+      const p = path.join(d, n);
+      if (p.includes('node_modules') || path.basename(p).startsWith('.')) continue;
+      const st = fs.statSync(p);
+      if (st.isDirectory()) walk(p); else if (/\.(js|json|md|css|twig|html)$/i.test(p)) files.push(p);
+    }
+  };
+  walk(root);
+  let loc = 0;
+  for (const f of files) {
+    try { loc += fs.readFileSync(f, 'utf8').split(/\r?\n/).length; } catch (e) { void e; }
+  }
+  return { files: files.length, loc };
+}
+
+async function collectMetrics(theme = 'demo') {
+  const t0 = Date.now();
+  // Build metrics
+  const build = sh(`node cli.js ${theme} --sanitize --i18n`);
+  const outputDir = path.join(process.cwd(), 'output', theme);
+  const buildSize = dirSizeBytes(outputDir);
+  // Validation
+  const repPath = path.join(outputDir, 'report-extended.json');
+  let errors = 0, warnings = 0;
+  try {
+    const rep = JSON.parse(fs.readFileSync(repPath, 'utf8'));
+    errors = rep?.summary?.errors || 0;
+    warnings = rep?.summary?.warnings || 0;
+  } catch (e) { void e; }
+  // Lint
+  const lint = sh('npx eslint . --ext .js -f json');
+  let lintErrors = 0, lintWarnings = 0;
+  try {
+    const arr = JSON.parse(lint.out || '[]');
+    for (const file of arr) {
+      lintErrors += file.errorCount || 0;
+      lintWarnings += file.warningCount || 0;
+    }
+  } catch (e) { void e; }
+  // Tests
+  const tests = sh('npm test');
+  const pass = tests.ok;
+  const coverage = { ratio: null };
+  // LOC
+  const { files, loc } = countLOC();
+  const totalMs = Date.now() - t0;
+  const metrics = {
+    timestamp: new Date().toISOString(),
+    theme,
+    buildMs: build.ms,
+    buildOk: build.ok,
+    buildSize,
+    validation: { errors, warnings },
+    lint: { errors: lintErrors, warnings: lintWarnings },
+    tests: { ok: pass, ms: tests.ms },
+    coverage,
+    code: { files, loc },
+    totalMs
+  };
+  fs.mkdirSync(TELEMETRY_DIR, { recursive: true });
+  const stamp = metrics.timestamp.replace(/[:.]/g,'-');
+  fs.writeFileSync(path.join(TELEMETRY_DIR, `metrics-${stamp}.json`), JSON.stringify(metrics, null, 2));
+  return metrics;
+}
+
+function summarizeImprovements(metrics) {
+  const recs = [];
+  if (!metrics.buildOk) recs.push({ area: 'build', action: 'investigate build failure', severity: 'high' });
+  if (metrics.validation.warnings > 0) recs.push({ area: 'validation', action: 'reduce i18n/asset warnings by expanding rules', severity: 'med' });
+  if (metrics.lint.errors > 0) recs.push({ area: 'lint', action: 'fix ESLint errors; enable stricter rules', severity: 'high' });
+  if (metrics.buildSize > 5_000_000) recs.push({ area: 'performance', action: 'optimize assets; enable minification', severity: 'med' });
+  return recs;
+}
+
+async function proposeImprovements(metrics) {
+  const recs = summarizeImprovements(metrics);
+  let ai = null;
+  if (openai) {
+    try {
+      const prompt = `You are Codex. Given these metrics, propose code-level improvements (file, change, rationale). Return JSON array with {file, change, rationale, auto_apply}`;
+      const input = `${prompt}\n\nMetrics:\n${JSON.stringify(metrics, null, 2)}`;
+      const res = await openai.chat.completions.create({ model: 'gpt-4o-mini', temperature: 0.2, messages: [{ role: 'user', content: input }] });
+      ai = res?.choices?.[0]?.message?.content || '';
+    } catch (e) { ai = null; }
+  }
+  fs.mkdirSync(REPORTS_DIR, { recursive: true });
+  const reportMd = [
+    '# Codex Improvement Summary',
+    `Date: ${new Date().toISOString()}`,
+    '',
+    '## Metrics',
+    '```json',
+    JSON.stringify(metrics, null, 2),
+    '```',
+    '',
+    '## Recommendations',
+    ...recs.map(r => `- [${r.severity}] ${r.area}: ${r.action}`),
+    '',
+    '## AI Suggestions',
+    ai ? ai : '_No AI suggestions (missing OPENAI_API_KEY)._'
+  ].join('\n');
+  fs.writeFileSync(path.join(REPORTS_DIR, 'codex-improvement-summary.md'), reportMd);
+  if (ai) fs.writeFileSync(path.join('logs', 'codex_suggestions.json'), ai);
+  return { recs, ai };
+}
+
+function updateProgressDoc(metrics) {
+  const doc = path.join('docs', 'codex-progress.md');
+  let existing = '';
+  try { existing = fs.readFileSync(doc, 'utf8'); } catch (e) { existing = ''; }
+  const line = `| ${metrics.timestamp} | ${metrics.code.loc} | ${metrics.tests.ok ? '✔' : '✖'} | ${metrics.buildSize} | e:${metrics.validation.errors} / w:${metrics.validation.warnings} |`;
+  if (!existing) {
+    existing = ['# 📈 Codex Progress Report','', '| Timestamp | LOC | Tests | Build Size (bytes) | Validation |', '|---|---:|:--:|---:|:--:|', line, ''].join('\n');
+  } else {
+    existing += `\n${line}`;
+  }
+  fs.mkdirSync('docs', { recursive: true });
+  fs.writeFileSync(doc, existing);
+}
+
 async function main() {
   console.log('🧠 Deemind Agent starting...\n');
   const { owner, repo } = getRepo();
@@ -117,6 +268,28 @@ async function main() {
   // STEP 2 — Read repo structure
   const allFiles = getAllFiles('.');
   console.log(`📁 Found ${allFiles.length} project files.\n`);
+
+  // Optional deep evaluation first if requested
+  const args = process.argv.slice(2);
+  const autoEval = args.includes('--auto-eval');
+  const apply = args.includes('--apply-suggestions');
+  if (autoEval) {
+    const metrics = await collectMetrics('demo');
+    updateProgressDoc(metrics);
+    await proposeImprovements(metrics);
+    // Gate auto-apply behind flags and green validations
+    const clean = metrics.validation.errors === 0; // warnings allowed
+    if (apply && clean) {
+      writeProgress('auto-apply:ready');
+      // Create a PR with the summary file only (non-destructive); code-level auto-apply handled by separate tool if present
+      try { execSync(`git checkout -B codex/improvement/${Date.now()}`); } catch (e) { void e; }
+      try { execSync('git add reports/codex-improvement-summary.md docs/codex-progress.md logs/codex_suggestions.json'); } catch (e) { void e; }
+      try { execSync("git commit -m 'chore(codex): improvement summary & progress' || echo no-changes"); } catch (e) { void e; }
+      try { execSync('git push origin HEAD --force'); } catch (e) { void e; }
+      const base = await resolveBaseBranch(octokit, owner, repo, BASE_BRANCH);
+      await ensurePullRequest(octokit, owner, repo, execSync('git branch --show-current', { encoding: 'utf8' }).trim(), base);
+    }
+  }
 
   // STEP 3 — Ask Codex to audit
   console.log('🤖 Asking Codex to audit the repository...');
@@ -132,18 +305,21 @@ Existing files:
 ${allFiles.join('\n')}
 `;
 
-  const auditResponse = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
-    temperature: 0,
-    messages: [{ role: 'user', content: auditPrompt }]
-  });
+  let auditResponse = null;
+  if (openai) {
+    auditResponse = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      temperature: 0,
+      messages: [{ role: 'user', content: auditPrompt }]
+    });
+  }
 
   let audit;
   try {
-    audit = JSON.parse(auditResponse.choices[0].message.content);
+    audit = auditResponse ? JSON.parse(auditResponse.choices[0].message.content) : { implemented: [], partial: [], missing: [] };
   } catch {
     console.error('⚠️ Codex output invalid JSON. Saving raw response.');
-    audit = { implemented: [], partial: [], missing: [], raw: auditResponse.choices[0].message.content };
+    audit = { implemented: [], partial: [], missing: [], raw: auditResponse ? auditResponse.choices[0].message.content : '' };
   }
 
   await fs.promises.mkdir(path.dirname(AUDIT_LOG_PATH), { recursive: true });

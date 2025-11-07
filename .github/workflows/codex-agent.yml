@@ -6,6 +6,8 @@ on:
   workflow_run:
     workflows: ["Deemind Codex Agent"]
     types: [completed]
+  push:
+    branches: [ main ]
 jobs:
   codex:
     runs-on: ubuntu-latest
@@ -27,4 +29,3 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
