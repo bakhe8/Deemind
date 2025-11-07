@@ -179,7 +179,11 @@ async function run() {
       engine: "twig",
       layout: "layout/default.twig",
       author: "Deemind",
-      license: "UNLICENSED"
+      license: "UNLICENSED",
+      categories: ["general"],
+      icon: "",
+      fonts: [],
+      settings: {}
     };
     await fs.writeJson(path.join(outputPath, "theme.json"), themeJson, { spaces: 2 });
 

@@ -1,11 +1,11 @@
 {
   "name": "deemind",
   "version": "1.0.0",
-  "description": "Deemind — The Intelligent Theming Engine for Salla and beyond.",
+  "description": "Deemind — Salla Theming & Validation Engine (Stable Release)",
   "type": "module",
   "private": true,
   "engines": {
-    "node": "^20.10.0"
+    "node": "20.x"
   },
   "engineStrict": true,
   "scripts": {

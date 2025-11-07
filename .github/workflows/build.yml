@@ -30,6 +30,16 @@ jobs:
         run: node tools/check-conflicts.js
       - run: npm ci
       - run: npm run lint
+      - name: Static analysis (cycles, unused deps)
+        run: |
+          npm i -D madge depcheck
+          node tools/build/static-analysis.js
+      - name: Upload static analysis
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-analysis
+          path: reports/static-analysis.md
       - run: npm run deemind:build demo -- --sanitize --i18n --autofix
       - run: npm run deemind:test
       - name: Package demo theme (zip)

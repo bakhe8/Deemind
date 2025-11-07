@@ -26,8 +26,11 @@ import OpenAI from 'openai';
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
+const agentCfgPath = path.join('configs', 'agent.json');
+let agentCfg = { targetBranch: 'main', autoBranching: true, allowExternalBranches: true };
+try { agentCfg = JSON.parse(fs.readFileSync(agentCfgPath, 'utf8')); } catch (e) { void e; }
 const BRANCH = 'auto-agent';
-const BASE_BRANCH = process.env.DEEMIND_BASE || 'develop';
+const BASE_BRANCH = agentCfg.targetBranch || process.env.DEEMIND_BASE || 'main';
 const CHECKLIST_PATH = 'docs/deemind_checklist.md';
 const AUDIT_LOG_PATH = 'logs/deemind_audit_report.json';
 const TASKS_PATH = 'codex-tasks.json';
@@ -282,12 +285,23 @@ async function main() {
     if (apply && clean) {
       writeProgress('auto-apply:ready');
       // Create a PR with the summary file only (non-destructive); code-level auto-apply handled by separate tool if present
-      try { execSync(`git checkout -B codex/improvement/${Date.now()}`); } catch (e) { void e; }
-      try { execSync('git add reports/codex-improvement-summary.md docs/codex-progress.md logs/codex_suggestions.json'); } catch (e) { void e; }
-      try { execSync("git commit -m 'chore(codex): improvement summary & progress' || echo no-changes"); } catch (e) { void e; }
-      try { execSync('git push origin HEAD --force'); } catch (e) { void e; }
       const base = await resolveBaseBranch(octokit, owner, repo, BASE_BRANCH);
-      await ensurePullRequest(octokit, owner, repo, execSync('git branch --show-current', { encoding: 'utf8' }).trim(), base);
+      if (agentCfg.autoBranching === false) {
+        // commit to fixed agent branch
+        try { execSync(`git checkout -B ${BRANCH}`); } catch (e) { void e; }
+        try { execSync('git add reports/codex-improvement-summary.md docs/codex-progress.md logs/codex_suggestions.json'); } catch (e) { void e; }
+        try { execSync("git commit -m 'chore(codex): improvement summary & progress' || echo no-changes"); } catch (e) { void e; }
+        try { execSync(`git push origin ${BRANCH} --force`); } catch (e) { void e; }
+        const pr = await ensurePullRequest(octokit, owner, repo, BRANCH, base);
+        if (pr?.number) { try { await octokit.rest.issues.addLabels({ owner, repo, issue_number: pr.number, labels: ['codex-trivial'] }); } catch (e) { void e; } }
+      } else {
+        try { execSync(`git checkout -B codex/improvement/${Date.now()}`); } catch (e) { void e; }
+        try { execSync('git add reports/codex-improvement-summary.md docs/codex-progress.md logs/codex_suggestions.json'); } catch (e) { void e; }
+        try { execSync("git commit -m 'chore(codex): improvement summary & progress' || echo no-changes"); } catch (e) { void e; }
+        try { execSync('git push origin HEAD --force'); } catch (e) { void e; }
+        const pr = await ensurePullRequest(octokit, owner, repo, execSync('git branch --show-current', { encoding: 'utf8' }).trim(), base);
+        if (pr?.number) { try { await octokit.rest.issues.addLabels({ owner, repo, issue_number: pr.number, labels: ['codex-trivial'] }); } catch (e) { void e; } }
+      }
     }
   }
 

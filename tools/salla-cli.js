@@ -12,7 +12,7 @@ function run(cmd, args, cwd) {
 }
 
 function usage() {
-  console.log('Usage: node tools/salla-cli.js <zip|serve|push> [theme]');
+  console.log('Usage: node tools/salla-cli.js <zip|serve|push|validate> [theme]');
 }
 
 async function main() {
@@ -36,6 +36,8 @@ async function main() {
       return;
     }
     ok = run(cmd, [...baseArgs, 'theme:push', `--path`, outDir], process.cwd());
+  } else if (sub === 'validate') {
+    ok = run(cmd, [...baseArgs, 'theme:validate', `--path`, outDir], process.cwd());
   } else {
     usage();
     return;
@@ -44,4 +46,3 @@ async function main() {
 }
 
 main();
-
