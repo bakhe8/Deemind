@@ -6,9 +6,17 @@ import path from 'path';
 export async function normalizeCssAssets({ outputPath, inputPath }) {
   const cssDir = path.join(outputPath, 'assets');
   const files = await listFiles(cssDir, '.css');
+  const cacheFile = path.join(process.cwd(), '.factory-cache', 'css-normalize.json');
+  await fs.ensureDir(path.dirname(cacheFile));
+  let cache = {};
+  try { cache = await fs.readJson(cacheFile); } catch {}
   let rewrites = 0, copies = 0;
   for (const file of files) {
     let css = await fs.readFile(file, 'utf8');
+    const hash = createHash('md5').update(css).digest('hex');
+    if (cache[file] && cache[file] === hash) {
+      continue; // unchanged
+    }
     const dirRelFromAssets = path.relative(path.join(outputPath, 'assets'), path.dirname(file));
     css = await css.replace(/url\((['"]?)([^)'"]+)\1\)/gi, (m, q, url) => {
       if (/^https?:\/\//i.test(url) || url.startsWith('//') || url.startsWith('assets/')) return m;
@@ -20,7 +28,9 @@ export async function normalizeCssAssets({ outputPath, inputPath }) {
       return `url('assets/${targetRel.replace(/\\/g,'/')}')`;
     });
     await fs.writeFile(file, css, 'utf8');
+    cache[file] = hash;
   }
+  try { await fs.writeJson(cacheFile, cache, { spaces: 0 }); } catch {}
   return { rewrites, copies };
 }
 
@@ -66,4 +76,3 @@ if (process.argv[1] && process.argv[1].endsWith('normalize-css-assets.js')) {
     .then(r => { console.log(`CSS normalized: rewrites=${r.rewrites}, copies=${r.copies}`); })
     .catch(e => { console.error(e); process.exit(1); });
 }
-

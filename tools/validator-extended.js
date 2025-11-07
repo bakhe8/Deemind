@@ -16,6 +16,9 @@ export async function validateExtended(themePath) {
   // Load settings
   let settings = { rawAllowlist: [], failOnBudget: false, requireI18n: false };
   try { settings = await fs.readJson(path.resolve('configs', 'settings.json')); } catch (err) { void err; }
+  if (typeof process !== 'undefined' && process.env && typeof process.env.REQUIRE_I18N !== 'undefined') {
+    settings.requireI18n = String(process.env.REQUIRE_I18N).toLowerCase() === 'true';
+  }
 
   // 1) UTF-8 encoding check
   for (const file of globSync(`${themePath}/**/*.{html,twig,css,js}`, { nodir: true })) {

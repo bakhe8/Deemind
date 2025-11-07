@@ -74,19 +74,31 @@ async function run() {
   const autofix = args.includes('--autofix');
 
   try {
+    const t0 = Date.now();
+    const inputChecksum = await hashInputDir(inputPath);
+
     console.log(chalk.yellow("🔍 Parsing HTML structure (hybrid)..."));
-    const parsed = await runHybridParser(inputPath);
+    const tParse0 = Date.now();
+    const parsed = await runHybridParser(inputPath, { inputChecksum });
+    const tParse1 = Date.now();
 
     console.log(chalk.yellow("🧠 Mapping semantics and Twig variables..."));
+    const tMap0 = Date.now();
     const mapped = await mapSemantics(parsed, { i18n, client, sanitize });
+    const tMap1 = Date.now();
 
+    const lockDefault = process.env.CI && !lockUnchanged ? true : lockUnchanged;
     console.log(chalk.yellow("🪄 Adapting to Salla theme format..."));
-    const adaptRes = await adaptToSalla(mapped, outputPath, { lockUnchanged, partialize });
+    const tAdapt0 = Date.now();
+    const adaptRes = await adaptToSalla(mapped, outputPath, { lockUnchanged: lockDefault, partialize });
+    const tAdapt1 = Date.now();
 
     // Post-process CSS assets for deterministic url(...) rewrites
     try {
       const { normalizeCssAssets } = await import('./tools/normalize-css-assets.js');
+      const tCss0 = Date.now();
       await normalizeCssAssets({ outputPath, inputPath });
+      var tCss1 = Date.now();
     } catch (_) { /* optional */ }
 
     // Verbose per-page, per-component progress
@@ -106,6 +118,7 @@ async function run() {
     }
 
     console.log(chalk.yellow("🧪 Running core validation..."));
+    const tVal0 = Date.now();
     const coreReport = await validateTheme(outputPath);
     // Fail gate on criticals unless --force
     const hasCritical = (coreReport.issues || []).some(i => i.level === 'critical');
@@ -116,6 +129,7 @@ async function run() {
 
     console.log(chalk.yellow("🔬 Running extended QA..."));
     let extReport = await validateExtended(outputPath);
+    const tVal1 = Date.now();
 
     // Optional auto-fix cycle for common issues
     if (autofix) {
@@ -141,7 +155,6 @@ async function run() {
 
     console.log(chalk.yellow("📜 Generating build manifest..."));
     const elapsed = Number(((Date.now() - start) / 1000).toFixed(2));
-    const inputChecksum = await hashInputDir(inputPath);
     const manifest = await generateBuildManifest(outputPath, { coreReport, elapsedSec: elapsed, layoutMap: parsed.layoutMap, inputChecksum });
     await fs.writeJson(path.join(outputPath, "manifest.json"), manifest, { spaces: 2 });
 
@@ -187,6 +200,24 @@ async function run() {
     const baseline = loadBaselineSet();
     const usage = computeComponentUsage(outputPath, baseline);
     await fs.writeJson(path.join(outputPath, 'reports', 'component-usage.json'), usage, { spaces: 2 });
+    const timings = {
+      parseMs: tParse1 - tParse0,
+      mapMs: tMap1 - tMap0,
+      adaptMs: tAdapt1 - tAdapt0,
+      cssNormalizeMs: typeof tCss1 === 'number' ? (tCss1 - tAdapt1) : 0,
+      validateMs: tVal1 - tVal0,
+      totalMs: Date.now() - t0
+    };
+    console.log(chalk.gray(`Timings(ms): ${JSON.stringify(timings)}`));
+    if (process.env.GITHUB_STEP_SUMMARY) {
+      const summary = [
+        `Build: ${themeName}`,
+        `Total: ${timings.totalMs}ms`,
+        `Parse: ${timings.parseMs}ms, Map: ${timings.mapMs}ms, Adapt: ${timings.adaptMs}ms, CSS: ${timings.cssNormalizeMs}ms, Validate: ${timings.validateMs}ms`,
+        `Pages: ${parsed.pages.length}, Written: ${adaptRes.written.length}, Skipped: ${adaptRes.skipped.length}`
+      ].join('\n');
+      try { await fs.appendFile(process.env.GITHUB_STEP_SUMMARY, `\n${summary}\n`); } catch {}
+    }
     console.log(chalk.greenBright(`\n✅ Deemind build complete in ${elapsed}s`));
     console.log(chalk.gray(`Output → ${outputPath}`));
 

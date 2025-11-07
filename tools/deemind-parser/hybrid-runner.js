@@ -10,8 +10,21 @@ function md5(text) {
   return crypto.createHash('md5').update(text, 'utf8').digest('hex');
 }
 
-export async function runHybridParser(inputPath, { logDir = path.join(process.cwd(), 'logs') } = {}) {
+export async function runHybridParser(inputPath, { logDir = path.join(process.cwd(), 'logs'), inputChecksum = null } = {}) {
   await fs.ensureDir(logDir);
+
+  // Cache by input checksum if provided
+  const cacheDir = path.join(process.cwd(), '.factory-cache', 'parse');
+  await fs.ensureDir(cacheDir);
+  const cacheFile = inputChecksum ? path.join(cacheDir, `${inputChecksum}.json`) : null;
+  if (cacheFile && await fs.pathExists(cacheFile)) {
+    try {
+      const cached = await fs.readJson(cacheFile);
+      if (cached && Array.isArray(cached.pages)) {
+        return { ...cached, fromCache: true };
+      }
+    } catch {}
+  }
 
   // Load previous run for change detection
   const lastRunFile = path.join(logDir, 'last-run.json');
@@ -102,7 +115,11 @@ export async function runHybridParser(inputPath, { logDir = path.join(process.cw
   // Persist layout map for transparency
   await fs.writeJson(path.join(logDir, 'layout-map.json'), layoutMap, { spaces: 2 });
 
-  return { inputPath, pages: stage1.pages, conflicts, confidence, templateHints, cssMap, jsMap, layoutMap, unchanged, failed: stage1.failed };
+  const result = { inputPath, pages: stage1.pages, conflicts, confidence, templateHints, cssMap, jsMap, layoutMap, unchanged, failed: stage1.failed };
+  if (cacheFile) {
+    try { await fs.writeJson(cacheFile, result, { spaces: 0 }); } catch {}
+  }
+  return result;
 }
 
 function collectComponents(html) {
@@ -122,4 +139,3 @@ function collectComponents(html) {
 function stableId(rel, idx) {
   return crypto.createHash('md5').update(`${rel}:${idx}`).digest('hex').slice(0,8);
 }
-

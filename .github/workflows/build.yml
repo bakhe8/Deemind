@@ -14,6 +14,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
       - name: Conflict Markers Check
         run: node tools/check-conflicts.js
       - run: npm ci
@@ -27,7 +34,21 @@ jobs:
           mkdir -p logs/history
           ts=$(date +%Y%m%d-%H%M%S)
           if [ -f logs/deemind_validation.log ]; then cp logs/deemind_validation.log logs/history/$ts.log; fi
+      - name: Detect changed paths
+        id: changes
+        run: |
+          set -e
+          BASE=$(git rev-parse HEAD^ || echo '')
+          if [ -z "$BASE" ]; then echo "RUN_SNAPSHOTS=1" >> $GITHUB_ENV; exit 0; fi
+          CHANGED=$(git diff --name-only "$BASE" HEAD)
+          echo "$CHANGED" | tee /tmp/changed.txt
+          if echo "$CHANGED" | grep -E '^(input/|tools/|tests/snapshots/|configs/)' >/dev/null; then
+            echo "RUN_SNAPSHOTS=1" >> $GITHUB_ENV
+          else
+            echo "RUN_SNAPSHOTS=0" >> $GITHUB_ENV
+          fi
       - name: Snapshot tests
+        if: env.RUN_SNAPSHOTS == '1'
         run: npm run test:snapshots
       - name: Flaky detector
         run: npm run test:flaky

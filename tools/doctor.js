@@ -113,9 +113,22 @@ async function doctorTheme(theme, { octokit, owner, repo }) {
 
   const afterRep = await readReport(outputPath);
   const after = (afterRep?.summary?.errors || 0) > 0;
-  if (after && octokit && owner && repo) {
+  if (octokit && owner && repo) {
     const diff = diffReports(beforeRep, afterRep);
-    await ensureIssue({ octokit, owner, repo, theme, diff, after: afterRep });
+    if (after) {
+      await ensureIssue({ octokit, owner, repo, theme, diff, after: afterRep });
+    } else {
+      // Close any existing open issue for this theme with all-clear note
+      const title = `Doctor: Theme "${theme}" build errors remain`;
+      try {
+        const res = await octokit.rest.issues.listForRepo({ owner, repo, state: 'open', per_page: 100 });
+        const existing = res.data.find(i => i.title.trim() === title.trim());
+        if (existing) {
+          await octokit.rest.issues.createComment({ owner, repo, issue_number: existing.number, body: '✅ All clear — doctor fixed remaining errors.' });
+          await octokit.rest.issues.update({ owner, repo, issue_number: existing.number, state: 'closed' });
+        }
+      } catch {}
+    }
   }
   return { theme, before, after };
 }
