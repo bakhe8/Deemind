@@ -1,0 +1,41 @@
+name: Codex Deep Evaluation
+on:
+  schedule:
+    - cron: "0 2 * * 0" # every Sunday at 02:00 UTC
+  workflow_dispatch:
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install deps
+        run: npm ci || npm i
+      - name: Run Doctor (validate → fix → revalidate)
+        run: npm run deemind:doctor
+      - name: Flaky detector
+        run: npm run test:flaky
+      - name: ESLint JSON report
+        run: npx eslint . --ext .js -f json > logs/eslint.json || true
+      - name: Codex Auto Evaluation
+        run: node tools/codex-auto-eval.js
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      - name: Upload Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: codex-evaluation
+          path: |
+            reports/codex-*.md
+            reports/codex-*.json
+            reports/codex-*.patch
+            logs/deemind_validation.log
+            logs/eslint.json
+
