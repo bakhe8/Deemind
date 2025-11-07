@@ -1,0 +1,26 @@
+name: Create GitHub Release from Notes (Deemind Tools)
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'reports/release-*.md'
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Publish Release from Notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: node tools/publish-release-from-notes.js
+
