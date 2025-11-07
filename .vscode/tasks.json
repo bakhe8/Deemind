@@ -1,0 +1,14 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Auto Commit & Push",
+      "type": "shell",
+      "command": "git add . && git commit -m \"Auto-commit: $(date +'%Y-%m-%d %H:%M:%S')\" && git push",
+      "problemMatcher": [],
+      "runOptions": {
+        "runOn": "fileSave"
+      }
+    }
+  ]
+}
