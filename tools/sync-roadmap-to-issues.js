@@ -15,6 +15,7 @@ if (!TOKEN || !OWNER || !REPO) {
 }
 
 const octokit = new Octokit({ auth: TOKEN });
+const graphql = octokit.graphql;
 
 const md = fs.readFileSync("docs/deemind_checklist.md", "utf8");
 const lines = md.split(/\r?\n/);
@@ -41,6 +42,7 @@ async function findIssue(title) {
 }
 
 (async function main() {
+  const projectId = await resolveProjectId();
   for (const item of items) {
     const existing = await findIssue(item.title);
 
@@ -54,6 +56,7 @@ async function findIssue(title) {
           labels: ["roadmap", "auto"]
         });
         console.log(`➕ Created #${created.data.number}: ${item.title}`);
+        if (projectId) await addToProject(projectId, created.data.node_id, created.data.number);
       } else {
         console.log(`✔️ Skipped (done in checklist): ${item.title}`);
       }
@@ -68,6 +71,8 @@ async function findIssue(title) {
       } else {
         console.log(`= In sync: ${item.title}`);
       }
+      // Ensure linked in project
+      if (projectId) await addToProject(projectId, existing.node_id, existing.number);
     }
   }
   console.log("Done syncing roadmap → issues.");
@@ -76,3 +81,64 @@ async function findIssue(title) {
   process.exit(1);
 });
 
+async function resolveProjectId() {
+  // If PROJECT_ID provided, use it
+  const direct = process.env.PROJECT_ID;
+  if (direct) return direct;
+  const ownerLogin = process.env.PROJECT_OWNER || OWNER;
+  const ownerType = (process.env.PROJECT_OWNER_TYPE || 'USER').toUpperCase(); // USER or ORG
+  const number = process.env.PROJECT_NUMBER ? Number(process.env.PROJECT_NUMBER) : null;
+  const title = process.env.PROJECT_TITLE || null;
+  try {
+    if (number) {
+      if (ownerType === 'ORG') {
+        const data = await graphql(
+          `query($login:String!,$number:Int!){ org(login:$login){ projectV2(number:$number){ id title number } } }`,
+          { login: ownerLogin }
+        );
+        return data?.org?.projectV2?.id || null;
+      }
+      const data = await graphql(
+        `query($login:String!,$number:Int!){ user(login:$login){ projectV2(number:$number){ id title number } } }`,
+        { login: ownerLogin }
+      );
+      return data?.user?.projectV2?.id || null;
+    }
+    if (title) {
+      if (ownerType === 'ORG') {
+        const data = await graphql(
+          `query($login:String!){ org(login:$login){ projectsV2(first:50){ nodes{ id title number } } } }`,
+          { login: ownerLogin }
+        );
+        const match = (data?.org?.projectsV2?.nodes || []).find(p => p.title === title);
+        return match?.id || null;
+      }
+      const data = await graphql(
+        `query($login:String!){ user(login:$login){ projectsV2(first:50){ nodes{ id title number } } } }`,
+        { login: ownerLogin }
+      );
+      const match = (data?.user?.projectsV2?.nodes || []).find(p => p.title === title);
+      return match?.id || null;
+    }
+  } catch (e) {
+    console.warn('Project lookup failed:', e?.message || e);
+  }
+  return null;
+}
+
+async function addToProject(projectId, issueNodeId, issueNumber) {
+  try {
+    await graphql(
+      `mutation($projectId:ID!,$contentId:ID!){ addProjectV2ItemById(input:{projectId:$projectId, contentId:$contentId}){ item { id } } }`,
+      { projectId, contentId: issueNodeId }
+    );
+    console.log(`📌 Added #${issueNumber} to project`);
+  } catch (e) {
+    const msg = String(e?.message || e);
+    if (msg.includes('already exists') || msg.includes('content id already in the project')) {
+      console.log(`= Already in project: #${issueNumber}`);
+      return;
+    }
+    console.warn(`⚠️ Project add failed for #${issueNumber}:`, msg);
+  }
+}
