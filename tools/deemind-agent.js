@@ -486,6 +486,9 @@ ${allFiles.join('\n')}
     }
   }
   writeStatus({ state: 'idle', remaining: (loadTasks().queue||[]).length });
+  // Final compatibility audit each cycle (best-effort, does not block)
+  try { execSync('node tools/codex-harmony-check.js', { stdio: 'inherit' }); } catch (e) { /* ignore */ }
+  try { execSync('node tools/codex-full-assessment.js', { stdio: 'inherit' }); } catch (e) { /* ignore */ }
   console.log('\n🎯 Deemind Agent completed execution.');
 }
 

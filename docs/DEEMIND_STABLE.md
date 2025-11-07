@@ -46,3 +46,14 @@ Principles
 - Add Lighthouse CI against preview deployments (optional).
 - Expand snapshot coverage for new themes.
 - Tighten ESLint rules incrementally.
+
+## 🧩 Harmony Engine Overview
+
+Harmony ensures Deemind's modules, adapters, and workflows remain synchronized.
+It verifies:
+
+- Canonical ↔ Adapter schema alignment
+- Cross-dependency health
+- Workflow-tool coherence
+- Documentation parity
+  Reports are stored under `/reports/harmony` and a score (0–100) is appended to `logs/harmony-score.json`.

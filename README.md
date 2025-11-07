@@ -123,3 +123,5 @@ You can now rename your local folder to deemind, run the CLI as-is, and you’ll
 - [validation.md](docs\validation.md)
 - [workflow.md](docs\workflow.md)
 - [workflows.md](docs\workflows.md)
+
+Note: Deemind builds themes; Deemind Tools build Deemind.

@@ -1,0 +1,40 @@
+name: Codex Harmony Validation (Deemind Tools)
+on:
+  schedule:
+    - cron: "0 */12 * * *"
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  harmony-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci || npm i
+      - name: Build & Validate
+        run: |
+          npm run lint
+          npm run deemind:build demo -- --sanitize --i18n
+          npm run deemind:build gimni -- --sanitize --i18n
+          npm run deemind:validate
+      - name: Run Codex Harmony Check
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: node tools/codex-harmony-check.js
+      - name: Enforce Harmony Threshold
+        run: |
+          SCORE=$(node -e "const fs=require('fs');let h=[];try{h=JSON.parse(fs.readFileSync('logs/harmony-score.json','utf8'))}catch(e){};const s=h.length?h[h.length-1].score:0;console.log('Harmony score:',s); if(s<90){process.exit(1)}")
+      - name: Upload Harmony Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: codex-harmony-report-${{ github.run_id }}
+          path: |
+            logs/codex-harmony-report.md
+            logs/harmony-score.json

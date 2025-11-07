@@ -1,4 +1,4 @@
-name: Codex Auto-Docs
+name: Codex Auto-Docs (Deemind Tools)
 
 on:
   push:

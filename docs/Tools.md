@@ -23,3 +23,8 @@ Node and environment
 
 - Node 20 enforced (`.nvmrc`, package.json engines).
 - CI uses `actions/setup-node@v4` node-version: 20.
+
+Scope and lifecycle
+
+- Tool categories: Codex (agent + evaluations), Builder (packaging, Salla CLI wrapper), Validator (extended checks), Telemetry (logs/history), Static Analysis (cycles/unused deps).
+- Tools exist to serve the Core and must not alter Core runtime outputs directly; they orchestrate builds and validations through defined interfaces only.

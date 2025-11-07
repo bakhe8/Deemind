@@ -1,0 +1,20 @@
+name: Separation Audit (Deemind Tools)
+on:
+  schedule:
+    - cron: '0 6 * * 1' # weekly Mondays 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node tools/separation-audit.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: separation-audit
+          path: reports/harmony/separation-audit.md
+

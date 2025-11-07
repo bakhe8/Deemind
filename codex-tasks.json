@@ -1,3 +1,6 @@
 {
-  "queue": []
+  "queue": [
+    "Reduce ESLint warnings; tighten rules incrementally",
+    "Run static analysis and address cycles/unused dependencies"
+  ]
 }

@@ -1,4 +1,4 @@
-name: Deemind CI
+name: CI (Deemind Core)
 on:
   push:
     branches: [ main ]

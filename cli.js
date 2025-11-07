@@ -181,9 +181,9 @@ async function run() {
       author: "Deemind",
       license: "UNLICENSED",
       categories: ["general"],
-      icon: "",
-      fonts: [],
-      settings: {}
+      icon: "assets/icon.png",
+      fonts: ["Inter", "Tajawal"],
+      settings: { "primaryColor": "#0046FF" }
     };
     await fs.writeJson(path.join(outputPath, "theme.json"), themeJson, { spaces: 2 });
 
