@@ -8,11 +8,11 @@
     "deemind": "dist/cli.js"
   },
   "scripts": {
-    "dev": "tsup src/cli.ts --watch --format esm,cjs --dts",
-    "build": "tsup src/cli.ts --format esm,cjs --dts",
-    "start": "node dist/cli.js",
-    "lint": "eslint 'src/**/*.{ts,tsx}' --max-warnings=0",
-    "test": "vitest"
+    "deemind:build": "node tools/delivery-pipeline.js",
+    "deemind:validate": "node tools/validator.js",
+    "deemind:test": "node tests/run-fixtures.js",
+    "lint": "npx eslint . --ext .js",
+    "start": "node cli.js"
   },
   "files": ["dist"],
   "keywords": ["sass", "insight", "cli", "nexus", "dependency-graph"],
