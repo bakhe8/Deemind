@@ -1,0 +1,26 @@
+{
+  "cases": [
+    {
+      "name": "demo",
+      "input": "input/fixtures/demo",
+      "expected": "output/snapshots_expected/demo",
+      "buildCommand": "npm run deemind:build demo"
+    }
+  ],
+  "compare": {
+    "includeExtensions": [".twig", ".html", ".json", ".css", ".js"],
+    "ignorePaths": [
+      "**/.DS_Store",
+      "**/*.map"
+    ],
+    "ignoreJsonKeys": [
+      "timestamp",
+      "buildDate",
+      "commit",
+      "checksum",
+      "environment"
+    ],
+    "normalizeWhitespace": true
+  }
+}
+

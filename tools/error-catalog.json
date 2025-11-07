@@ -1,0 +1,8 @@
+[
+  { "id": "missing-assets", "pattern": "missing asset(s)?|missing-assets|asset references not found" },
+  { "id": "i18n", "pattern": "unwrapped visible text|i18n" },
+  { "id": "sample-strings", "pattern": "Sample placeholder string|Lorem ipsum" },
+  { "id": "dependency-cycle", "pattern": "cycle detected|Include/extends cycle" },
+  { "id": "encoding", "pattern": "Invalid UTF-8" }
+]
+

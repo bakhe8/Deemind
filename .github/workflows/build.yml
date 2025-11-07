@@ -20,7 +20,18 @@ jobs:
       - run: npm run lint
       - run: npm run deemind:build demo
       - run: npm run deemind:test
-      - name: Run Doctor (post-failure or errors)
+      - name: Deemind doctor (validate → fix → revalidate)
+        run: npm run deemind:doctor
+      - name: Append validation log to history
+        run: |
+          mkdir -p logs/history
+          ts=$(date +%Y%m%d-%H%M%S)
+          if [ -f logs/deemind_validation.log ]; then cp logs/deemind_validation.log logs/history/$ts.log; fi
+      - name: Snapshot tests
+        run: npm run test:snapshots
+      - name: Flaky detector
+        run: npm run test:flaky
+      - name: Run Doctor (issue + delta)
         run: |
           node tools/doctor.js || echo "doctor exit code non-zero (remaining issues)"
         env:
@@ -43,3 +54,5 @@ jobs:
         with:
           name: telemetry
           path: logs/telemetry.json
+
+
