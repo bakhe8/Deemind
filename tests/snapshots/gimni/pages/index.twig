@@ -1,0 +1,1626 @@
+{% extends "layout/default.twig" %}
+{% block content %}
+<!DOCTYPE html><!-- 
+  ============================================================================
+  FILE:           ultimate-store-theme.html
+  DESCRIPTION:    Consolidated Single-File E-commerce Theme
+  AUTHOR:         Gemini
+  VERSION:        1.3
+
+  CHANGELOG:
+  - v1.0: Initial merge of all features.
+  - v1.1: Removed hero wave divider.
+  - v1.2: Updated card hover effect to remove border color change.
+  - v1.3: Applied new design principles:
+          - Made product card CTA ("Add to Cart") always visible.
+          - Established clear visual hierarchy for card actions.
+          - Added loading="lazy" and decoding="async" to dynamic images.
+          - Added accessibility labels (aria-label) to icon buttons.
+
+  FEATURES INCLUDED (as per user's master list):
+  - I.   FOUNDATIONAL ARCHITECTURE:
+    - Tailwind CSS, Swiper.js, AOS.js, Font Awesome, Google Fonts
+    - Vanilla JavaScript (ES6+)
+    - Mobile-First, Single-File Build
+  - II.  BRANDING & UI:
+    - CSS Animated Logo (NeedsBoxes)
+    - Dark/Light Mode Engine (with localStorage persistence)
+    - RTL/LTR Bidirectional Support (with localStorage persistence)
+    - Typography (Tajawal, Almarai, Inter)
+    - Glass-morphism, Scroll Animations (AOS)
+  - III. LAYOUT & NAVIGATION:
+    - Sticky Header with Blur
+    - Mobile Sidebar (Hamburger Menu)
+    - Mobile Bottom Tab Bar (for key actions)
+    - Multi-column Footer with Payment Logos
+  - IV.  HERO & PROMOTIONAL:
+    - Multi-slide Swiper Hero Section (Straight bottom edge)
+    - "Deal of the Day" section with Live Countdown Timer
+    - Promotional Offers Swiper
+    - Category Banners Grid
+    - Top Trust Bar
+  - V.   PRODUCT CATALOG:
+    - JavaScript-based product database
+    - Filtering: Category, Price Range (Min/Max), Real-time Search
+    - Sorting: Popularity, Price (asc/desc), Rating, Newest
+    - Product Card: **Always-visible primary CTA**, hover effects, badges, rating, price, stock
+    - Quick View Modal: Advanced modal with tabs for:
+      - Media (Images, Video, User Photos)
+      - Info (Description, Specs, Shipping)
+      - Upsell/Cross-sell component
+    - Skeleton Shimmer Loaders
+  - VI.  SHOPPING CART:
+    - Slide-out Mini-Cart Drawer
+    - Real-time cart updates and total calculation
+    - "Add to Cart" toast notifications with icon jiggle feedback
+    - Cart persistence via localStorage
+  - VII. CUSTOMER EXPERIENCE:
+    - Testimonials Swiper
+    - FAQ Section (using native <details> accordion)
+    - Contact Form & Info
+    - Floating WhatsApp Button (with pulse animation)
+    - Newsletter Subscription
+  - X.   ACCESSIBILITY (a11y):
+    - Skip-to-content link
+    - ARIA labels for all interactive elements
+    - aria-modal="true" for dialogs
+    - Semantic HTML (<main>, <section>, etc.)
+  - XII. PERFORMANCE:
+    - Lazy loading and async decoding for all product/offer images.
+  ============================================================================
+--><html lang="ar" dir="rtl" data-theme="light"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% trans %}NeedsBoxes — The Ultimate Merged E-commerce Store{% endtrans %}</title>
+  <meta name="description" content="The ultimate single-file e-commerce theme merging all requested features: Dark/Light Mode, RTL/LTR, Swiper Hero, Countdown, Full Product Filtering &amp; Sorting, Advanced Quick View Modal, Mini-Cart, and more.">
+  <meta name="theme-color" content="#0D2C6C">
+
+  <!-- 
+    I. FOUNDATIONAL ARCHITECTURE
+    1. Technology Stack: Fonts & Icons
+  -->
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&amp;family=Almarai:wght@400;700;800&amp;family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+  <!-- 1. Technology Stack: Swiper & AOS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+
+  <!-- 1. Technology Stack: Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Tailwind Configuration -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class', // Matches [data-theme="dark"] selector in CSS
+      theme: {
+        extend: {
+          colors: {
+            // 3. Design Tokens & Global Variables
+            primary: {
+              dark: '#0D2C6C',
+              blue: '#0D2C6C',
+            },
+            accent: {
+              coral: '#FF9E1B',
+              orange: '#F36C21',
+              ultralight: '#fffaf5',
+            },
+            neutral: {
+              light: '#f8f9fa',
+              ink: '#333333'
+            },
+            text: {
+              dark: '#333333'
+            },
+            success: '#22c55e',
+            danger: '#ef4444',
+            error: '#ef4444',
+            navy: '#11224E',
+            grayx: '#E9E9E9',
+            ink: '#111827'
+          },
+          boxShadow: {
+            glow: '0 10px 30px rgba(13,44,108,.22)',
+            orange: '0 10px 28px rgba(255,158,27,.28)',
+            nb: '0 10px 30px rgba(250,129,47,0.15)',
+            soft: '0 10px 30px rgba(0,0,0,.10)',
+            coral: '0 10px 28px rgba(255,158,27,.30)',
+          },
+          backgroundImage: {
+            'brand-blue': 'linear-gradient(135deg, #0D2C6C, #1E40AF)',
+            'nb-hero': 'linear-gradient(135deg, #0D2C6C 0%, #1E40AF 65%)',
+            'nb-coral': 'linear-gradient(135deg, #FF9E1B, #F36C21)',
+            'nb-glass': 'linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.05))',
+            hero: 'linear-gradient(135deg, #0046FF 0%, #11224E 75%)',
+            stripe: 'repeating-linear-gradient(135deg, rgba(255,255,255,.10) 0 6px, rgba(255,255,255,.04) 6px 16px)'
+          },
+          borderRadius: {
+            'xl': '1rem',
+            '2xl': '1.25rem',
+            '3xl': '1.5rem',
+          },
+          // 3. Design & Micro-Interactions
+          keyframes: {
+            shimmer: { '0%': { transform: 'translateX(-100%)' }, '100%': { transform: 'translateX(100%)' } },
+            cartJiggle: { '0%': { transform: 'scale(1)' }, '25%': { transform: 'scale(1.1) rotate(5deg)' }, '50%': { transform: 'scale(1.1) rotate(-5deg)' }, '75%': { transform: 'scale(1.1) rotate(5deg)' }, '100%': { transform: 'scale(1)' } },
+            spin: { 'to': { transform: 'rotate(360deg)' } },
+            // 1. Branding & Logo Animation
+            bump: { '0%':{transform:'scale(1)'}, '50%':{transform:'scale(1.06)'}, '100%':{transform:'scale(1)'} },
+            elementRise: { '0%': { transform: 'translateY(20px)', opacity: 0 }, '100%': { transform: 'translateY(0)', opacity: 1 } },
+            boxReveal: { '0%': { transform: 'scale(0.8)', opacity: 0 }, '100%': { transform: 'scale(1)', opacity: 1 } },
+            // 4. Contact & Communication (WhatsApp Pulse)
+            pulse: { '0%': { boxShadow: '0 0 0 0 rgba(37, 211, 102, 0.7)' }, '70%': { boxShadow: '0 0 0 15px rgba(37, 211, 102, 0)' }, '100%': { boxShadow: '0 0 0 0 rgba(37, 211, 102, 0)' } },
+          },
+          animation: {
+            'cart-jiggle': 'cartJiggle .5s ease', 
+            spin: 'spin 1s ease-in-out infinite', 
+            bump:'bump .35s ease', 
+            pulse:'pulse 2s infinite',
+            shimmer: 'shimmer 1.5s infinite',
+          },
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Styles (Global) -->
+  <style>
+    /* I. FOUNDATIONAL ARCHITECTURE
+      3. Design Tokens & Global Variables
+      4. Dynamic Theming Engine
+    */
+    :root {
+      --primary-dark: #0D2C6C;
+      --primary-blue: #0D2C6C;
+      --accent-coral: #FF9E1B;
+      --accent-orange-dark: #F36C21;
+      --neutral-light: #f8f9fa;
+      --text-dark: #333333;
+      --accent-ultralight: #fffaf5;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --border-radius: 12px;
+      /* 2. Typography System */
+      --font-main: 'Tajawal', sans-serif;
+      --font-heading: 'Almarai', sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --primary-dark: #1e3a8a;
+      --primary-blue: #1e3a8a;
+      --accent-coral: #fdba74;
+      --accent-orange-dark: #fb923c;
+      --neutral-light: #0f1422; /* Darker background */
+      --text-dark: #e2e8f0;
+      --accent-ultralight: #2a2d38; /* Darker accent */
+      --success: #2ed573;
+      --danger: #ff6b6b;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-main);
+      background-color: var(--neutral-light);
+      color: var(--text-dark);
+      transition: background-color 0.3s, color 0.3s;
+    }
+    
+    /* 2. Typography System */
+    h1, h2, h3, h4 {
+      font-family: var(--font-heading); 
+      color: var(--primary-dark); 
+      transition: color 0.3s;
+    }
+    [data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3, [data-theme="dark"] h4 { 
+      color: var(--accent-coral); 
+    }
+    [dir="ltr"] body { font-family: 'Inter', sans-serif; }
+    [dir="ltr"] h1, [dir="ltr"] h2, [dir="ltr"] h3, [dir="ltr"] h4 { font-family: 'Inter', sans-serif; font-weight: 700; }
+
+    .container{max-width:1240px}
+    
+    /* 4. Visual Enhancements: Frosted Glass */
+    .glass{
+      backdrop-filter: blur(10px); 
+      -webkit-backdrop-filter: blur(10px); 
+      background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.05));
+    }
+    
+    /* 10. PERFORMANCE: Skeleton Loaders */
+    .skeleton{position:relative;overflow:hidden;background:#e6e6e6;border-radius:10px}
+    .skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);animation:shimmer 1.5s infinite}
+    [data-theme="dark"] .skeleton { background: #333; }
+    [data-theme="dark"] .skeleton::after { background:linear-gradient(90deg, transparent, rgba(80, 80, 80, 0.6), transparent); }
+
+    .rating i{color:#F59E0B}
+    .line-clamp-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    
+    /* 6. Accessibility & Inclusivity (a11y) */
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .sr-only:focus {
+        display: inline-block; padding: 1rem; width: auto; height: auto;
+        clip: auto; white-space: normal; background: var(--primary-dark);
+        color: white; font-weight: bold; z-index: 10000;
+        top: 10px; right: 10px;
+    }
+    
+    /* 3. Design & Micro-Interactions: Section Dividers */
+    .salla-section-title{position:relative;display:inline-block}
+    .salla-section-title::after{content:'';position:absolute;bottom:-10px;right:50%;transform:translateX(50%);width:80px;height:3px;background:linear-gradient(90deg, var(--primary-dark), var(--accent-coral)); transition: all 0.3s;}
+    [data-theme="dark"] .salla-section-title::after { background:linear-gradient(90deg, var(--accent-coral), var(--primary-dark)); }
+    
+    /* III. LAYOUT & NAVIGATION SYSTEM
+      1. Header & Navigation: Sidebar
+    */
+    .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:40;opacity:0;visibility:hidden;transition:all .3s ease-in-out}
+    .sidebar-overlay.active{opacity:1;visibility:visible}
+    .sidebar{position:fixed;top:0;right:-300px;width:300px;max-width:85vw;height:100%;background:#fff;z-index:50;transition:right .3s ease-in-out, left .3s ease-in-out;display:flex;flex-direction:column;box-shadow:-2px 0 10px rgba(0,0,0,.1)}
+    /* 5. Dual Language & Direction Support */
+    [dir="ltr"] .sidebar{right:auto;left:-300px}
+    .sidebar.active{right:0}
+    [dir="ltr"] .sidebar.active{left:0}
+    [data-theme="dark"] .sidebar { background: #1a1d28; }
+
+    /* VI. SHOPPING CART, CHECKOUT & PAYMENT FLOW
+      1. Mini-Cart Drawer
+    */
+    .mini-cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:98;opacity:0;visibility:hidden;transition:all .3s ease-in-out}
+    .mini-cart-overlay.active{opacity:1;visibility:visible}
+    .mini-cart{position:fixed;top:0;right:-400px;width:400px;max-width:90vw;height:100%;background:#fff;z-index:99;transition:right .3s ease-in-out, left .3s ease-in-out;display:flex;flex-direction:column;box-shadow:2px 0 15px rgba(0,0,0,.1)}
+    /* 5. Dual Language & Direction Support */
+    [dir="ltr"] .mini-cart{right:auto;left:-400px}
+    .mini-cart.active{right:0}
+    [dir="ltr"] .mini-cart.active{left:0}
+    [data-theme="dark"] .mini-cart{background:#1a1d28}
+    
+    /* V. PRODUCT CATALOG & DISCOVERY ENGINE
+      5. Quick View Modal
+    */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .3s ease-in-out;padding:1rem}
+    .modal-overlay.active{opacity:1;visibility:visible}
+    .modal-card{background:#fff;border-radius:var(--border-radius);width:100%;max-width:900px;max-height:90vh;overflow:auto;transform:scale(.96);transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275)}
+    .modal-overlay.active .modal-card{transform:scale(1)}
+    [data-theme="dark"] .modal-card{background:#1a1d28}
+    .modal-tab-btn{border-bottom:3px solid transparent;padding-bottom:.5rem;opacity:.6; transition: all 0.2s;}
+    .modal-tab-btn.active{border-color:var(--accent-coral);opacity:1;font-weight:bold}
+    .modal-tab-panel{display:none}
+    .modal-tab-panel.active{display:block; animation: fadeIn 0.3s ease;}
+    
+    /* V. PRODUCT CATALOG & DISCOVERY ENGINE
+      3. Product Card Components (Refined per Design Principles)
+    */
+    .salla-product-card {
+      background: #fff;
+      border-radius: var(--border-radius);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      border: 1px solid #e0e8ff;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column; /* Ensure card is a flex column */
+    }
+    .salla-product-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 15px 30px rgba(13, 44, 108, 0.12);
+    }
+    .salla-product-image {
+      height: 250px;
+      overflow: hidden;
+      display: block; /* Make it a block element for the link */
+    }
+    .salla-product-image img {
+      transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+    .salla-product-card:hover .salla-product-image img {
+      transform: scale(1.05);
+    }
+    .salla-product-content {
+      padding: 1rem;
+      space-y: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1; /* Allow content to grow */
+    }
+    .salla-product-details {
+      flex-grow: 1; /* Pushes actions to the bottom */
+    }
+    
+    [data-theme="dark"] .salla-product-card {
+      background: #222530;
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    [data-theme="dark"] .salla-product-card:hover {
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+    .salla-product-badge {
+      background: linear-gradient(135deg, var(--accent-coral) 0%, var(--accent-orange-dark) 100%);
+      color: #111827;
+    }
+    
+    /* Principle 3 (Visual Hierarchy) & 7 (Strong CTAs)
+      Primary "Add to Cart" button, always visible.
+    */
+    .salla-add-to-cart {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-blue) 100%);
+      transition: all 0.3s ease;
+      width: 100%;
+      text-align: center;
+      padding: 0.625rem; /* 10px */
+      border-radius: 0.75rem; /* 12px */
+      font-weight: 700;
+      color: white;
+      font-size: 0.875rem; /* 14px */
+    }
+    .salla-add-to-cart:hover {
+      background: linear-gradient(135deg, var(--accent-coral) 0%, var(--accent-orange-dark) 100%);
+      color: var(--primary-dark);
+      transform: scale(1.05);
+    }
+    .salla-add-to-cart:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+      transform: none;
+      opacity: 0.7;
+    }
+    
+    /* Secondary icon buttons */
+    .salla-icon-btn {
+      padding: 0.625rem; /* 10px */
+      border-radius: 0.75rem; /* 12px */
+      border: 1px solid #e0e8ff;
+      background-color: #fff;
+      transition: all 0.2s ease;
+    }
+    .salla-icon-btn:hover {
+      border-color: var(--accent-coral);
+      color: var(--accent-coral);
+    }
+    [data-theme="dark"] .salla-icon-btn {
+      background-color: #222530;
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Stock Status */
+    .out-of-stock { opacity: 0.6; filter: grayscale(80%); }
+    .out-of-stock-badge { 
+      background: #4b5563; color: white; position: absolute; top: 50%; 
+      left: 50%; transform: translate(-50%, -50%); padding: 0.25rem 0.75rem; 
+      border-radius: 99px; font-size: 0.875rem; font-weight: bold; z-index: 5; 
+    }
+
+    /* 2. Filtering & Sorting */
+    .product-filter-btn { background-color: #fff; border: 1px solid #e0e8ff; color: var(--text-dark); transition: all 0.3s ease; }
+    .product-filter-btn.active-filter { background-color: var(--primary-dark); color: white; border-color: var(--primary-dark); transform: scale(1.05); }
+    [data-theme="dark"] .product-filter-btn { background-color: #222530; border-color: rgba(255,255,255,.1); }
+    [data-theme="dark"] .product-filter-btn.active-filter { background-color: var(--accent-coral); color: #111827; border-color: var(--accent-coral); }
+
+    /* II. BRANDING, VISUAL DESIGN & UI
+      1. Branding & Logo Animation
+    */
+    .needsbox-logo{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+    .needsbox-box{position:relative;width:24px;height:16px;background:linear-gradient(to bottom, var(--accent-coral), var(--accent-orange-dark));border-radius:2px;animation:bump 1s ease-out}
+    .needsbox-item{position:absolute;background-color:var(--primary-dark);animation:elementRise 1s ease-out .5s both}
+    [data-theme="dark"] .needsbox-item { background-color: var(--neutral-light); }
+    .needsbox-usb{left:2px;bottom:-4px;width:6px;height:10px;border-radius:1px 1px 0 0}
+    .needsbox-bulb{left:50%;transform:translateX(-50%);bottom:-6px;width:8px;height:10px;border-radius:4px 4px 2px 2px;animation-delay:.7s}
+    .needsbox-headphones{right:4px;bottom:-5px;width:10px;height:8px;border-radius:4px 4px 2px 2px;animation-delay:.9s}
+    
+    /* 1. Hero Section (Swiper) */
+    .hero-swiper .swiper-pagination-bullet {
+      background: white; opacity: 0.5;
+    }
+    .hero-swiper .swiper-pagination-bullet-active {
+      background: var(--accent-coral) !important;
+      opacity: 1;
+      transform: scale(1.2);
+    }
+    
+    /* Toast Notification */
+    .toast {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 2000;
+        padding: 12px 16px;
+        background: var(--primary-dark);
+        color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        opacity: 0;
+        transition: all 0.3s ease;
+        visibility: hidden;
+    }
+    .toast.show {
+        bottom: 80px; /* Adjust for mobile tab bar */
+        opacity: 1;
+        visibility: visible;
+    }
+    @media (min-width: 768px) {
+      .toast.show {
+        bottom: 40px;
+      }
+    }
+    [data-theme="dark"] .toast {
+        background: var(--accent-coral);
+        color: var(--primary-dark);
+    }
+    .toast.error {
+      background: var(--danger) !important;
+      color: white !important;
+    }
+
+    /* Animation Fade In */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="selection:bg-[var(--accent-coral)]/30">
+  <!-- 6. Accessibility & Inclusivity (a11y) -->
+  <a href="#main-content" class="sr-only">{% trans %}انتقل إلى المحتوى الرئيسي{% endtrans %}</a>
+
+  <!-- 
+    IV. HERO, PROMOTIONAL & TRUST SECTIONS
+    3. Urgency & Trust Elements: Top Trust Bar
+  -->
+  <div class="hidden md:block bg-[#07173f] text-white text-sm dark:bg-gray-900">
+    <div class="container mx-auto px-4 py-2 flex items-center justify-between">
+      <p>شحن سريع — دفع آمن — منتجات أصلية 100%</p>
+      <div class="flex items-center gap-4">
+        <span class="flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> ضمان سنة</span>
+        <span class="flex items-center gap-2"><i class="fa-solid fa-truck-fast"></i> توصيل خلال 48 ساعة*</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 
+    III. LAYOUT & NAVIGATION SYSTEM
+    1. Header & Navigation
+  -->
+  <header class="sticky top-0 z-30 backdrop-blur supports-[backdrop-filter]:bg-white/70 bg-white/90 border-b border-gray-200/70 dark:bg-[#0f1422]/70 dark:border-white/10">
+    <div class="container mx-auto px-4 py-3 flex items-center gap-3 justify-between">
+      <!-- Left Side: Menu + Logo -->
+      <div class="flex items-center gap-3">
+        <button id="sidebarToggle" class="lg:hidden px-3 py-2 rounded-xl bg-white ring-1 ring-gray-200 hover:bg-gray-50 dark:bg-gray-700 dark:ring-white/10 dark:hover:bg-gray-600" aria-label="{{ &quot;Menu&quot; | t }}"><i class="fa-solid fa-bars"></i></button>
+        <a href="#" class="flex items-center gap-2" aria-label="{{ &quot;Home&quot; | t }}">{% trans %}NEEDS BOXES{% endtrans %}</a>
+        <nav class="hidden lg:flex items-center gap-6 font-semibold" aria-label="{{ &quot;Main Navigation&quot; | t }}">
+          <a class="hover:text-[var(--primary-blue)] dark:hover:text-[var(--accent-coral)] transition-colors duration-200" href="#offers">{% trans %}العروض{% endtrans %}</a>
+          <a class="hover:text-[var(--primary-blue)] dark:hover:text-[var(--accent-coral)] transition-colors duration-200" href="#categories">{% trans %}التصنيفات{% endtrans %}</a>
+          <a class="hover:text-[var(--primary-blue)] dark:hover:text-[var(--accent-coral)] transition-colors duration-200" href="#featured-products">{% trans %}المميزة{% endtrans %}</a>
+          <a class="hover:text-[var(--primary-blue)] dark:hover:text-[var(--accent-coral)] transition-colors duration-200" href="#all-products">{% trans %}المنتجات{% endtrans %}</a>
+          <a class="hover:text-[var(--primary-blue)] dark:hover:text-[var(--accent-coral)] transition-colors duration-200" href="#faq">{% trans %}الأسئلة{% endtrans %}</a>
+        </nav>
+      </div>
+      <!-- Right Side: Search + Actions -->
+      <div class="flex items-center gap-2">
+        <div class="relative hidden md:block">
+          <input id="searchInput" class="peer w-64 px-4 py-2 rounded-full border dark:border-white/10 dark:bg-gray-700 outline-none focus:ring-2 focus:ring-[var(--primary-blue)]" placeholder="ابحث عن المنتجات…" aria-label="{{ &quot;Search products&quot; | t }}">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" aria-hidden="true"></i>
+        </div>
+        <!-- 5. Dual Language & Direction Support -->
+        <button id="dirToggle" class="px-3 py-2 rounded-xl bg-white ring-1 ring-gray-200 hover:bg-gray-50 dark:bg-gray-700 dark:ring-white/10 dark:hover:bg-gray-600" aria-label="{{ &quot;Toggle Language Direction&quot; | t }}">
+          <i class="fa-solid fa-language"></i>
+        </button>
+        <!-- 4. Dynamic Theming Engine -->
+        <button id="themeToggle" class="px-3 py-2 rounded-xl bg-white ring-1 ring-gray-200 hover:bg-gray-50 dark:bg-gray-700 dark:ring-white/10 dark:hover:bg-gray-600" aria-label="{{ &quot;Toggle Dark Mode&quot; | t }}">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <!-- 1. Mini-Cart Drawer -->
+        <button id="cartBtn" class="px-4 py-2 rounded-full text-white bg-gradient-to-r from-[var(--accent-coral)] to-[var(--accent-orange-dark)] hover:shadow-lg shadow-coral flex items-center gap-2" aria-label="{{ &quot;View Cart&quot; | t }}">{% trans %}0{% endtrans %}</button>
+      </div>
+    </div>
+    <!-- Decorative bottom border -->
+    <div class="h-[2px] bg-gradient-to-r from-[var(--primary-dark)] via-[var(--accent-coral)] to-[var(--primary-dark)]" aria-hidden="true"></div>
+  </header>
+
+  <!-- 1. Header & Navigation: Sidebar (Mobile Menu) -->
+  <div id="sidebarOverlay" class="sidebar-overlay" aria-hidden="true"></div>
+  <aside id="sidebar" class="sidebar" aria-label="{{ &quot;Site menu&quot; | t }}">
+    <div class="p-4 border-b border-gray-200/70 dark:border-white/10 flex items-center justify-between">
+      <h2 class="font-extrabold text-lg text-[var(--primary-dark)] dark:text-[var(--accent-coral)]">{% trans %}NEEDS BOXES{% endtrans %}</h2>
+      <button id="sidebarClose" class="text-2xl" aria-label="{{ &quot;Close&quot; | t }}"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="p-4 space-y-3 overflow-y-auto">
+      <div class="mb-2"><input id="mobileSearch" type="search" placeholder="ابحث…" class="w-full px-4 py-2.5 rounded-full border dark:border-white/10 dark:bg-gray-700 bg-white/90 focus:outline-none focus:ring-2 focus:ring-[var(--primary-blue)]" aria-label="{{ &quot;Search&quot; | t }}"></div>
+      <a class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200" href="#">{% trans %}الرئيسية{% endtrans %}</a>
+      <a class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200" href="#categories">{% trans %}التصنيفات{% endtrans %}</a>
+      <a class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200" href="#featured-products">{% trans %}المميزة{% endtrans %}</a>
+      <a class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200" href="#all-products">{% trans %}كل المنتجات{% endtrans %}</a>
+      <a class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200" href="#testimonials">{% trans %}آراء العملاء{% endtrans %}</a>
+      <a class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200" href="#faq">{% trans %}الأسئلة{% endtrans %}</a>
+      <a class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200" href="#contact">{% trans %}تواصل{% endtrans %}</a>
+    </div>
+  </aside>
+
+  <main id="main-content">
+    <!-- 
+      IV. HERO, PROMOTIONAL & TRUST SECTIONS
+      1. Hero Section (Swiper)
+    -->
+    <section id="hero" class="relative h-[70vh] min-h-[500px] overflow-hidden bg-brand-blue text-white" aria-label="{{ &quot;عرض الشركة&quot; | t }}">
+      <div class="swiper hero-swiper w-full h-full">
+        <div class="swiper-wrapper">
+          <!-- Slide 1 -->
+          <div class="swiper-slide">
+            <div class="hero-slide relative h-full flex items-center justify-center text-center">
+              <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&amp;w=2070&amp;auto=format&amp;fit=crop" alt="{{ &quot;خلفية&quot; | t }}" class="absolute inset-0 w-full h-full object-cover opacity-20" loading="eager">
+              <div class="hero-content relative z-10 max-w-2xl p-8" data-aos="fade-up">
+                <h1 class="hero-title text-3xl sm:text-5xl mb-4 font-extrabold text-white">{% trans %}الأجهزة التي تثق بها{% endtrans %}</h1>
+                <p class="hero-subtitle text-lg sm:text-xl mb-8 opacity-90">اكتشف مجموعتنا من الإلكترونيات عالية الجودة والملحقات المبتكرة.</p>
+                <a href="#featured-products" class="hero-cta inline-block bg-white text-primary-dark px-8 py-3 rounded-full text-lg font-bold shadow-lg hover:bg-gray-100 transition-all hover:-translate-y-0.5">{% trans %}تسوق الآن{% endtrans %}</a>
+              </div>
+            </div>
+          </div>
+          <!-- Slide 2 -->
+          <div class="swiper-slide">
+            <div class="hero-slide relative h-full flex items-center justify-center text-center">
+              <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&amp;w=2070&amp;auto=format&amp;fit=crop" alt="{{ &quot;خلفية&quot; | t }}" class="absolute inset-0 w-full h-full object-cover opacity-20">
+              <div class="hero-content relative z-10 max-w-2xl p-8" data-aos="fade-up">
+                <h1 class="hero-title text-3xl sm:text-5xl mb-4 font-extrabold text-white">{% trans %}عروض وتخفيضات حصرية{% endtrans %}</h1>
+                <p class="hero-subtitle text-lg sm:text-xl mb-8 opacity-90">استفد من عروضنا الحصرية وتوصيل سريع لجميع أنحاء المملكة.</p>
+                <a href="#offers" class="hero-cta inline-block bg-white text-primary-dark px-8 py-3 rounded-full text-lg font-bold shadow-lg hover:bg-gray-100 transition-all hover:-translate-y-0.5">{% trans %}استعرض العروض{% endtrans %}</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="swiper-pagination"></div>
+      </div>
+    </section>
+
+    <!-- 
+      IV. HERO, PROMOTIONAL & TRUST SECTIONS
+      2. Promotional Banners (Swiper)
+    -->
+    <section id="offers" class="py-10">
+      <div class="container mx-auto px-4">
+        <div class="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-white/10 p-4 sm:p-6 shadow-soft">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-extrabold">{% trans %}العروض الخاصة{% endtrans %}</h2>
+            <a href="#all-products" class="text-[var(--primary-dark)] dark:text-accent-coral font-semibold hover:underline">{% trans %}عرض الكل{% endtrans %}</a>
+          </div>
+          <div class="swiper offers-swiper">
+            <div class="swiper-wrapper" id="offers-wrapper">
+              <!-- Skeletons for offers -->
+              <div class="swiper-slide"><div class="skeleton h-64 rounded-2xl"></div></div>
+              <div class="swiper-slide"><div class="skeleton h-64 rounded-2xl"></div></div>
+              <div class="swiper-slide"><div class="skeleton h-64 rounded-2xl"></div></div>
+            </div>
+            <div class="swiper-pagination mt-4 relative"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 
+      IV. HERO, PROMOTIONAL & TRUST SECTIONS
+      3. Urgency & Trust Elements: "Deal of the Day"
+    -->
+    <section class="py-12 bg-accent-ultralight dark:bg-black/20" data-aos="fade-up" data-aos-delay="100">
+      <div class="container mx-auto px-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden flex flex-col md:flex-row items-center p-6 md:p-8">
+          <!-- Product Image -->
+          <div class="w-full md:w-1/3 mb-4 md:mb-0">
+            <img src="https://cdn.salla.sa/mQbARj/2w1sSRRfycRdql1J5TMiIlC1EiOaFAGM8dkCu4yT.jpg" alt="{{ &quot;Deal of the Day&quot; | t }}" class="rounded-xl object-cover w-full" loading="lazy" decoding="async">
+          </div>
+          <!-- Deal Details -->
+          <div class="w-full md:w-2/3 text-center md:text-right md:pr-8">
+            <span class="inline-block bg-accent-coral text-white text-sm font-bold px-4 py-1 rounded-full mb-3">عرض اليوم</span>
+            <h2 class="font-heading text-3xl font-extrabold mb-2">{% trans %}سماعة M90 Pro اللاسلكية{% endtrans %}</h2>
+            <p class="text-gray-600 dark:text-gray-300 mb-4">تجربة صوتية لا مثيل لها مع شاشة LED لمعرفة الشحن. احصل عليها الآن!</p>
+            <div class="flex items-center justify-center md:justify-start gap-3 mb-4">
+              <span class="text-primary-dark dark:text-white font-bold text-3xl">٤٠ ر.س</span>
+              <span class="text-gray-400 line-through text-xl">٧٥ ر.س</span>
+            </div>
+            <!-- Countdown Timer -->
+            <div class="mb-5">
+              <p class="font-bold text-gray-700 dark:text-gray-300 mb-2">ينتهي العرض خلال:</p>
+              <div id="countdown-timer" class="flex justify-center md:justify-start gap-2 text-center" aria-label="{{ &quot;Time left for deal&quot; | t }}">
+                <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-xl min-w-[70px]"><span id="countdown-days" class="text-2xl font-bold text-primary-dark dark:text-white block">--</span><span class="text-xs text-gray-600 dark:text-gray-400">أيام</span></div>
+                <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-xl min-w-[70px]"><span id="countdown-hours" class="text-2xl font-bold text-primary-dark dark:text-white block">--</span><span class="text-xs text-gray-600 dark:text-gray-400">ساعات</span></div>
+                <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-xl min-w-[70px]"><span id="countdown-minutes" class="text-2xl font-bold text-primary-dark dark:text-white block">--</span><span class="text-xs text-gray-600 dark:text-gray-400">دقائق</span></div>
+                <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-xl min-w-[70px]"><span id="countdown-seconds" class="text-2xl font-bold text-primary-dark dark:text-white block">--</span><span class="text-xs text-gray-600 dark:text-gray-400">ثواني</span></div>
+              </div>
+            </div>
+            <!-- CTA -->
+            <button class="salla-add-to-cart inline-block bg-gradient-to-l from-accent-coral to-accent-orange text-white px-8 py-3 rounded-full font-heading font-bold text-lg shadow-nb hover:shadow-lg hover:from-accent-orange-dark hover:to-accent-coral transition-all hover:-translate-y-0.5" data-add="p2">{% trans %}أضف للسلة الآن{% endtrans %}</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 
+      IV. HERO, PROMOTIONAL & TRUST SECTIONS
+      2. Promotional Banners (Categories)
+    -->
+    <section id="categories" class="py-12">
+      <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <a href="#all-products" class="group relative rounded-2xl overflow-hidden bg-white border dark:border-white/10 dark:bg-gray-800 shadow-soft hover:shadow-nb min-h-[160px] flex flex-col justify-end p-6 transition-all duration-300 hover:-translate-y-1" data-cat-filter="audio">{% trans %}صوتيات احترافية ومحمولة{% endtrans %}</a>
+        <a href="#all-products" class="group relative rounded-2xl overflow-hidden bg-white border dark:border-white/10 dark:bg-gray-800 shadow-soft hover:shadow-nb min-h-[160px] flex flex-col justify-end p-6 transition-all duration-300 hover:-translate-y-1" data-cat-filter="lighting">{% trans %}إضاءة وشواحن LED و RGB{% endtrans %}</a>
+        <a href="#all-products" class="group relative rounded-2xl overflow-hidden bg-white border dark:border-white/10 dark:bg-gray-800 shadow-soft hover:shadow-nb min-h-[160px] flex flex-col justify-end p-6 transition-all duration-300 hover:-translate-y-1" data-cat-filter="accessory">{% trans %}اكسسوارات تنظيم ومنافذ{% endtrans %}</a>
+      </div>
+    </section>
+
+    <!-- 
+      V. PRODUCT CATALOG & DISCOVERY ENGINE
+      4. Product Grid (Featured)
+    -->
+    <section id="featured-products" class="py-12">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-8">
+          <h2 class="salla-section-title text-3xl font-extrabold inline-block relative pb-3">{% trans %}المنتجات المميزة{% endtrans %}</h2>
+        </div>
+        <ul id="featured-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <!-- Skeletons for Featured Products -->
+          <li class="skeleton h-[420px] rounded-2xl"></li>
+          <li class="skeleton h-[420px] rounded-2xl"></li>
+          <li class="skeleton h-[420px] rounded-2xl hidden sm:block"></li>
+          <li class="skeleton h-[420px] rounded-2xl hidden lg:block"></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 
+      V. PRODUCT CATALOG & DISCOVERY ENGINE
+      2. Filtering & Sorting
+      4. Product Grid (All Products)
+    -->
+    <section id="all-products" class="py-12 bg-white/60 dark:bg-black/10">
+      <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-3 mb-5">
+          <!-- Filters -->
+          <div class="flex items-center gap-2 flex-wrap justify-center">
+            <button class="product-filter-btn px-3 py-1.5 rounded-full active-filter" data-cat="all">{% trans %}الكل{% endtrans %}</button>
+            <button class="product-filter-btn px-3 py-1.5 rounded-full" data-cat="audio">{% trans %}صوتيات{% endtrans %}</button>
+            <button class="product-filter-btn px-3 py-1.5 rounded-full" data-cat="lighting">{% trans %}إضاءة{% endtrans %}</button>
+            <button class="product-filter-btn px-3 py-1.5 rounded-full" data-cat="charging">{% trans %}شحن{% endtrans %}</button>
+            <button class="product-filter-btn px-3 py-1.5 rounded-full" data-cat="accessory">{% trans %}اكسسوارات{% endtrans %}</button>
+          </div>
+          <!-- Sorting & Price -->
+          <div class="flex flex-col sm:flex-row items-center gap-3">
+            <select id="sortSelect" class="px-3 py-2 rounded-xl border dark:border-white/10 dark:bg-gray-700 w-full sm:w-auto" aria-label="{{ &quot;Sort products&quot; | t }}">
+              <option value="pop">الأكثر رواجًا</option>
+              <option value="priceAsc">السعر: من الأقل للأعلى</option>
+              <option value="priceDesc">السعر: من الأعلى للأقل</option>
+              <option value="rating">الأعلى تقييمًا</option>
+              <option value="new">الأحدث</option>
+            </select>
+            <div class="flex items-center gap-2">
+              <input id="priceMin" type="number" min="0" placeholder="أقل سعر" class="px-3 py-2 rounded-xl border dark:border-white/10 dark:bg-gray-700 w-28" aria-label="{{ &quot;Minimum price&quot; | t }}">
+              <input id="priceMax" type="number" min="0" placeholder="أعلى سعر" class="px-3 py-2 rounded-xl border dark:border-white/10 dark:bg-gray-700 w-28" aria-label="{{ &quot;Maximum price&quot; | t }}">
+            </div>
+          </div>
+        </div>
+        <ul id="all-products-list" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4" aria-live="polite">
+          <!-- Skeletons for All Products -->
+          <li class="skeleton h-[420px] rounded-2xl"></li>
+          <li class="skeleton h-[420px] rounded-2xl"></li>
+          <li class="skeleton h-[420px] rounded-2xl hidden sm:block"></li>
+          <li class="skeleton h-[420px] rounded-2xl hidden lg:block"></li>
+          <li class="skeleton h-[420px] rounded-2xl hidden lg:block"></li>
+          <li class="skeleton h-[420px] rounded-2xl hidden lg:block"></li>
+          <li class="skeleton h-[420px] rounded-2xl hidden lg:block"></li>
+          <li class="skeleton h-[420px] rounded-2xl hidden lg:block"></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 
+      VII. CUSTOMER EXPERIENCE & SOCIAL ENGAGEMENT
+      1. Reviews & Testimonials
+    -->
+    <section id="testimonials" class="py-16 bg-accent-ultralight dark:bg-gray-900">
+      <div class="container mx-auto px-4">
+        <h2 class="text-2xl font-extrabold mb-10 salla-section-title text-center">{% trans %}آراء عملائنا{% endtrans %}</h2>
+        <div class="swiper testimonial-swiper max-w-4xl mx-auto pb-16">
+          <div class="swiper-wrapper" id="testimonials-wrapper">
+            <!-- Testimonial Slides generated by JS -->
+            <div class="swiper-slide">
+              <div class="skeleton h-64 rounded-2xl"></div>
+            </div>
+            <div class="swiper-slide">
+              <div class="skeleton h-64 rounded-2xl"></div>
+            </div>
+          </div>
+          <div class="swiper-pagination"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 
+      VII. CUSTOMER EXPERIENCE & SOCIAL ENGAGEMENT
+      2. FAQ Section
+    -->
+    <section id="faq" class="py-12">
+      <div class="container mx-auto px-4">
+        <h2 class="text-2xl font-extrabold mb-6 salla-section-title text-center">{% trans %}الأسئلة الشائعة{% endtrans %}</h2>
+        <div class="max-w-3xl mx-auto space-y-4 mt-8">
+          <details class="bg-white dark:bg-gray-800 rounded-2xl p-4 border dark:border-white/10 shadow-sm transition-all duration-300 hover:shadow-md" open="">
+            <summary class="font-bold cursor-pointer list-none flex items-center justify-between">
+              هل المنتجات أصلية؟
+              <i class="fa-solid fa-plus text-primary-dark dark:text-accent-coral group-open:rotate-45 transition-transform"></i>
+            </summary>
+            <p class="mt-2 text-gray-600 dark:text-gray-300">نعم، جميع منتجاتنا أصلية 100% ومشمولة بضمان الوكيل المعتمد.</p>
+          </details>
+          <details class="bg-white dark:bg-gray-800 rounded-2xl p-4 border dark:border-white/10 shadow-sm transition-all duration-300 hover:shadow-md">
+            <summary class="font-bold cursor-pointer list-none flex items-center justify-between">
+              كم يستغرق التوصيل؟
+              <i class="fa-solid fa-plus text-primary-dark dark:text-accent-coral group-open:rotate-45 transition-transform"></i>
+            </summary>
+            <p class="mt-2 text-gray-600 dark:text-gray-300">عادةً يستغرق التوصيل من 48 إلى 72 ساعة داخل المدن الرئيسية في المملكة.</p>
+          </details>
+          <details class="bg-white dark:bg-gray-800 rounded-2xl p-4 border dark:border-white/10 shadow-sm transition-all duration-300 hover:shadow-md">
+            <summary class="font-bold cursor-pointer list-none flex items-center justify-between">
+              هل يمكن الاستبدال/الاسترجاع؟
+              <i class="fa-solid fa-plus text-primary-dark dark:text-accent-coral group-open:rotate-45 transition-transform"></i>
+            </summary>
+            <p class="mt-2 text-gray-600 dark:text-gray-300">نعم، نوفر خدمة الاستبدال والاسترجاع خلال 7 أيام من تاريخ استلام الطلب، وفقًا للشروط والأحكام.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- 
+      VII. CUSTOMER EXPERIENCE & SOCIAL ENGAGEMENT
+      4. Contact & Communication
+    -->
+    <section id="contact" class="py-12 bg-white/60 dark:bg-black/10">
+      <div class="container mx-auto px-4">
+        <h2 class="text-2xl font-extrabold mb-6 salla-section-title text-center">{% trans %}تواصل معنا{% endtrans %}</h2>
+        <div class="grid md:grid-cols-2 gap-6 mt-8">
+          <form class="bg-white dark:bg-gray-800 rounded-2xl p-4 border dark:border-white/10 shadow-soft space-y-3 transition-all duration-300 hover:shadow-md">
+            <input class="w-full px-4 py-2 rounded-xl border dark:border-white/10 dark:bg-gray-700" placeholder="الاسم" aria-label="{{ &quot;Name&quot; | t }}">
+            <input class="w-full px-4 py-2 rounded-xl border dark:border-white/10 dark:bg-gray-700" placeholder="البريد الإلكتروني" aria-label="{{ &quot;Email&quot; | t }}">
+            <textarea class="w-full px-4 py-2 rounded-xl border dark:border-white/10 dark:bg-gray-700" rows="4" placeholder="رسالتك" aria-label="{{ &quot;Your message&quot; | t }}"></textarea>
+            <button type="submit" class="px-4 py-2 rounded-xl text-white bg-gradient-to-r from-[var(--primary-dark)] to-[var(--primary-blue)] transition-all hover:scale-105">{% trans %}إرسال{% endtrans %}</button>
+          </form>
+          <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 border dark:border-white/10 shadow-soft space-y-3 transition-all duration-300 hover:shadow-md">
+            <p class="flex items-center gap-2"><i class="fa-solid fa-phone text-[var(--accent-coral)]"></i> 966-57-372-5600</p>
+            <p class="flex items-center gap-2"><i class="fa-brands fa-whatsapp text-green-500"></i> واتساب متاح</p>
+            <p class="flex items-center gap-2"><i class="fa-solid fa-location-dot text-[var(--accent-coral)]"></i> الرياض، المملكة العربية السعودية</p>
+            <div class="h-48 rounded-lg overflow-hidden mt-4">
+              <img src="https://placehold.co/600x300/e0e8ff/0D2C6C?text=Riyadh+Location+Map" alt="{{ &quot;Map&quot; | t }}" class="w-full h-full object-cover">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 
+    III. LAYOUT & NAVIGATION SYSTEM
+    2. Footer Structure
+  -->
+  <footer class="mt-10 py-10 bg-[#07173f] text-white dark:bg-gray-900 pb-24 md:pb-10">
+    <div class="container mx-auto px-4 grid md:grid-cols-4 gap-6">
+      <div>
+        <div class="w-12 h-12 grid place-items-center rounded-xl bg-gradient-to-br from-[var(--accent-coral)] to-[var(--accent-orange-dark)] mb-3">
+          <div class="needsbox-logo"><div class="needsbox-box"></div></div>
+        </div>
+        <p class="text-white/80">NeedsBoxes — كل ما تحتاجه… في صندوق واحد.</p>
+      </div>
+      <div>
+        <h4 class="font-extrabold mb-3">روابط</h4>
+        <ul class="space-y-2 text-white/85">
+          <li><a href="#categories" class="hover:underline transition-colors duration-200">{% trans %}التصنيفات{% endtrans %}</a></li>
+          <li><a href="#all-products" class="hover:underline transition-colors duration-200">{% trans %}المنتجات{% endtrans %}</a></li>
+          <li><a href="#faq" class="hover:underline transition-colors duration-200">{% trans %}الأسئلة الشائعة{% endtrans %}</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-extrabold mb-3">الدفع والشحن</h4>
+        <p class="text-white/80">دفع آمن | توصيل سريع</p>
+         <div class="flex flex-wrap gap-2 mt-2">
+            <img class="h-6 bg-white rounded p-0.5" src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Visa_2021.svg" alt="{{ &quot;Visa&quot; | t }}">
+            <img class="h-6 bg-white rounded p-0.5" src="https://upload.wikimedia.org/wikipedia/commons/b/b7/MasterCard_Logo.svg" alt="{{ &quot;Mastercard&quot; | t }}">
+            <img class="h-6 bg-white rounded p-0.5" src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Mada_Logo.svg" alt="{{ &quot;Mada&quot; | t }}">
+            <img class="h-6 bg-white rounded p-0.5" src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Apple_Pay_logo.svg" alt="{{ &quot;Apple Pay&quot; | t }}">
+        </div>
+      </div>
+      <div>
+        <h4 class="font-extrabold mb-3">النشرة البريدية</h4>
+        <form class="flex gap-2">
+          <input type="email" placeholder="بريدك الإلكتروني" class="flex-1 px-3 py-2 rounded-xl border text-black" aria-label="{{ &quot;Email for newsletter&quot; | t }}">
+          <button type="submit" class="px-4 py-2 rounded-xl text-[#07173f] bg-white font-bold">{% trans %}اشتراك{% endtrans %}</button>
+        </form>
+      </div>
+    </div>
+    <div class="container mx-auto px-4 mt-6 text-center text-white/70">© <span id="footer-year">2025</span> NeedsBoxes</div>
+  </footer>
+
+  <!-- 
+    VII. CUSTOMER EXPERIENCE & SOCIAL ENGAGEMENT
+    4. Contact & Communication: Floating WhatsApp
+  -->
+  <a href="https://wa.me/966573725600" class="salla-whatsapp-button fixed bottom-20 left-5 md:bottom-5 w-14 h-14 bg-[#25D366] flex items-center justify-center text-white text-3xl rounded-full shadow-lg z-50 hover:scale-110 transition-transform animate-pulse" target="_blank" aria-label="{{ &quot;تواصل معنا عبر واتساب&quot; | t }}">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+  
+  <!-- 
+    III. LAYOUT & NAVIGATION SYSTEM
+    3. Mobile Optimization: Bottom Navigation Tab Bar
+  -->
+  <nav class="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-gray-200 md:hidden dark:bg-gray-800/95 dark:border-white/10" aria-label="{{ &quot;التنقل السفلي&quot; | t }}">
+    <ul class="grid grid-cols-4 text-center text-xs font-semibold">
+      <li><a href="#" class="block py-3 text-[var(--primary-dark)] dark:text-accent-coral focus:outline-none focus:ring-1 focus:ring-inset focus:ring-[var(--primary-dark)]">{% trans %}الرئيسية{% endtrans %}</a></li>
+      <li><a href="#categories" class="block py-3 text-gray-600 dark:text-gray-300 hover:text-[var(--primary-dark)] focus:outline-none focus:ring-1 focus:ring-inset focus:ring-[var(--primary-dark)]">{% trans %}الأقسام{% endtrans %}</a></li>
+      <li><a href="#all-products" class="block py-3 text-gray-600 dark:text-gray-300 hover:text-[var(--primary-dark)] focus:outline-none focus:ring-1 focus:ring-inset focus:ring-[var(--primary-dark)]">{% trans %}المنتجات{% endtrans %}</a></li>
+      <li><a href="#contact" class="block py-3 text-gray-600 dark:text-gray-300 hover:text-[var(--primary-dark)] focus:outline-none focus:ring-1 focus:ring-inset focus:ring-[var(--primary-dark)]">{% trans %}تواصل{% endtrans %}</a></li>
+    </ul>
+  </nav>
+
+  <!-- 
+    VI. SHOPPING CART, CHECKOUT & PAYMENT FLOW
+    1. Mini-Cart Drawer
+  -->
+  <aside class="mini-cart-overlay" id="mini-cart-overlay"></aside>
+  <aside class="mini-cart" id="mini-cart" aria-label="{{ &quot;سلة التسوق&quot; | t }}">
+    <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-white/10">
+      <h2 class="text-xl font-bold">{% trans %}سلة التسوق{% endtrans %}</h2>
+      <button id="mini-cart-close" class="text-gray-500 hover:text-red-500" aria-label="{{ &quot;إغلاق السلة&quot; | t }}"><i class="fas fa-times text-xl"></i></button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-4" id="mini-cart-body">
+      <p id="mini-cart-empty" class="text-gray-500 text-center py-10">سلتك فارغة حالياً.</p>
+    </div>
+    <div class="p-4 border-t border-gray-200 dark:border-white/10">
+      <div class="flex justify-between items-center font-bold text-lg mb-4">
+        <span>الإجمالي:</span>
+        <span id="mini-cart-total">0 ر.س</span>
+      </div>
+      <a href="#" class="block w-full text-center bg-gradient-to-l from-[var(--accent-coral)] to-[var(--accent-orange-dark)] text-white py-3 rounded-xl font-extrabold text-lg transition-all hover:from-[var(--accent-orange-dark)] hover:to-[var(--accent-coral)] shadow-nb hover:shadow-lg">{% trans %}إتمام الطلب{% endtrans %}</a>
+      <button id="mini-cart-continue" class="w-full text-center text-gray-600 dark:text-gray-300 py-2 mt-2">{% trans %}متابعة التسوق{% endtrans %}</button>
+    </div>
+  </aside>
+
+  <!-- 
+    V. PRODUCT CATALOG & DISCOVERY ENGINE
+    5. Quick View Modal
+  -->
+  <div id="quickViewModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="{{ &quot;نظرة سريعة&quot; | t }}">
+    <div class="modal-card">
+      <button class="modal-close-btn absolute top-3 left-3 bg-gray-100 dark:bg-gray-700 w-10 h-10 rounded-full text-lg z-20" aria-label="{{ &quot;إغلاق&quot; | t }}">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="grid md:grid-cols-2 gap-0">
+        <!-- Modal Gallery -->
+        <div class="p-4">
+          <div class="rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-700">
+            <img id="modal-main-image" src="https://placehold.co/600x600/0D2C6C/ffffff?text=Product" alt="{{ &quot;Product image&quot; | t }}" class="w-full h-80 object-cover">
+          </div>
+          <!-- Tabs for media -->
+          <div class="flex gap-2 border-b border-gray-200 dark:border-white/10 mt-2">
+            <button class="modal-tab-btn active" data-tab-group="media" data-tab-target="#modal-image-panel">{% trans %}الصور{% endtrans %}</button>
+            <button class="modal-tab-btn" data-tab-group="media" data-tab-target="#modal-video-panel" id="modal-video-tab">{% trans %}فيديو{% endtrans %}</button>
+            <button class="modal-tab-btn" data-tab-group="media" data-tab-target="#modal-user-photos-panel">{% trans %}صور العملاء{% endtrans %}</button>
+          </div>
+          <!-- Media Panels -->
+          <div class="mt-2">
+            <div id="modal-image-panel" class="modal-tab-panel active">
+              <div class="grid grid-cols-4 gap-2" id="modal-thumbnail-grid">
+                <!-- Thumbnails injected here -->
+              </div>
+            </div>
+            <div id="modal-video-panel" class="modal-tab-panel">
+              <div class="rounded-2xl overflow-hidden aspect-video" id="video-container">
+                <iframe id="modal-video-iframe" class="w-full h-full" src="" title="{{ &quot;Product video&quot; | t }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+              </div>
+            </div>
+            <div id="modal-user-photos-panel" class="modal-tab-panel">
+               <div class="grid grid-cols-4 gap-2" id="modal-user-photos-grid">
+                <!-- User photos injected here -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Modal Details -->
+        <div class="p-4 space-y-4">
+          <h3 id="modal-title" class="text-2xl font-extrabold"></h3>
+          <div id="modal-rating"></div>
+          <div id="modal-price" class="modal-price text-2xl font-extrabold"></div>
+          <div class="border-t pt-3">
+            <div class="flex gap-3">
+              <button id="modal-add-to-cart" class="px-4 py-2 rounded-xl text-white salla-add-to-cart" data-product-id="">{% trans %}أضف للسلة{% endtrans %}</button>
+              <button class="px-4 py-2 rounded-xl border dark:border-white/10">{% trans %}إغلاق{% endtrans %}</button>
+            </div>
+          </div>
+          <!-- Tabs for info -->
+          <div class="mt-3">
+            <div class="flex gap-4 border-b border-gray-200 dark:border-white/10 pb-2">
+              <button class="modal-tab-btn active" data-tab-group="info" data-tab-target="#tab-description">{% trans %}الوصف{% endtrans %}</button>
+              <button class="modal-tab-btn" data-tab-group="info" data-tab-target="#tab-specs">{% trans %}المواصفات{% endtrans %}</button>
+              <button class="modal-tab-btn" data-tab-group="info" data-tab-target="#tab-shipping">{% trans %}الشحن{% endtrans %}</button>
+            </div>
+            <div class="mt-3 space-y-3 text-sm text-gray-600 dark:text-gray-300">
+              <div id="tab-description" class="modal-tab-panel active"></div>
+              <div id="tab-specs" class="modal-tab-panel whitespace-pre-line"></div>
+              <div id="tab-shipping" class="modal-tab-panel"></div>
+            </div>
+          </div>
+          <!-- Modal Upsell -->
+          <div class="mt-3 p-3 rounded-xl bg-[var(--accent-ultralight)] dark:bg-gray-700">
+             <h4 class="font-bold mb-2">يُشترى معه عادة:</h4>
+             <div id="modal-upsell-item" class="flex items-center gap-3">
+                <!-- Upsell item injected here -->
+             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">
+    تمت الإضافة إلى السلة
+  </div>
+
+  <!-- 
+    I. FOUNDATIONAL ARCHITECTURE
+    1. Technology Stack: JS Libraries
+  -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  
+  <!-- 
+    I. FOUNDATIONAL ARCHITECTURE
+    1. Technology Stack: Vanilla JavaScript
+    (Main Application Logic)
+  -->
+  <script>
+    // ===== Helpers =====
+    const $ = (s, c=document) => c.querySelector(s);
+    const $$ = (s, c=document) => Array.from(c.querySelectorAll(s));
+    // Format number to SAR currency
+    const SAR = v => new Intl.NumberFormat('ar-SA',{style:'currency',currency:'SAR', minimumFractionDigits: 0, maximumFractionDigits: 0}).format(v);
+
+    // ===== State =====
+    let CART = [];
+    let currentCat = 'all';
+
+    // ===== 
+    // V. PRODUCT CATALOG & DISCOVERY ENGINE
+    // 1. Product Data Structure
+    // This is the most comprehensive data list merged from all files.
+    // =====
+    const PRODUCTS = [
+      {id:'p1', name:'مايكروفون استوديو احترافي', cat:'audio', price:499, old:599, rating:5, pop: 95, date: '2025-10-01', img:'https://cdn.salla.sa/mQbARj/HUKUwBOlCCAEPURLdgbYLUEwM8u0dR9vinh2Xowv.jpg', featured:true, stock:true, 
+       desc:'مايكروفون هجين XLR/USB بهيكل معدني، يوفر وضوحًا بجودة الاستوديو لتسجيلاتك.', 
+       specs:'نمط الالتقاط: كارديويد\nواجهة: USB/XLR\nهيكل معدني بالكامل', 
+       shipping:'يشحن خلال 48 ساعة داخل المملكة.',
+       video: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+       userImages: ["https://placehold.co/100x100/ccc/333?text=User1", "https://placehold.co/100x100/ccc/333?text=User2"]
+      },
+      {id:'p2', name:'سماعة M90 Pro اللاسلكية', cat:'audio', price:40, old:75, rating:4.7, pop: 98, date: '2025-09-15', img:'https://cdn.salla.sa/mQbARj/2w1sSRRfycRdql1J5TMiIlC1EiOaFAGM8dkCu4yT.jpg', featured:true, stock:true, 
+       desc:'بلوتوث 5.3، بطارية 30 ساعة، وسائد أذن مريحة للاستخدام اليومي.', 
+       specs:'بلوتوث 5.3\nعمر بطارية 30 ساعة\nشاشة LED لمعرفة الشحن', 
+       shipping:'توصيل سريع مع إمكانية الاسترجاع خلال 7 أيام.',
+       video: null,
+       userImages: ["https://placehold.co/100x100/ccc/333?text=User3"]
+      },
+      {id:'p3', name:'إضاءة حلقة LED 18 بوصة', cat:'lighting', price:199, old:249, rating:4.5, pop: 88, date: '2025-08-20', img:'https://cdn.salla.sa/mQbARj/fk0NPtu5Z6btX8EwRoM0roGkv2gS0Hs0QcuFtUza.jpg', featured:false, stock:true, 
+       desc:'درجة حرارة لون قابلة للتعديل، حامل متين، مثالية للتصوير والبث المباشر.', 
+       specs:'18 بوصة\nتحكم بدرجة اللون\nحامل ثلاثي متضمن', 
+       shipping:'يشحن خلال 48 ساعة.',
+       video: null,
+       userImages: []
+      },
+      {id:'p4', name:'شاحن 65 واط GaN', cat:'charging', price:149, old:null, rating:5, pop: 92, date: '2025-10-05', img:'https://cdn.salla.sa/mQbARj/products/Jie3nJEgFyejMA6aw02lgKxWLbNcLnClGBSfWOTt.jpg', featured:true, stock:true, 
+       desc:'شحن سريع USB-C PD لأجهزة اللابتوب، التابلت، والهواتف.', 
+       specs:'قدرة 65W\nتقنية GaN\n3 منافذ (2 USB-C, 1 USB-A)', 
+       shipping:'توصيل خلال 48–72 ساعة.',
+       video: null,
+       userImages: ["https://placehold.co/100x100/ccc/333?text=User4"]
+      },
+      {id:'p5', name:'منظم كابلات مكتبي', cat:'accessory', price:39, old:null, rating:4.2, pop: 70, date: '2025-07-10', img:'https://cdn.salla.sa/mQbARj/ljwqCC4leNFTRQiW4pngTvfDqhqNL5oFi5M1WdzN.jpg', featured:false, stock:true, 
+       desc:'حافظ على مساحة عملك نظيفة وخالية من تشابك الكابلات.', 
+       specs:'مواد مطاطية عالية الجودة\nلاصق 3M قوي', 
+       shipping:'يشحن مع الطلب.',
+       video: null,
+       userImages: []
+      },
+      {id:'p6', name:'موزع USB-C 7 في 1', cat:'accessory', price:229, old:279, rating:4.8, pop: 85, date: '2025-09-01', img:'https://cdn.salla.sa/mQbARj/7qMwE9dY3fklDvQzEZmbTnHssdB1TL9KO7bQOd8R.png', featured:true, stock:true, 
+       desc:'HDMI 4K، قارئ بطاقات SD/TF، منفذين USB-A، ومنفذ شحن USB-C PD — هيكل معدني مدمج.', 
+       specs:'HDMI 4K @ 30Hz\nقارئ بطاقات SD/TF\nUSB-C PD 100W', 
+       shipping:'يشحن خلال 48 ساعة.',
+       video: null,
+       userImages: ["https://placehold.co/100x100/ccc/333?text=User5", "https://placehold.co/100x100/ccc/333?text=User6"]
+      },
+      {id:'p7', name:'مصباح LED صغير', cat:'lighting', price:119, old:null, rating:4.1, pop: 60, date: '2025-06-15', img:'https://cdn.salla.sa/mQbARj/NT8o24OnosrROMJy00C4t70j71MfWCjenltrPNi0.jpg', featured:false, stock:false, 
+       desc:'حجم الجيب، شحن USB-C، سطوع قابل للتعديل.', 
+       specs:'محمول\nUSB-C\nسطوع 500 لومن', 
+       shipping:'قد يتأخر الشحن عند نفاد المخزون.',
+       video: null,
+       userImages: []
+      },
+      {id:'p8', name:'ذراع مايكروفون استوديو', cat:'accessory', price:89, old:119, rating:4.3, pop: 75, date: '2025-08-01', img:'https://cdn.salla.sa/mQbARj/72TtGQyBMvBC7H9FDnZMHMNz4YrcFAM87I38rhGC.jpg', featured:false, stock:true, 
+       desc:'نوابض صامتة، مشبك تثبيت قوي، مثالي للمايكروفونات والكاميرات.', 
+       specs:'ذراع قابل للتعديل\nقاعدة تثبيت قوية\nإدارة للكابلات مدمجة', 
+       shipping:'يشحن خلال 48 ساعة.',
+       video: null,
+       userImages: []
+      }
+    ];
+
+    // Data for Offers Swiper
+    const OFFERS = [
+      { title: 'خصم 30% على الإكسسوارات', badge:'عرض اليوم', image:'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=2070&auto=format&fit=crop' },
+      { title: 'حزمة تصوير للمبتدئين', badge:'باقة', image:'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=2070&auto=format&fit=crop' },
+      { title: 'شواحن GaN فائقة السرعة', badge:'جديد', image:'https://images.unsplash.com/photo-1618365908648-e71bd5716cba?q=80&w=2070&auto=format&fit=crop' }
+    ];
+    
+    // Data for Testimonials
+    const TESTIMONIALS = [
+      { name: "سارة", text: "وصلتني اليوم وطلعت جميلة متحمسة أجربها ❤️ جودة المنتج والتغليف كانت ممتازة، والشحن كان سريعاً جداً.", avatar: "https://cdn.assets.salla.network/prod/stores/themes/default/assets/images/avatar_female.png", rating: 5 },
+      { name: "عبدالله", text: "اشتريت من هنا لعيالي وصراحة شئ لا يعلى عليه. المنتجات أصلية والسعر مناسب جداً. خدمة العملاء محترمة.", avatar: "https://cdn.assets.salla.network/prod/stores/themes/default/assets/images/avatar_male.png", rating: 5 },
+      { name: "محمد", text: "رهيبين يفكون أزمة. الطلب وصل خلال يومين فقط والمنتج يعمل بكفاءة عالية. سأطلب مرة أخرى قريباً.", avatar: "https://cdn.assets.salla.network/prod/stores/themes/default/assets/images/avatar_male.png", rating: 5 },
+    ];
+
+    // ===== UI Builders =====
+    
+    // Generates star rating HTML
+    function star(n, id=''){
+      let o=''; 
+      for(let i=1;i<=5;i++){
+        o += `<i class="fa-${i<=n?'solid':'regular'} fa-star text-sm"></i>`
+      } 
+      // 10. Accessibility
+      return `<div class="text-amber-400" role="img" aria-label="Rating ${n} out of 5 stars">${o}</div>`
+    }
+
+    // Generates HTML for a single product card
+    function productCard(p){
+      const old = p.old? `<span class=\"line-through text-gray-500 mr-2\">${SAR(p.old)}</span>`:'';
+      const stockBadge = p.stock? '' : `<span class=\"out-of-stock-badge\">غير متوفر</span>`;
+      return `<li class=\"salla-product-card ${p.stock? '':'out-of-stock'}\" data-aos="fade-up">
+        <div class="relative">
+          <span class=\"salla-product-badge absolute top-3 left-3 text-xs font-extrabold px-2 py-1 rounded-lg z-10\">${p.featured?'مميز':'جديد'}</span>
+          ${stockBadge}
+          <a href="#" class=\"salla-product-image relative block\" aria-label="${p.name}">
+            <img src=\"${p.img}\" alt=\"${p.name}\" class=\"w-full h-[250px] object-cover\" loading=\"lazy\" decoding="async"/>
+          </a>
+        </div>
+        <div class="salla-product-content">
+          <div class="salla-product-details">
+            <a href="#" class="hover:underline">
+              <h3 class="font-bold line-clamp-2 h-12">${p.name}</h3>
+            </a>
+            ${star(p.rating||4, p.id)}
+            <div class="flex items-baseline gap-2 mt-2\"><span class="text-[var(--primary-dark)] dark:text-white font-extrabold text-lg\">${SAR(p.price)}</span>${old}</div>
+          </div>
+          <div class="flex items-center gap-2 mt-3">
+            <button class="salla-icon-btn" data-qv="${p.id}" aria-label="Quick View ${p.name}">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button class="salla-icon-btn" aria-label="Add ${p.name} to Wishlist">
+              <i class="fa-regular fa-heart"></i>
+            </button>
+            <button class="salla-add-to-cart" data-add="${p.id}" ${p.stock?'':'disabled'}>
+              <i class="fa-solid fa-cart-plus ml-1"></i> 
+              ${p.stock?'أضف للسلة':'غير متوفر'}
+            </button>
+          </div>
+        </div>
+      </li>`;
+    }
+
+    // Renders featured products
+    function renderFeatured(){ 
+      const grid=$('#featured-grid'); 
+      if(!grid) return; 
+      grid.innerHTML = PRODUCTS.filter(p=>p.featured).slice(0,8).map(productCard).join(''); 
+    }
+
+    // Creates a skeleton card
+    function createSkeleton(){ return `<li class=\"skeleton h-[420px] rounded-2xl\"></li>`; }
+
+    // Renders all products (with skeletons first)
+    function renderAll(){ 
+      const grid=$('#all-products-list'); 
+      if(!grid) return; 
+      grid.innerHTML=Array(8).fill(0).map(createSkeleton).join(''); 
+      grid.setAttribute('aria-busy','true'); 
+      // Simulate network delay
+      setTimeout(()=>{ applyFiltersAndSort(); }, 500); 
+    }
+
+    // Applies filters and sorting to the main product grid
+    function applyFiltersAndSort(searchTerm = ''){
+      const grid=$('#all-products-list'); if(!grid) return;
+      
+      const min=parseFloat($('#priceMin')?.value||'0') || 0;
+      let max=parseFloat($('#priceMax')?.value||'999999');
+      if (isNaN(max) || max === 0) max = 999999;
+      
+      let list = PRODUCTS.filter(p => {
+        const nameMatch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
+        const catMatch = (currentCat==='all'||p.cat===currentCat);
+        const priceMatch = p.price>=min && p.price<=max;
+        return nameMatch && catMatch && priceMatch;
+      });
+      
+      const sort=$('#sortSelect')?.value;
+      if(sort==='priceAsc') list.sort((a,b)=>a.price-b.price);
+      if(sort==='priceDesc') list.sort((a,b)=>b.price-a.price);
+      if(sort==='rating') list.sort((a,b)=> (b.rating||0)-(a.rating||0));
+      if(sort==='new') list.sort((a,b)=> new Date(b.date) - new Date(a.date));
+      if(sort==='pop') list.sort((a,b)=> (b.pop||0)-(a.pop||0));
+      
+      grid.innerHTML = list.length ? list.map(productCard).join('') : `<p class="col-span-full text-center text-gray-500">لا توجد منتجات تطابق بحثك.</p>`;
+      grid.removeAttribute('aria-busy');
+      attachCardListeners(); // Re-attach listeners to new cards
+      AOS.refresh(); // Refresh AOS for new items
+    }
+
+    // Renders the offers swiper
+    function renderOffers(){ 
+      const wrap=$('#offers-wrapper'); 
+      if(!wrap) return; 
+      wrap.innerHTML = OFFERS.map(o=>`<div class=\"swiper-slide\">
+        <article class=\"rounded-2xl overflow-hidden border dark:border-white/10 bg-white dark:bg-gray-800 transform transition-transform hover:scale-[1.02] shadow-soft hover:shadow-nb\">
+          <div class=\"relative\">
+            <img src=\"${o.image}\" alt=\"${o.title}\" class=\"w-full h-52 object-cover\" loading="lazy" decoding="async"/>
+            <span class=\"absolute top-3 left-3 bg-gradient-to-r from-[var(--accent-coral)] to-[var(--accent-orange-dark)] text-white text-xs font-extrabold px-2 py-1 rounded-lg\">${o.badge}</span>
+          </div>
+          <div class=\"p-4\"><h3 class=\"font-extrabold\">${o.title}</h3></div>
+        </article></div>`).join(''); 
+    }
+    
+    // Renders the testimonials swiper
+    function renderTestimonials() {
+      const testimonialsWrapper = $('#testimonials-wrapper');
+      if (!testimonialsWrapper) return;
+      testimonialsWrapper.innerHTML = TESTIMONIALS.map(t => `
+        <div class="swiper-slide">
+          <div class="salla-testimonial bg-white dark:bg-gray-800 p-8 text-center rounded-2xl shadow-soft border border-gray-100 dark:border-white/10 h-full">
+            <img src="${t.avatar}" class="w-16 h-16 rounded-full mx-auto mb-3 border-2 border-[var(--primary-dark)]" alt="${t.name}" loading="lazy" decoding="async">
+            <div class="mb-2">
+              ${star(t.rating)}
+            </div>
+            <p class="text-gray-700 dark:text-gray-300 italic mb-4">"${t.text}"</p>
+            <h3 class="font-bold text-md text-[var(--primary-dark)] dark:text-accent-coral">${t.name}</h3>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ===== Cart & Modal Logic =====
+    
+    // Updates the mini-cart UI
+    function updateMiniCart(){
+      const body=$('#mini-cart-body'); 
+      const totalEl=$('#mini-cart-total'); 
+      const empty=$('#mini-cart-empty');
+      const cartCountBadge = $('#cartCount');
+      
+      if(!CART.length){ 
+        body.innerHTML = `<p id=\"mini-cart-empty\" class=\"text-gray-500 text-center py-10\">سلتك فارغة حالياً.</p>`; 
+        totalEl.textContent=SAR(0); 
+        cartCountBadge.textContent = '0';
+        return; 
+      }
+      
+      empty?.remove();
+      let sum=0; 
+      let totalItems = 0;
+      body.innerHTML = CART.map(it=>{ 
+        sum += it.price*it.qty; 
+        totalItems += it.qty;
+        const p = PRODUCTS.find(prod => prod.id === it.id); // Get full product info
+        return `<div class=\"flex items-center justify-between gap-3 py-2 border-b dark:border-white/10\">
+          <div class=\"flex items-center gap-3\"><img src=\"${p.img}\" class=\"w-12 h-12 object-cover rounded-lg\" alt=\"${p.name}\"/>
+          <div><div class=\"font-bold text-sm\">${p.name}</div><div class=\"text-xs\">${SAR(p.price)} × ${it.qty}</div></div></div>
+          <button class=\"text-red-500\" data-del=\"${it.id}\" aria-label="Remove ${p.name}"><i class=\"fas fa-trash\"></i></button>
+        </div>` 
+      }).join('');
+      
+      totalEl.textContent = SAR(sum);
+      cartCountBadge.textContent = totalItems;
+      
+      // Re-attach delete listeners
+      $$('[data-del]', body).forEach(b=> b.addEventListener('click', e=>{ 
+        const id=e.currentTarget.getAttribute('data-del'); 
+        CART = CART.filter(x=>x.id!==id); 
+        updateMiniCart(); 
+        saveCartToStorage(); // Save changes
+      }));
+    }
+
+    // Adds a product to the cart by ID
+    function addToCartById(id){ 
+      const p = PRODUCTS.find(x=>x.id===id); 
+      if(!p) return;
+      if(!p.stock) {
+        showToast('المنتج غير متوفر حالياً', true);
+        return;
+      } 
+      const ex = CART.find(x=>x.id===id); 
+      if(ex) ex.qty+=1; 
+      else CART.push({id:p.id, price: p.price, qty:1}); 
+      
+      showToast('تمت إضافة المنتج إلى السلة'); 
+      updateMiniCart(); 
+      saveCartToStorage(); // Save changes
+      
+      // 1. Mini-Cart: Animated Feedback
+      $('#cartBtn').classList.add('animate-cart-jiggle'); 
+      setTimeout(()=>$('#cartBtn').classList.remove('animate-cart-jiggle'), 550); 
+    }
+
+    // Attaches listeners to dynamically created cards
+    function attachCardListeners(){
+      // Use event delegation on the grid for stable listeners
+      const grid = $('#all-products-list');
+      if (grid) {
+        grid.addEventListener('click', e => {
+          const addBtn = e.target.closest('[data-add]');
+          const qvBtn = e.target.closest('[data-qv]');
+          
+          if (addBtn) {
+            e.preventDefault();
+            addToCartById(addBtn.getAttribute('data-add')); 
+          }
+          if (qvBtn) {
+            e.preventDefault();
+            openQuickViewById(qvBtn.getAttribute('data-qv'));
+          }
+        });
+      }
+      
+      // Also attach to featured grid
+      const featuredGrid = $('#featured-grid');
+      if (featuredGrid) {
+        featuredGrid.addEventListener('click', e => {
+          const addBtn = e.target.closest('[data-add]');
+          const qvBtn = e.target.closest('[data-qv]');
+          
+          if (addBtn) {
+            e.preventDefault();
+            addToCartById(addBtn.getAttribute('data-add')); 
+          }
+          if (qvBtn) {
+            e.preventDefault();
+            openQuickViewById(qvBtn.getAttribute('data-qv'));
+          }
+        });
+      }
+      
+      // Attach to category banners
+      $$('[data-cat-filter]').forEach(btn => {
+         btn.addEventListener('click', e=> {
+            e.preventDefault();
+            const cat = e.currentTarget.getAttribute('data-cat-filter');
+            currentCat = cat;
+            $$('.product-filter-btn').forEach(b => b.classList.remove('active-filter'));
+            const filterBtn = $(`.product-filter-btn[data-cat="${cat}"]`);
+            if (filterBtn) filterBtn.classList.add('active-filter');
+            
+            applyFiltersAndSort();
+            const targetElement = $('#all-products');
+            if(targetElement) targetElement.scrollIntoView({ behavior: 'smooth' });
+         });
+      });
+    }
+
+    // Opens the Quick View modal with product data
+    function openQuickViewById(id){ 
+      const p=PRODUCTS.find(x=>x.id===id); 
+      if(!p) return; 
+      const modal=$('#quickViewModal');
+      
+      $('#modal-main-image').src = p.img; 
+      $('#modal-title').innerText = p.name;
+      $('#modal-rating').innerHTML = star(p.rating||4, 'modal');
+      $('#modal-price').innerHTML = `${SAR(p.price)} ${p.old? `<span class='text-gray-400 text-base line-through mr-2'>${SAR(p.old)}</span>`:''}`;
+      
+      $('#tab-description').innerText = p.desc||'لا يوجد وصف متوفر.';
+      $('#tab-specs').innerText = p.specs||'لا توجد مواصفات متوفرة.';
+      $('#tab-shipping').innerText = p.shipping||'تطبق سياسات الشحن القياسية.';
+      
+      // Media Tabs
+      const videoTab = $('#modal-video-tab');
+      if (p.video) {
+        videoTab.style.display = 'block';
+        $('#modal-video-iframe').src = p.video;
+      } else {
+        videoTab.style.display = 'none';
+        $('#modal-video-iframe').src = '';
+      }
+      
+      const userPhotosGrid = $('#modal-user-photos-grid');
+      const userPhotosTab = $('[data-tab-target="#modal-user-photos-panel"]');
+      if (p.userImages && p.userImages.length > 0) {
+        userPhotosGrid.innerHTML = p.userImages.map(img => `<img src="${img}" class="w-full h-20 object-cover rounded-md" alt="User photo">`).join('');
+        if(userPhotosTab) userPhotosTab.style.display = 'block';
+      } else {
+        userPhotosGrid.innerHTML = `<p class="text-sm text-gray-500 col-span-4">لا توجد صور.</p>`;
+        if(userPhotosTab) userPhotosTab.style.display = 'none';
+      }
+      
+       const thumbnailGrid = $('#modal-thumbnail-grid');
+       thumbnailGrid.innerHTML = `<img src="${p.img}" class="w-full h-20 object-cover rounded-md border-2 border-[var(--primary-dark)]" alt="Thumbnail">`;
+       
+      // Upsell
+      const up = PRODUCTS.find(x=> x.cat===p.cat && x.id!==p.id);
+      if(up) {
+         $('#modal-upsell-item').innerHTML = `<img src='${up.img}' class='w-12 h-12 rounded-lg object-cover' alt='${up.name}'/><div class='text-sm flex-1'><div class='font-bold'>${up.name}</div><div class='text-[var(--primary-dark)] dark:text-white font-extrabold'>${SAR(up.price)}</div></div> <button class="salla-add-to-cart text-white w-9 h-9 rounded-full" data-add="${up.id}" aria-label="Add ${up.name} to cart"><i class="fas fa-plus"></i></button>`;
+      } else {
+        $('#modal-upsell-item').innerHTML = '<p class="text-sm text-gray-500">لا توجد منتجات مقترحة.</p>';
+      }
+      
+      $('#modal-add-to-cart').setAttribute('data-product-id', p.id);
+      
+      // Reset tabs
+      $$('.modal-tab-btn[data-tab-group="media"]').forEach(b=>b.classList.remove('active'));
+      $('[data-tab-target="#modal-image-panel"]').classList.add('active');
+      $$('.modal-tab-panel[id^="modal-"]').forEach(p=>p.classList.remove('active'));
+      $('#modal-image-panel').classList.add('active');
+      
+      $$('.modal-tab-btn[data-tab-group="info"]').forEach(b=>b.classList.remove('active'));
+      $('[data-tab-target="#tab-description"]').classList.add('active');
+      $$('.modal-tab-panel[id^="tab-"]').forEach(p=>p.classList.remove('active'));
+      $('#tab-description').classList.add('active');
+
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    // Closes the Quick View modal
+    function closeQuickView(){ 
+      const modal = $('#quickViewModal');
+      modal.classList.remove('active'); 
+      $('#modal-video-iframe').src = ''; // Stop video
+      document.body.style.overflow = ''; // Restore scrolling
+    }
+    
+    // Modal Tab logic
+    $$(".modal-tab-btn").forEach(btn=> btn.addEventListener('click', e=>{ 
+      const group = e.currentTarget.getAttribute('data-tab-group');
+      $$(`.modal-tab-btn[data-tab-group="${group}"]`).forEach(b=>b.classList.remove('active')); 
+      e.currentTarget.classList.add('active'); 
+      $$(`.modal-tab-panel[id^="${group==='media'?'modal-':'tab-'}"]`).forEach(p=>p.classList.remove('active')); 
+      const t=e.currentTarget.getAttribute('data-tab-target'); 
+      $(t).classList.add('active'); 
+    }));
+
+    // Shows a toast notification
+    function showToast(msg, isError = false){ 
+      const t=$('#toast'); 
+      t.textContent=msg; 
+      t.classList.remove('error');
+      if (isError) {
+        t.classList.add('error');
+      } else {
+        // Handle dark/light mode for non-error toasts
+        if(document.documentElement.getAttribute('data-theme') === 'dark') {
+          t.style.backgroundColor = 'var(--accent-coral)';
+          t.style.color = 'var(--primary-dark)';
+        } else {
+          t.style.backgroundColor = 'var(--primary-dark)';
+          t.style.color = 'white';
+        }
+      }
+      
+      t.classList.add('show');
+      setTimeout(()=>{ 
+        t.classList.remove('show'); 
+        t.removeAttribute('style'); // Clear inline styles
+      }, 2000); 
+    }
+    
+    // ===== LocalStorage Persistence =====
+    
+    function saveCartToStorage() {
+      localStorage.setItem('needsboxes_cart', JSON.stringify(CART));
+    }
+    
+    function loadCartFromStorage() {
+      const storedCart = localStorage.getItem('needsboxes_cart');
+      if (storedCart) {
+        CART = JSON.parse(storedCart);
+        updateMiniCart();
+      }
+    }
+    
+    function saveThemeToStorage(theme) {
+      localStorage.setItem('needsboxes_theme', theme);
+    }
+    
+    function loadThemeFromStorage() {
+      const storedTheme = localStorage.getItem('needsboxes_theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.body.classList.add('dark');
+        $('#themeToggle i').classList.remove('fa-moon');
+        $('#themeToggle i').classList.add('fa-sun');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        document.body.classList.remove('dark');
+        $('#themeToggle i').classList.remove('fa-sun');
+        $('#themeToggle i').classList.add('fa-moon');
+      }
+    }
+    
+    function saveDirToStorage(dir) {
+      localStorage.setItem('needsboxes_dir', dir);
+    }
+    
+    function loadDirFromStorage() {
+      const storedDir = localStorage.getItem('needsboxes_dir');
+      // Default to RTL as per original file
+      if (storedDir === 'ltr') {
+        document.documentElement.dir = 'ltr';
+      } else {
+        document.documentElement.dir = 'rtl';
+      }
+    }
+    
+    // ===== Countdown Timer =====
+    function startCountdown() {
+      // Set countdown to end tonight at 23:59:59
+      const end = new Date(); 
+      end.setHours(23,59,59,999); 
+      
+      const timer = setInterval(function() {
+        const now = new Date().getTime();
+        const distance = end - now;
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        const daysEl = $("#countdown-days");
+        const hoursEl = $("#countdown-hours");
+        const minutesEl = $("#countdown-minutes");
+        const secondsEl = $("#countdown-seconds");
+
+        if (distance < 0) {
+          clearInterval(timer);
+          const timerEl = $("#countdown-timer");
+          if(timerEl) timerEl.innerHTML = "<div class='text-red-500 font-bold p-3 bg-gray-100 rounded-xl'>انتهى العرض!</div>";
+          return;
+        }
+
+        if(daysEl) daysEl.innerText = days.toString().padStart(2, '0');
+        if(hoursEl) hoursEl.innerText = hours.toString().padStart(2, '0');
+        if(minutesEl) minutesEl.innerText = minutes.toString().padStart(2, '0');
+        if(secondsEl) secondsEl.innerText = seconds.toString().padStart(2, '0');
+        
+      }, 1000);
+    }
+
+    // ===== Initialization =====
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      // Load stored preferences
+      loadThemeFromStorage();
+      loadDirFromStorage();
+      loadCartFromStorage();
+    
+      // Initialize AOS
+      AOS.init({ once:true, duration:600 });
+      
+      // Initialize Swipers
+      new Swiper('.hero-swiper', {
+        loop: true,
+        autoplay: { delay: 5000, disableOnInteraction: false },
+        pagination: { el: '.hero-swiper .swiper-pagination', clickable: true },
+      });
+      new Swiper('.offers-swiper', { 
+        slidesPerView:1.2, 
+        spaceBetween:12, 
+        breakpoints:{640:{slidesPerView:2.2},1024:{slidesPerView:3.2}}, 
+        pagination:{el:'.offers-swiper .swiper-pagination', clickable:true} 
+      });
+      new Swiper('.testimonial-swiper', {
+        loop: true,
+        spaceBetween: 30,
+        autoplay: { delay: 5000, disableOnInteraction: false },
+        pagination: { el: '.testimonial-swiper .swiper-pagination', clickable: true },
+        breakpoints: {
+          640: { slidesPerView: 1.2, centeredSlides: true },
+          768: { slidesPerView: 2, centeredSlides: false },
+          1024: { slidesPerView: 3, centeredSlides: false }
+        }
+      });
+      
+      // Start Countdown
+      startCountdown();
+
+      // Initial Renders
+      renderOffers();
+      renderTestimonials();
+      renderFeatured();
+      renderAll();
+      
+      // Set Footer Year
+      $('#footer-year').textContent = new Date().getFullYear();
+
+      // --- Event Listeners ---
+      
+      // Sidebar Toggles
+      $('#sidebarToggle')?.addEventListener('click', ()=>{ $('#sidebar').classList.add('active'); $('#sidebarOverlay').classList.add('active'); });
+      $('#sidebarClose')?.addEventListener('click', ()=>{ $('#sidebar').classList.remove('active'); $('#sidebarOverlay').classList.remove('active'); });
+      $('#sidebarOverlay')?.addEventListener('click', ()=>{ $('#sidebar').classList.remove('active'); $('#sidebarOverlay').classList.remove('active'); });
+
+      // Mini-Cart Toggles
+      $('#cartBtn')?.addEventListener('click', ()=>{ $('#mini-cart').classList.add('active'); $('#mini-cart-overlay').classList.add('active'); });
+      $('#mini-cart-close')?.addEventListener('click', ()=>{ $('#mini-cart').classList.remove('active'); $('#mini-cart-overlay').classList.remove('active'); });
+      $('#mini-cart-continue')?.addEventListener('click', ()=>{ $('#mini-cart').classList.remove('active'); $('#mini-cart-overlay').classList.remove('active'); });
+      $('#mini-cart-overlay')?.addEventListener('click', ()=>{ $('#mini-cart').classList.remove('active'); $('#mini-cart-overlay').classList.remove('active'); });
+      
+      // Theme & Direction Toggles
+      $('#dirToggle')?.addEventListener('click', ()=>{ 
+        const html=document.documentElement; 
+        html.dir = (html.dir==='rtl'?'ltr':'rtl'); 
+        saveDirToStorage(html.dir);
+      });
+      $('#themeToggle')?.addEventListener('click', ()=>{ 
+        const html=document.documentElement; 
+        const isDark = html.getAttribute('data-theme')==='dark';
+        const newTheme = isDark ? 'light' : 'dark';
+        html.setAttribute('data-theme', newTheme); 
+        document.body.classList.toggle('dark', !isDark); 
+        saveThemeToStorage(newTheme);
+        // Update icon
+        const icon = $('#themeToggle i');
+        if (newTheme === 'dark') {
+          icon.classList.remove('fa-moon');
+          icon.classList.add('fa-sun');
+        } else {
+          icon.classList.remove('fa-sun');
+          icon.classList.add('fa-moon');
+        }
+      });
+      
+      // Filter & Sort Listeners
+      $$('.product-filter-btn').forEach(b=> b.addEventListener('click', e=>{ 
+        $$('.product-filter-btn').forEach(x=>x.classList.remove('active-filter')); 
+        e.currentTarget.classList.add('active-filter'); 
+        currentCat = e.currentTarget.getAttribute('data-cat'); 
+        applyFiltersAndSort($('#searchInput').value); 
+      }));
+      $('#sortSelect')?.addEventListener('change', () => applyFiltersAndSort($('#searchInput').value));
+      $('#priceMin')?.addEventListener('input', () => applyFiltersAndSort($('#searchInput').value));
+      $('#priceMax')?.addEventListener('input', () => applyFiltersAndSort($('#searchInput').value));
+      
+      // Search Listeners
+      $('#searchInput')?.addEventListener('input', e => applyFiltersAndSort(e.target.value));
+      $('#mobileSearch')?.addEventListener('input', e => {
+        applyFiltersAndSort(e.target.value);
+        // If searching on mobile, scroll to products
+        $('#all-products').scrollIntoView({ behavior: 'smooth' });
+      });
+      
+      // Modal Add to Cart
+      $('#modal-add-to-cart')?.addEventListener('click', (e)=>{ 
+        const id=e.currentTarget.getAttribute('data-product-id'); 
+        if(id){ 
+          addToCartById(id); 
+          closeQuickView(); 
+        }
+      });
+      
+      // Modal Upsell Delegation
+      $('#modal-upsell-item').addEventListener('click', e => {
+        const addBtn = e.target.closest('[data-add]');
+        if (addBtn) {
+          e.preventDefault();
+          addToCartById(addBtn.getAttribute('data-add'));
+          closeQuickView();
+        }
+      });
+
+    });
+
+  </script>
+
+
+
+</body></html>
+{% endblock %}
