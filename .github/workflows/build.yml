@@ -29,6 +29,15 @@ jobs:
       - run: npm run lint
       - run: npm run deemind:build demo -- --sanitize --i18n --autofix
       - run: npm run deemind:test
+      - name: Package demo theme (zip)
+        run: |
+          mkdir -p artifacts
+          (cd output && zip -r ../artifacts/demo-theme.zip demo)
+      - name: Upload packaged theme
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-theme
+          path: artifacts/demo-theme.zip
       - name: Deemind doctor (validate → fix → revalidate)
         run: npm run deemind:doctor
       - name: Append validation log to history
@@ -77,5 +86,4 @@ jobs:
         with:
           name: telemetry
           path: logs/telemetry.json
-
 
