@@ -100,6 +100,50 @@ export async function validateExtended(themePath) {
   }
   report.checks.i18n = true;
 
+  // 6b) Baseline convention warnings (non-fatal)
+  try {
+    const baseRoot = path.resolve('configs', 'baselines', 'raed');
+    const conventions = await fs.readJson(path.join(baseRoot, 'conventions.json'));
+    const graph = await fs.readJson(path.join(baseRoot, 'graph.json'));
+    const conv = { layoutDir: 'layout', pagesDir: 'pages', partialsDir: 'partials', assetsDir: 'assets', ...conventions };
+    const expectDirs = [conv.layoutDir, conv.pagesDir, conv.partialsDir, conv.assetsDir].map(d => path.join(themePath, path.basename(d)));
+    for (const d of expectDirs) {
+      if (!fs.existsSync(d)) report.warnings.push({ type: 'baseline-convention', message: `Expected directory missing: ${path.relative(themePath, d)}` });
+    }
+    // Pages should extend a layout
+    for (const page of globSync(`${themePath}/pages/**/*.twig`, { nodir: true })) {
+      const txt = await fs.readFile(page, 'utf8');
+      if (!/{%\s*extends\s*['"]layout\//.test(txt)) {
+        report.warnings.push({ type: 'baseline-convention', file: page, message: 'Page does not extend a layout/* template.' });
+      }
+    }
+    // Includes should prefer partials/
+    for (const file of twigs) {
+      const txt = await fs.readFile(file, 'utf8');
+      for (const m of txt.matchAll(/{%\s*include\s*['"]([^'"]+)['"]/g)) {
+        if (!m[1].startsWith('partials/')) {
+          report.warnings.push({ type: 'baseline-convention', file, message: `Include not under partials/: ${m[1]}` });
+        }
+      }
+    }
+    // i18n usage vs baseline (coarse)
+    const baselineI18nRatio = (() => {
+      const files = Object.keys(graph).filter(k => k.endsWith('.twig')).length || 1;
+      const i18nFiles = Object.values(graph).filter(v => v.i18n).length || 0;
+      return i18nFiles / files;
+    })();
+    const oursI18nRatio = (() => {
+      const files = twigs.length || 1;
+      // eslint-disable-next-line no-useless-escape
+      const i18nFiles = twigs.filter(f => /\|\s*t\b|\{\%\s*trans\b/.test(fs.readFileSync(f, 'utf8'))).length;
+      return i18nFiles / files;
+    })();
+    if (baselineI18nRatio > 0.6 && oursI18nRatio < 0.3) {
+      report.warnings.push({ type: 'baseline-convention', message: `Low i18n coverage (${(oursI18nRatio*100)|0}%) vs baseline (${(baselineI18nRatio*100)|0}%).` });
+    }
+    report.checks.baseline = true;
+  } catch (e) { void e; }
+
   // Sample string detection
   const samples = /(Lorem ipsum|Sample Product|PRODUCT_NAME)/i;
   for (const f of twigs) {

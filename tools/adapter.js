@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import fs from 'fs-extra';
 import path from 'path';
 
@@ -7,7 +8,7 @@ function ensureInside(base, target) {
   if (!t.startsWith(b)) throw new Error(`Refusing to write outside output: ${t}`);
 }
 
-export async function adaptToSalla(parsed, outputPath, { lockUnchanged = false, partialize = false } = {}) {
+export async function adaptToSalla(parsed, outputPath, { lockUnchanged = false, partialize = false, baseline } = {}) {
   const layoutDir = path.join(outputPath, 'layout');
   const pagesDir = path.join(outputPath, 'pages');
   const partialsDir = path.join(outputPath, 'partials');
@@ -30,6 +31,8 @@ export async function adaptToSalla(parsed, outputPath, { lockUnchanged = false, 
   // Prepare partialization plan if enabled
   const sharedSignatures = new Set();
   const signatureToHtml = new Map();
+  const baselineCtx = await loadBaseline(baseline);
+  const baselineRewrites = [];
   if (partialize && Array.isArray(parsed.layoutMap)) {
     const counts = new Map();
     for (const lm of parsed.layoutMap) {
@@ -43,7 +46,12 @@ export async function adaptToSalla(parsed, outputPath, { lockUnchanged = false, 
 
   function partialNameFor(signature) {
     const base = signature && signature.length ? signature : `component-${Date.now()}`;
-    return base.replace(/[^a-zA-Z0-9_.-]/g, '_') + '.twig';
+    const slug = base.replace(/[^a-zA-Z0-9_.-]/g, '_');
+    if (baselineCtx) {
+      const cat = guessCategoryFromSignature(signature, baselineCtx);
+      return `${cat}/${slug}.twig`;
+    }
+    return slug + '.twig';
   }
 
   // Convert each HTML page to a Twig page extending the default layout
@@ -86,6 +94,10 @@ export async function adaptToSalla(parsed, outputPath, { lockUnchanged = false, 
     const content = `{% extends "layout/default.twig" %}\n{% block content %}\n${pageHtml}\n{% endblock %}\n`;
     await fs.writeFile(outFile, content, 'utf8');
     written.push(relTwig);
+     
+    for (const m of content.matchAll(/\{\%\s*include\s*\"(partials\/[^\"]+)\"\s*\%\}/g)) {
+      baselineRewrites.push({ page: `pages/${relTwig}`, include: m[1] });
+    }
   }
 
   // Copy assets from input if present
@@ -154,6 +166,11 @@ export async function adaptToSalla(parsed, outputPath, { lockUnchanged = false, 
     }
   }
 
+  if (baselineRewrites.length) {
+    const repDir = path.join(outputPath, 'reports');
+    await fs.ensureDir(repDir);
+    await fs.writeJson(path.join(repDir, 'baseline-rewrites.json'), { baseline: baseline || null, items: baselineRewrites }, { spaces: 2 });
+  }
   return { written, skipped };
 }
 
@@ -196,3 +213,36 @@ async function normalizeAssetsInHtml(html, inputRoot, pageDirRel, assetsDir, out
 function escapeRegExp(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
+
+async function loadBaseline(name) {
+  if (!name || name.toLowerCase() !== 'raed') return null;
+  try {
+    const root = path.resolve('configs', 'baselines', 'raed');
+    const graph = await fs.readJson(path.join(root, 'graph.json'));
+    const conventions = await fs.readJson(path.join(root, 'conventions.json'));
+    const categories = new Set();
+    for (const rel of Object.keys(graph)) {
+      if (!rel.includes('/components/')) continue;
+      const after = rel.split('/components/')[1];
+      const parts = after.split('/');
+      if (parts.length > 1) categories.add(parts[0]);
+    }
+    return { graph, conventions, categories: Array.from(categories) };
+  } catch {
+    return null;
+  }
+}
+
+function guessCategoryFromSignature(signature, baselineCtx) {
+  if (!baselineCtx) return 'common';
+  const s = (signature || '').toLowerCase();
+  for (const cat of baselineCtx.categories) {
+    if (s.includes(cat.toLowerCase())) return cat;
+  }
+  if (/header|nav|topbar/.test(s)) return 'header';
+  if (/footer|bottom/.test(s)) return 'footer';
+  if (/home|hero|banner|slider/.test(s)) return 'home';
+  if (/product|grid|card/.test(s)) return 'product';
+  return 'common';
+}
+

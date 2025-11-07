@@ -72,6 +72,8 @@ async function run() {
   const partialize = args.includes('--partialize');
   const sanitize = args.includes('--sanitize');
   const autofix = args.includes('--autofix');
+  const baselineFlag = args.find(a => a.startsWith('--baseline='));
+  const baseline = baselineFlag ? baselineFlag.split('=')[1] : undefined;
 
   try {
     const t0 = Date.now();
@@ -90,7 +92,7 @@ async function run() {
     const lockDefault = process.env.CI && !lockUnchanged ? true : lockUnchanged;
     console.log(chalk.yellow("🪄 Adapting to Salla theme format..."));
     const tAdapt0 = Date.now();
-    const adaptRes = await adaptToSalla(mapped, outputPath, { lockUnchanged: lockDefault, partialize });
+    const adaptRes = await adaptToSalla(mapped, outputPath, { lockUnchanged: lockDefault, partialize, baseline });
     const tAdapt1 = Date.now();
 
     // Post-process CSS assets for deterministic url(...) rewrites
@@ -155,6 +157,14 @@ async function run() {
 
     console.log(chalk.yellow("📜 Generating build manifest..."));
     const elapsed = Number(((Date.now() - start) / 1000).toFixed(2));
+    const timings = {
+      parseMs: tParse1 - tParse0,
+      mapMs: tMap1 - tMap0,
+      adaptMs: tAdapt1 - tAdapt0,
+      cssNormalizeMs: typeof tCss1 === 'number' ? (tCss1 - tAdapt1) : 0,
+      validateMs: tVal1 - tVal0,
+      totalMs: Date.now() - t0
+    };
     const manifest = await generateBuildManifest(outputPath, { coreReport, elapsedSec: elapsed, layoutMap: parsed.layoutMap, inputChecksum, performance: timings });
     await fs.writeJson(path.join(outputPath, "manifest.json"), manifest, { spaces: 2 });
 
@@ -197,17 +207,10 @@ async function run() {
     }
 
     // Component usage report (standard vs custom)
-    const baseline = loadBaselineSet();
-    const usage = computeComponentUsage(outputPath, baseline);
+    const baselineSet = loadBaselineSet();
+    const usage = computeComponentUsage(outputPath, baselineSet);
     await fs.writeJson(path.join(outputPath, 'reports', 'component-usage.json'), usage, { spaces: 2 });
-    const timings = {
-      parseMs: tParse1 - tParse0,
-      mapMs: tMap1 - tMap0,
-      adaptMs: tAdapt1 - tAdapt0,
-      cssNormalizeMs: typeof tCss1 === 'number' ? (tCss1 - tAdapt1) : 0,
-      validateMs: tVal1 - tVal0,
-      totalMs: Date.now() - t0
-    };
+    // timings already computed above
     console.log(chalk.gray(`Timings(ms): ${JSON.stringify(timings)}`));
     if (process.env.GITHUB_STEP_SUMMARY) {
       const summary = [
@@ -216,7 +219,7 @@ async function run() {
         `Parse: ${timings.parseMs}ms, Map: ${timings.mapMs}ms, Adapt: ${timings.adaptMs}ms, CSS: ${timings.cssNormalizeMs}ms, Validate: ${timings.validateMs}ms`,
         `Pages: ${parsed.pages.length}, Written: ${adaptRes.written.length}, Skipped: ${adaptRes.skipped.length}`
       ].join('\n');
-      try { await fs.appendFile(process.env.GITHUB_STEP_SUMMARY, `\n${summary}\n`); } catch {}
+      try { await fs.appendFile(process.env.GITHUB_STEP_SUMMARY, `\n${summary}\n`); } catch (e) { void e; }
     }
     console.log(chalk.greenBright(`\n✅ Deemind build complete in ${elapsed}s`));
     console.log(chalk.gray(`Output → ${outputPath}`));
