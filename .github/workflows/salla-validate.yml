@@ -1,0 +1,40 @@
+name: Salla Validate & Package
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  salla:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci || npm i
+      - name: Build demo theme
+        run: npm run deemind:build demo -- --sanitize --i18n
+      - name: Stylelint CSS
+        run: npm run stylelint || true
+      - name: PostCSS process (autoprefix + dir pseudo)
+        run: npm run postcss:process -- demo || true
+      - name: Package with Salla CLI (if available)
+        run: node tools/salla-cli.js zip demo
+        env:
+          SALLA_TOKEN: ${{ secrets.SALLA_TOKEN }}
+      - name: Upload packaged artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: salla-demo-package
+          path: |
+            output/demo/theme.json
+            output/demo/manifest.json
+            output/demo/layout/**
+            output/demo/pages/**
+            output/demo/assets/**
+
