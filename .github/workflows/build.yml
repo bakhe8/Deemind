@@ -1,13 +1,16 @@
 name: Deemind CI
 on: [push, pull_request]
+
 jobs:
-      env:\n      REQUIRE_I18N: 'true'\n    
+  build:
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       issues: write
       id-token: write
       attestations: write
-    runs-on: ubuntu-latest
+    env:
+      REQUIRE_I18N: 'true'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -24,7 +27,7 @@ jobs:
         run: node tools/check-conflicts.js
       - run: npm ci
       - run: npm run lint
-      - run: npm run deemind:build demo
+      - run: npm run deemind:build demo -- --sanitize --i18n --autofix
       - run: npm run deemind:test
       - name: Deemind doctor (validate → fix → revalidate)
         run: npm run deemind:doctor
@@ -74,6 +77,5 @@ jobs:
         with:
           name: telemetry
           path: logs/telemetry.json
-
 
 
