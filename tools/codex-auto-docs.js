@@ -135,9 +135,23 @@ async function main(){
       const resp = await client.responses.create({ model: 'gpt-4.1-mini', input: prompt });
       const enhanced = String(resp.output_text || '').trim();
       if (enhanced) write(path.resolve('docs','architecture-enhanced.md'), enhanced + '\n');
+      // Targeted component docs
+      await generateComponentDoc(client, 'Parser', [
+        'tools/deemind-parser/parser.js',
+        'tools/deemind-parser/hybrid-runner.js',
+        'tools/deemind-parser/semantic-mapper.js'
+      ], 'docs/parser.md');
+      await generateComponentDoc(client, 'Adapter', [
+        'tools/adapter.js',
+        'tools/adapter-salla.js'
+      ], 'docs/adapter.md');
+      await generateComponentDoc(client, 'Validator', [
+        'tools/validator.js',
+        'tools/validator-extended.js'
+      ], 'docs/validator.md');
     } catch (e) {
       // If enhancement fails, proceed with extracted docs only
-       
+      
       console.warn('AI enhancement skipped:', e.message || e);
     }
   }
@@ -145,5 +159,17 @@ async function main(){
   console.log('Auto-docs generated.');
 }
 
-main().catch(e => { console.error('codex-auto-docs error:', e); process.exit(1); });
+async function generateComponentDoc(client, title, files, outPath){
+  const parts = files.map(f => `--- ${f} ---\n` + read(f).slice(0, 16000)).join('\n');
+  const input = [
+    `You are Codex. Write a complete ${title} documentation page for Deemind.`,
+    'Describe responsibilities, inputs/outputs, data flow, key functions, error handling, performance considerations, and extension points.',
+    'No placeholders or generic text — ground in the provided code. Use concise sections and bullet points where helpful.',
+    parts
+  ].join('\n');
+  const resp = await client.responses.create({ model: 'gpt-4.1-mini', input });
+  const text = String(resp.output_text || '').trim();
+  if (text) write(path.resolve(outPath), text + '\n');
+}
 
+main().catch(e => { console.error('codex-auto-docs error:', e); process.exit(1); });
