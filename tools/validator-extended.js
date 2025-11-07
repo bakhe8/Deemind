@@ -106,7 +106,10 @@ export async function validateExtended(themePath) {
     const conventions = await fs.readJson(path.join(baseRoot, 'conventions.json'));
     const graph = await fs.readJson(path.join(baseRoot, 'graph.json'));
     const conv = { layoutDir: 'layout', pagesDir: 'pages', partialsDir: 'partials', assetsDir: 'assets', ...conventions };
-    const expectDirs = [conv.layoutDir, conv.pagesDir, conv.partialsDir, conv.assetsDir].map(d => path.join(themePath, path.basename(d)));
+    const basenames = [conv.layoutDir, conv.pagesDir, conv.partialsDir, conv.assetsDir].map(d => path.basename(d));
+    // Map baseline 'components' folder to output 'partials' equivalence
+    const mapped = basenames.map(b => (b === 'components' ? 'partials' : b));
+    const expectDirs = mapped.map(name => path.join(themePath, name));
     for (const d of expectDirs) {
       if (!fs.existsSync(d)) report.warnings.push({ type: 'baseline-convention', message: `Expected directory missing: ${path.relative(themePath, d)}` });
     }
