@@ -144,6 +144,36 @@ export async function validateExtended(themePath) {
     report.checks.baseline = true;
   } catch (e) { void e; }
 
+  // 6c) SDK usage checks (warn-only)
+  try {
+    const knowPath = path.resolve('configs', 'knowledge', 'salla-docs.json');
+    if (await fs.pathExists(knowPath)) {
+      const know = await fs.readJson(knowPath);
+      const knownApis = new Set(((know.sdk && know.sdk.apis) || []).map(String));
+      const deprecated = new Set(((know.sdk && know.sdk.deprecated) || []).map(String));
+      const rx = /\b(?:salla|Salla|SDK)\.[A-Za-z0-9_.]+/g;
+      const seen = new Set();
+      // scan twig files
+      for (const file of twigs) {
+        const txt = await fs.readFile(file, 'utf8');
+        for (const m of txt.matchAll(rx)) seen.add(m[0]);
+      }
+      // scan built JS assets
+      for (const jsFile of globSync(`${themePath}/assets/**/*.js`, { nodir: true })) {
+        const txt = await fs.readFile(jsFile, 'utf8');
+        for (const m of txt.matchAll(rx)) seen.add(m[0]);
+      }
+      for (const api of Array.from(seen)) {
+        if (deprecated.has(api)) {
+          report.warnings.push({ type: 'sdk-deprecated', message: `Deprecated SDK API used: ${api}` });
+        } else if (!knownApis.has(api)) {
+          report.warnings.push({ type: 'sdk-unknown', message: `Unknown SDK API reference: ${api}` });
+        }
+      }
+      report.checks.sdk = true;
+    }
+  } catch (e) { void e; }
+
   // Sample string detection
   const samples = /(Lorem ipsum|Sample Product|PRODUCT_NAME)/i;
   for (const f of twigs) {
