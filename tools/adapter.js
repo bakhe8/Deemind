@@ -27,6 +27,19 @@ export async function adaptToSalla(parsed, outputPath, { lockUnchanged = false, 
   const defaultLayoutPath = path.join(layoutDir, 'default.twig');
   ensureInside(outputPath, defaultLayoutPath);
   await fs.writeFile(defaultLayoutPath, defaultLayout, 'utf8');
+  // Optionally enrich layout with Salla master hooks if knowledge is available
+  try {
+    const hintsPath = path.resolve('configs', 'knowledge', 'salla-docs.json');
+    if (await fs.pathExists(hintsPath)) {
+      const hints = await fs.readJson(hintsPath);
+      const hooks = Array.isArray(hints?.layouts?.masterHooks) ? hints.layouts.masterHooks : [];
+      if (hooks.length) {
+        const bodyBlocks = hooks.map(h => `  {% block ${h} %}{% endblock %}`).join("\n");
+        const enriched = `{# Deemind default layout #}\n<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="utf-8"/>\n  <title>{% block title %}Salla Theme{% endblock %}</title>\n  {% block head %}{% endblock %}\n</head>\n<body>\n${bodyBlocks}\n  {% block scripts %}{% endblock %}\n</body>\n</html>\n`;
+        await fs.writeFile(defaultLayoutPath, enriched, 'utf8');
+      }
+    }
+  } catch (e) { void e; }
 
   // Prepare partialization plan if enabled
   const sharedSignatures = new Set();
@@ -245,4 +258,5 @@ function guessCategoryFromSignature(signature, baselineCtx) {
   if (/product|grid|card/.test(s)) return 'product';
   return 'common';
 }
+
 

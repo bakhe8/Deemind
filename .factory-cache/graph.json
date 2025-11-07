@@ -1,4 +1,10 @@
 {
-  "nodes": [],
-  "edges": []
+  "nodes": ["pages/index.twig"],
+  "edges": [
+    {
+      "from": "pages/index.twig",
+      "to": "layout/default.twig",
+      "type": "extends"
+    }
+  ]
 }
