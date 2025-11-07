@@ -1,0 +1,6 @@
+.factory-cache/
+output/
+input/**/*.html
+archives/
+logs/
+coverage/
