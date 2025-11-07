@@ -42,6 +42,7 @@ function defaultHints(){
       products: []
     },
     sdk: { apis: [], deprecated: [] },
+    webComponents: { tags: [] },
     fetched: false,
     fetchedAt: new Date().toISOString()
   };
@@ -71,6 +72,10 @@ function scrape(html){
   // SDK main API identifiers (salla.*, Salla.*, SDK.*)
   const sdkMatches = Array.from(text.matchAll(/\b(?:salla|Salla|SDK)\.[A-Za-z0-9_.]+/g)).map(m=>m[0]);
   if (sdkMatches.length) hints.sdk.apis = Array.from(new Set([...(hints.sdk.apis||[]), ...sdkMatches]));
+  // Custom elements (web components), prefer salla-* tags
+  const tagMatches = Array.from(html.matchAll(/<\s*([a-z][a-z0-9-]+)(\s|>)/g)).map(m=>m[1]).filter(t=>t.includes('-'));
+  const sallaTags = tagMatches.filter(t => t.toLowerCase().startsWith('salla-'));
+  if (sallaTags.length) hints.webComponents.tags = Array.from(new Set([...(hints.webComponents.tags||[]), ...sallaTags]));
   hints.fetched = true;
   hints.fetchedAt = new Date().toISOString();
   return hints;
@@ -91,6 +96,9 @@ async function fetchAll(){
       hints.filters = mergeSet(hints.filters, part.filters);
       if (part.sdk && Array.isArray(part.sdk.apis)) {
         hints.sdk.apis = mergeSet(hints.sdk.apis, part.sdk.apis);
+      }
+      if (part.webComponents && Array.isArray(part.webComponents.tags)) {
+        hints.webComponents.tags = mergeSet(hints.webComponents.tags, part.webComponents.tags);
       }
       Object.keys(hints.components).forEach(k => {
         hints.components[k] = mergeSet(hints.components[k], part.components[k]||[]);

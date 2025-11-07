@@ -220,6 +220,9 @@
     ],
     "deprecated": []
   },
+  "webComponents": {
+    "tags": []
+  },
   "fetched": true,
-  "fetchedAt": "2025-11-07T13:00:05.683Z"
+  "fetchedAt": "2025-11-07T13:02:23.671Z"
 }

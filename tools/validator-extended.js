@@ -174,6 +174,30 @@ export async function validateExtended(themePath) {
     }
   } catch (e) { void e; }
 
+  // 6d) Web Components (custom elements) checks (warn-only)
+  try {
+    const knowPath = path.resolve('configs', 'knowledge', 'salla-docs.json');
+    if (await fs.pathExists(knowPath)) {
+      const know = await fs.readJson(knowPath);
+      const knownTags = new Set(((know.webComponents && know.webComponents.tags) || []).map(t => t.toLowerCase()));
+      const rxTag = /<\s*([a-z][a-z0-9-]+)(\s|>)/g;
+      const used = new Set();
+      for (const f of twigs) {
+        const txt = await fs.readFile(f, 'utf8');
+        for (const m of txt.matchAll(rxTag)) {
+          const tag = (m[1] || '').toLowerCase();
+          if (tag.includes('-')) used.add(tag);
+        }
+      }
+      for (const tag of Array.from(used)) {
+        if (tag.startsWith('salla-') && !knownTags.has(tag)) {
+          report.warnings.push({ type: 'webcomponents-unknown', message: `Unknown Salla web component: <${tag}>` });
+        }
+      }
+      report.checks.webComponents = true;
+    }
+  } catch (e) { void e; }
+
   // Sample string detection
   const samples = /(Lorem ipsum|Sample Product|PRODUCT_NAME)/i;
   for (const f of twigs) {
