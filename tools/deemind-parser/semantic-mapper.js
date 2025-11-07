@@ -22,6 +22,9 @@ export async function mapSemantics(parsed, { i18n = false, client, sanitize = fa
     for (const [key, value] of Object.entries(placeholders)) {
       const re = new RegExp(`\\{\\{\\s*${key}\\s*\\}\\}`, 'g');
       html = html.replace(re, value);
+      // Also replace bare tokens in text nodes (e.g., PRODUCT_NAME)
+      const bare = new RegExp(`\\b${key}\\b`, 'g');
+      html = html.replace(bare, value);
     }
     if (i18n) {
       html = html.replace(/<title>(.*?)<\/title>/is, (_m, p1) => `<title>{% trans %}${p1}{% endtrans %}</title>`);

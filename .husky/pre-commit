@@ -1,5 +1,5 @@
 echo "🧠  Running Deemind pre-commit checks..."
-npx lint-staged --config .lintstagedrc.cjs || exit 1
+npx lint-staged || exit 1
 npm run deemind:test || exit 1
 node tools/validator-extended.js || exit 1
 echo "✅  Deemind pre-commit passed."
