@@ -112,10 +112,38 @@ async function main(){
   const modules = parseModules();
   write(path.resolve('docs','workflows.md'), genWorkflowsMd(workflows));
   write(path.resolve('docs','modules.md'), genModulesMd(modules));
+  // Optional: Enhanced narratives via OpenAI if key is present
+  if (process.env.OPENAI_API_KEY) {
+    try {
+      const { default: OpenAI } = await import('openai');
+      const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      const wfText = genWorkflowsMd(workflows);
+      const modText = genModulesMd(modules);
+      const repoOverview = read('README.md');
+      const prompt = [
+        'You are Codex. Produce concise but thorough technical documentation for this repository.',
+        'Audience: senior engineers. Tone: precise, actionable. No placeholders.',
+        'Include: architecture overview, parser/mapper/adapter/validator responsibilities, CI/CD summary, workflows, and maintenance loops.',
+        'Base your writing strictly on the provided extracted content; synthesize where helpful.',
+        '--- README (context) ---',
+        repoOverview.slice(0, 12000),
+        '--- Workflows (extracted) ---',
+        wfText.slice(0, 12000),
+        '--- Modules (extracted) ---',
+        modText.slice(0, 12000)
+      ].join('\n');
+      const resp = await client.responses.create({ model: 'gpt-4.1-mini', input: prompt });
+      const enhanced = String(resp.output_text || '').trim();
+      if (enhanced) write(path.resolve('docs','architecture-enhanced.md'), enhanced + '\n');
+    } catch (e) {
+      // If enhancement fails, proceed with extracted docs only
+       
+      console.warn('AI enhancement skipped:', e.message || e);
+    }
+  }
   updateReadmeIndex();
   console.log('Auto-docs generated.');
 }
 
 main().catch(e => { console.error('codex-auto-docs error:', e); process.exit(1); });
-
 
