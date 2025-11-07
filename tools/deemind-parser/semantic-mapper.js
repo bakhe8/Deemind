@@ -37,15 +37,19 @@ export async function mapSemantics(parsed, { i18n = false, client, sanitize = fa
 
     if (i18n) {
       const $ = cheerio.load(html, { decodeEntities: false });
-      const sels = Array.isArray(settings.i18nSelectors) ? settings.i18nSelectors : [];
+      let sels = Array.isArray(settings.i18nSelectors) ? settings.i18nSelectors : [];
+      if (!sels.length) {
+        sels = ['h1','h2','h3','h4','h5','h6','p','button','label','a','li','span'];
+      }
       const attrs = Array.isArray(settings.i18nAttrAllowlist) ? settings.i18nAttrAllowlist : [];
       // Wrap inner text
       for (const s of sels) {
         $(s).each((_, el) => {
-          const txt = $(el).text();
+          const txt = ($(el).text() || '').trim();
           if (!txt) return;
           if (/[{}%]/.test(txt)) return; // skip if likely Twig already
-          const wrapped = `{% trans %}${txt.trim()}{% endtrans %}`;
+          if (/^\d+[\s\w%]*$/.test(txt)) return; // numeric-only or trivial counters
+          const wrapped = `{% trans %}${txt}{% endtrans %}`;
           $(el).text('');
           $(el).append(wrapped);
         });

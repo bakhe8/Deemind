@@ -1,0 +1,66 @@
+name: Actions Digest
+
+on:
+  workflow_run:
+    workflows: ["Deemind CI", "Codex Deep Evaluation", "Deemind Codex Agent", "Actions Digest"]
+    types: [completed]
+
+jobs:
+  summarize:
+    if: ${{ github.event.workflow_run.name != 'Actions Digest' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Generate actions digest
+        run: node tools/monitor-actions.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+      - name: Append latest digest to job summary
+        shell: bash
+        run: |
+          f=$(ls -t reports/actions-summary-*.md | head -n1 || true)
+          if [ -n "$f" ]; then
+            echo "### Latest Actions Digest" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            cat "$f" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No digest file found" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Comment digest on PR (if exists for this SHA)
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const head_sha = context.payload.workflow_run.head_sha;
+            const { owner, repo } = context.repo;
+            // Find PRs associated with this commit
+            const prs = await github.request('GET /repos/{owner}/{repo}/commits/{ref}/pulls', { owner, repo, ref: head_sha, mediaType: { previews: ['groot'] } });
+            if (!prs.data.length) {
+              core.info('No PRs found for this commit.');
+              return;
+            }
+            // Read latest digest file
+            const fs = require('fs');
+            const path = require('path');
+            const dir = 'reports';
+            let files = [];
+            try { files = fs.readdirSync(dir).filter(f => f.startsWith('actions-summary-') && f.endsWith('.md')); } catch {}
+            if (!files.length) {
+              core.info('No digest file to post.');
+              return;
+            }
+            files.sort();
+            const md = fs.readFileSync(path.join(dir, files[files.length-1]), 'utf8');
+            for (const pr of prs.data) {
+              await github.rest.issues.createComment({ owner, repo, issue_number: pr.number, body: md });
+              core.info(`Commented digest on PR #${pr.number}`);
+            }
+

@@ -29,16 +29,21 @@ function main(){
   const knowPath = path.resolve('configs','knowledge','salla-docs.json');
   const knowledge = loadJson(knowPath, { sdk:{ apis:[], deprecated:[] }, webComponents:{ tags:[] } });
 
-  // Merge SDK APIs from report warnings (gimni)
-  const reportPath = path.resolve('output','gimni','report-extended.json');
-  const rep = loadJson(reportPath, null);
-  if (rep && Array.isArray(rep.warnings)){
-    const apis = rep.warnings.filter(w=>w.type==='sdk-unknown').map(w=>{
-      const m = String(w.message||'').match(/reference:\s*(\S+)/i);
-      return m ? m[1] : null;
-    }).filter(Boolean);
-    knowledge.sdk = knowledge.sdk || { apis:[], deprecated:[] };
-    knowledge.sdk.apis = uniq([...(knowledge.sdk.apis||[]), ...apis]);
+  // Merge SDK APIs from report warnings across all outputs
+  const outRoot = path.resolve('output');
+  if (fs.existsSync(outRoot)) {
+    for (const name of fs.readdirSync(outRoot)) {
+      const repPath = path.join(outRoot, name, 'report-extended.json');
+      const rep = loadJson(repPath, null);
+      if (rep && Array.isArray(rep.warnings)){
+        const apis = rep.warnings.filter(w=>w.type==='sdk-unknown').map(w=>{
+          const m = String(w.message||'').match(/reference:\s*(\S+)/i);
+          return m ? m[1] : null;
+        }).filter(Boolean);
+        knowledge.sdk = knowledge.sdk || { apis:[], deprecated:[] };
+        knowledge.sdk.apis = uniq([...(knowledge.sdk.apis||[]), ...apis]);
+      }
+    }
   }
 
   // Merge web components from current outputs
@@ -52,4 +57,3 @@ function main(){
 }
 
 main();
-

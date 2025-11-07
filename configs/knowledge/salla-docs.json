@@ -311,12 +311,31 @@
       "salla.wishlist.toggle",
       "salla.helpers.inputDigitsOnly",
       "salla.api.component.getMenus",
-      "salla.logger.error"
+      "salla.logger.error",
+      "Salla.onReady",
+      "Salla.status",
+      "salla.config.all",
+      "salla.event.dispatchEvents",
+      "salla.com"
     ],
     "deprecated": []
   },
   "webComponents": {
-    "tags": []
+    "tags": [
+      "salla-advertisement",
+      "salla-search",
+      "salla-contacts",
+      "salla-cart-summary",
+      "salla-products-slider",
+      "salla-slider",
+      "salla-rating-stars",
+      "salla-social",
+      "salla-menu",
+      "salla-apps-icons",
+      "salla-payments",
+      "salla-offer-modal",
+      "salla-login-modal"
+    ]
   },
   "fetched": true,
   "fetchedAt": "2025-11-07T13:06:57.128Z"
