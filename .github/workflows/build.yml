@@ -1,8 +1,7 @@
 name: Deemind CI
 on: [push, pull_request]
 jobs:
-  build:
-    continue-on-error: true
+      env:\n      REQUIRE_I18N: 'true'\n    
     permissions:
       contents: write
       issues: write
@@ -75,5 +74,6 @@ jobs:
         with:
           name: telemetry
           path: logs/telemetry.json
+
 
 

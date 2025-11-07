@@ -155,7 +155,7 @@ async function run() {
 
     console.log(chalk.yellow("📜 Generating build manifest..."));
     const elapsed = Number(((Date.now() - start) / 1000).toFixed(2));
-    const manifest = await generateBuildManifest(outputPath, { coreReport, elapsedSec: elapsed, layoutMap: parsed.layoutMap, inputChecksum });
+    const manifest = await generateBuildManifest(outputPath, { coreReport, elapsedSec: elapsed, layoutMap: parsed.layoutMap, inputChecksum, performance: timings });
     await fs.writeJson(path.join(outputPath, "manifest.json"), manifest, { spaces: 2 });
 
     // Conversion report (what succeeded vs not)

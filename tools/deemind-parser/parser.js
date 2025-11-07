@@ -1,6 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { glob } from 'glob';
+import pLimit from 'p-limit';
 import * as cheerio from 'cheerio';
 
 function withTimeout(promise, ms, onTimeout) {
@@ -32,25 +33,25 @@ export async function parseFolder(inputPath) {
     maxBytes = s.maxInputFileBytes || 0;
   } catch (err) { void err; }
 
-  for (const rel of htmlFiles) {
+  const limit = pLimit(8);
+  await Promise.all(htmlFiles.map(rel => limit(async () => {
     const abs = path.join(inputPath, rel);
     try {
       const stat = await fs.stat(abs);
       if (maxBytes && stat.size > maxBytes) {
         failed.push(rel);
-        continue;
+        return;
       }
       const html = await withTimeout(fs.readFile(abs, 'utf8'), 5000);
       const $ = cheerio.load(html, { decodeEntities: false });
       const normalized = $.html().replace(/^\uFEFF/, '').replace(/\r\n/g, '\n');
       pages.push({ rel, html: normalized });
     } catch (e) {
-      // Quarantine problematic file
       const quarantine = path.join(inputPath, '_failed', rel);
       await fs.ensureDir(path.dirname(quarantine));
       await fs.copy(abs, quarantine).catch(() => {});
       failed.push(rel);
     }
-  }
+  })));
   return { inputPath, pages, failed };
 }

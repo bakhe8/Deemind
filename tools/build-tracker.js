@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import crypto from 'crypto';
 
-export async function generateBuildManifest(outputPath, { coreReport, elapsedSec, layoutMap, inputChecksum } = {}) {
+export async function generateBuildManifest(outputPath, { coreReport, elapsedSec, layoutMap, inputChecksum, performance } = {}) {
   const theme = path.basename(outputPath);
   const pagesDir = path.join(outputPath, 'pages');
   const layoutDir = path.join(outputPath, 'layout');
@@ -30,6 +30,7 @@ export async function generateBuildManifest(outputPath, { coreReport, elapsedSec
     pageOrder: layoutMap?.map(l => l.page) || [],
     failedFiles: (coreReport?.issues || []).filter(i => i.level==='critical').map(i => i.file).filter(Boolean),
     inputChecksum,
+    performance: performance || undefined,
   };
 
   // Append analytics build history (respect local settings)
