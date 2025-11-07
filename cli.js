@@ -96,11 +96,13 @@ async function run() {
     const tAdapt1 = Date.now();
 
     // Post-process CSS assets for deterministic url(...) rewrites
+    // Declare timing vars once; assign inside try to avoid redeclaration lint
+    let tCss1;
     try {
       const { normalizeCssAssets } = await import('./tools/normalize-css-assets.js');
-      const tCss0 = Date.now();
+      const tCssStart = Date.now();
       await normalizeCssAssets({ outputPath, inputPath });
-      var tCss1 = Date.now();
+      tCss1 = Date.now();
     } catch (_) { /* optional */ }
 
     // Verbose per-page, per-component progress

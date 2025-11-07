@@ -9,18 +9,15 @@
   ],
   "compare": {
     "includeExtensions": [".twig", ".html", ".json", ".css", ".js"],
-    "ignorePaths": [
-      "**/.DS_Store",
-      "**/*.map"
-    ],
+    "ignorePaths": ["**/.DS_Store", "**/*.map"],
     "ignoreJsonKeys": [
       "timestamp",
       "buildDate",
       "commit",
       "checksum",
-      "environment"
+      "environment",
+      "elapsedSec"
     ],
     "normalizeWhitespace": true
   }
 }
-
