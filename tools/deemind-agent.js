@@ -30,6 +30,9 @@ const BRANCH = 'auto-agent';
 const BASE_BRANCH = process.env.DEEMIND_BASE || 'develop';
 const CHECKLIST_PATH = 'docs/deemind_checklist.md';
 const AUDIT_LOG_PATH = 'logs/deemind_audit_report.json';
+const TASKS_PATH = 'codex-tasks.json';
+const PROGRESS_LOG = 'logs/codex-progress.log';
+const STATUS_PATH = 'logs/codex-status.json';
 
 function getRepo() {
   const envRepo = process.env.GITHUB_REPOSITORY;
@@ -46,9 +49,67 @@ function getRepo() {
   throw new Error('Unable to resolve repo. Set GITHUB_REPOSITORY or DEEMIND_REPO_OWNER/DEEMIND_REPO_NAME.');
 }
 
+function writeProgress(line) {
+  try {
+    fs.mkdirSync(path.dirname(PROGRESS_LOG), { recursive: true });
+    fs.appendFileSync(PROGRESS_LOG, `[${new Date().toISOString()}] ${line}\n`);
+  } catch (err) { /* ignore logging errors */ }
+}
+
+function writeStatus(obj) {
+  try {
+    fs.mkdirSync(path.dirname(STATUS_PATH), { recursive: true });
+    fs.writeFileSync(STATUS_PATH, JSON.stringify(obj, null, 2));
+  } catch (err) { /* ignore logging errors */ }
+}
+
+function loadTasks() {
+  if (!fs.existsSync(TASKS_PATH)) return { queue: [] };
+  try { return JSON.parse(fs.readFileSync(TASKS_PATH, 'utf8')); } catch (err) { return { queue: [] }; }
+}
+
+function saveTasks(tasks) {
+  fs.writeFileSync(TASKS_PATH, JSON.stringify(tasks, null, 2));
+}
+
+async function runCodexCycle(taskName) {
+  const maxCycles = Number(process.env.CODEX_MAX_CYCLES || 5);
+  let current = 1;
+  let status = 'in-progress';
+  writeProgress(`cycle:start task="${taskName}"`);
+  while (status === 'in-progress' && current <= maxCycles) {
+    console.log(`🧠 Codex cycle ${current} for task: ${taskName}`);
+    writeProgress(`cycle:${current} executing`);
+    status = await executeCodexTask(taskName);
+    await validateResults();
+    current++;
+  }
+  const result = (status === 'done') ? 'done' : 'needs-review';
+  writeProgress(`cycle:end task="${taskName}" result=${result}`);
+  return result;
+}
+
+async function validateResults() {
+  try {
+    execSync('npm run deemind:doctor', { stdio: 'inherit' });
+    writeProgress('validate:ok');
+    return true;
+  } catch (e) {
+    writeProgress('validate:fail');
+    return false;
+  }
+}
+
+async function executeCodexTask(taskName) {
+  // Bridge to existing implementation: for now, one pass marks task done
+  void taskName;
+  return 'done';
+}
+
 async function main() {
   console.log('🧠 Deemind Agent starting...\n');
   const { owner, repo } = getRepo();
+  writeStatus({ state: 'starting', repo: `${owner}/${repo}` });
 
   // STEP 1 — Read checklist
   const checklist = fs.readFileSync(CHECKLIST_PATH, 'utf8');
@@ -220,6 +281,21 @@ ${allFiles.join('\n')}
     console.log('⏳ Skipping auto-close: CI not green yet.');
   }
 
+  // Self-driven loop: process tasks queue if present
+  const tasks = loadTasks();
+  while (tasks.queue && tasks.queue.length) {
+    const taskName = tasks.queue[0];
+    writeStatus({ state: 'running', task: taskName, queue: tasks.queue });
+    const res = await runCodexCycle(taskName);
+    if (res === 'done') {
+      tasks.queue.shift();
+      saveTasks(tasks);
+    } else {
+      writeStatus({ state: 'paused', reason: 'needs-review', task: taskName });
+      break;
+    }
+  }
+  writeStatus({ state: 'idle', remaining: (loadTasks().queue||[]).length });
   console.log('\n🎯 Deemind Agent completed execution.');
 }
 

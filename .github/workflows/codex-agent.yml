@@ -3,6 +3,9 @@ on:
   schedule:
     - cron: "0 */6 * * *"
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Deemind Codex Agent"]
+    types: [completed]
 jobs:
   codex:
     runs-on: ubuntu-latest
@@ -17,10 +20,11 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
-      - name: Run Deemind Agent
-        run: node tools/codex-auto-docs.js\n      - run: node tools/deemind-agent.js
+      - name: Auto-generate docs first
+        run: node tools/codex-auto-docs.js
+      - name: Run Deemind Agent (self-driven)
+        run: node tools/deemind-agent.js
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 
