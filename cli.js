@@ -70,20 +70,14 @@ async function run() {
   const client = clientFlag ? clientFlag.split('=')[1] : undefined;
   const prune = args.includes('--prune-partials');
   const partialize = args.includes('--partialize');
-  const doArchive = args.includes('--archive');
+  const sanitize = args.includes('--sanitize');
 
   try {
     console.log(chalk.yellow("🔍 Parsing HTML structure (hybrid)..."));
     const parsed = await runHybridParser(inputPath);
 
     console.log(chalk.yellow("🧠 Mapping semantics and Twig variables..."));
-    // Apply sanitizeByDefault from settings unless explicitly disabled
-    let sanitizeUsed = args.includes('--sanitize');
-    try {
-      const cfg = await fs.readJson(path.join(__dirname, "configs", "settings.json"));
-      if (cfg && cfg.sanitizeByDefault) sanitizeUsed = true;
-    } catch (err) { void err; }
-    const mapped = await mapSemantics(parsed, { i18n, client, sanitize: sanitizeUsed });
+    const mapped = await mapSemantics(parsed, { i18n, client, sanitize });
 
     console.log(chalk.yellow("🪄 Adapting to Salla theme format..."));
     const adaptRes = await adaptToSalla(mapped, outputPath, { lockUnchanged, partialize });
@@ -127,13 +121,6 @@ async function run() {
     const inputChecksum = await hashInputDir(inputPath);
     const manifest = await generateBuildManifest(outputPath, { coreReport, elapsedSec: elapsed, layoutMap: parsed.layoutMap, inputChecksum });
     await fs.writeJson(path.join(outputPath, "manifest.json"), manifest, { spaces: 2 });
-    if (doArchive) {
-      const { archiveTheme } = await import('./tools/delivery-pipeline.js');
-      console.log(chalk.yellow("📦 Archiving build output..."));
-      const zipPath = await archiveTheme(outputPath);
-      await fs.writeJson(path.join(outputPath, 'delivery-report.json'), { zipPath, timestamp: new Date().toISOString() }, { spaces: 2 });
-      console.log(chalk.gray(`Archive → ${zipPath}`));
-    }
 
     // Conversion report (what succeeded vs not)
     const critical = (coreReport.issues || []).filter(i => i.level === 'critical').length;
@@ -192,12 +179,6 @@ async function run() {
 
 run();
 
-/**
- * Compute an MD5 checksum of the input directory contents.
- * Why: We persist this into manifest.json to capture the exact
- * source state used for the build, enabling reproducibility and
- * quick change detection without walking git history.
- */
 async function hashInputDir(dir) {
   const crypto = await import('crypto');
   const { glob } = await import('glob');
@@ -211,4 +192,3 @@ async function hashInputDir(dir) {
   }
   return h.digest('hex');
 }
-

@@ -1,0 +1,17 @@
+name: PR Summary (placeholder)
+on:
+  pull_request:
+    types: [opened, synchronize]
+jobs:
+  summarize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add PR summary comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          header: summary
+          message: |
+            Automated summary placeholder. Integrate OpenAI later to auto-summarize changes and suggest changelog entries.
+

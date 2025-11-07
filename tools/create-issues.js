@@ -1,11 +1,6 @@
 #!/usr/bin/env node
-/**
- * Create labels, milestones, and issues via the GitHub REST API.
- * Why: Keeps the project board aligned with the master checklist and
- * avoids manual duplication; deduplication is title‑based (case‑insensitive)
- * to make repeated runs idempotent.
- * Usage: node tools/create-issues.js <owner/repo> [jsonPath|builtin:comprehensive|builtin:advanced]
- */
+// Create labels, milestones, and issues from .github/deemind-issues.json via GitHub REST API
+// Usage: node tools/create-issues.js <owner/repo> [jsonPath]
 
 import fs from 'fs';
 import path from 'path';
@@ -115,36 +110,7 @@ async function main() {
   const msMap = await ensureMilestones(api, [...new Set(issues.map(i => i.milestone).filter(Boolean))]);
   // Labels
   await ensureLabels(api, unique(issues.flatMap(i => i.labels || [])));
-  // Existing issues titles (state=all)
-  const existingTitles = new Set();
-  {
-    let page = 1;
-    while (true) {
-      const data = await api(`/issues?state=all&per_page=100&page=${page}`);
-      if (!Array.isArray(data) || data.length === 0) break;
-      for (const it of data) existingTitles.add((it.title || '').toLowerCase());
-      page++;
-    }
-  }
-  // Issues
-  for (const it of issues) {
-    if (existingTitles.has((it.title || '').toLowerCase())) {
-      process.stdout.write(`Skip duplicate: ${it.title}\n`);
-      continue;
-    }
-    const milestoneNumber = it.milestone ? msMap.get(it.milestone) : undefined;
-    await api('/issues', {
-      method: 'POST',
-      body: {
-        title: it.title,
-        body: it.body || '',
-        labels: it.labels || [],
-        milestone: milestoneNumber,
-      },
-    });
-    process.stdout.write(`Created: ${it.title}\n`);
-  }
-  console.log('All issues created.');
+  // Existing issues titles (state=all)\n  const existingTitles = new Set();\n  {\n    let page = 1;\n    while (true) {\n      const data = await api(/issues?state=all&per_page=100&page=);\n      if (!Array.isArray(data) || data.length === 0) break;\n      for (const it of data) existingTitles.add((it.title||'').toLowerCase());\n      page++;\n    }\n  }\n  // Issues\n  for (const it of issues) {\n    if (existingTitles.has((it.title||'').toLowerCase())) {\n      process.stdout.write(Skip duplicate: \n);\n      continue;\n    }\n    const milestoneNumber = it.milestone ? msMap.get(it.milestone) : undefined;\n    await api('/issues', {\n      method: 'POST',\n      body: {\n        title: it.title,\n        body: it.body || '',\n        labels: it.labels || [],\n        milestone: milestoneNumber,\n      },\n    });\n    process.stdout.write(Created: \n);\n  }\n  console.log('All issues created.');
 }
 
 function unique(arr) { return Array.from(new Set(arr)); }

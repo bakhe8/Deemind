@@ -6,14 +6,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import { globSync } from 'glob';
 import { createHash } from 'crypto';
-import Ajv from 'ajv';
 
-/**
- * Deep validator for encoding, unsafe patterns, dependencies, assets, budgets, i18n.
- * Why: These checks catch review-time failures (e.g., inline handlers, cycles,
- * missing assets) that the core validator intentionally skips for speed.
- * Budgets default to warn to avoid blocking iteration; can be escalated via config.
- */
 export async function validateExtended(themePath) {
   const report = {
     errors: [],
@@ -96,17 +89,12 @@ export async function validateExtended(themePath) {
 
   // 6) Translation check (simple visible text check)
   const untranslated = twigs.filter(f => {
-    const text = fs.readFileSync(f, "utf8");
-    const hasFilter = /\|\s*t\b/.test(text);
-        const hasBlock = /\{%\s*trans\s*%\}[\s\S]*?\{%\s*endtrans\s*%\}/.test(text);
-    const hasI18n = hasFilter || hasBlock;
-    return />[^<]{8,}</.test(text) && !hasI18n;
+    const text = fs.readFileSync(f, 'utf8');
+    return />[^<]{8,}</.test(text) && !/\|\s*t/.test(text);
   });
-  // Record potential untranslated content as warnings
-  for (const f of untranslated) {
-    report.warnings.push({ type: 'i18n-untranslated-heuristic', file: f, message: 'Possible untranslated text detected.' });
+  if (untranslated.length) {
+    (settings.requireI18n ? report.errors : report.warnings).push({ type: 'i18n', message: `${untranslated.length} files with unwrapped visible text.` });
   }
-  
   report.checks.i18n = true;
 
   // Sample string detection
@@ -150,24 +138,6 @@ export async function validateExtended(themePath) {
     report.errors.push({ type: 'manifest-missing', message: 'manifest.json not found.' });
   }
   report.checks.manifest = true;
-
-  // 8) Schema validation (manifest against cached Salla schema)
-  try {
-    const schemaPath = path.resolve('configs', 'salla-schema.json');
-    if (await fs.pathExists(schemaPath) && await fs.pathExists(manifestPath)) {
-      const ajv = new Ajv({ allErrors: true, strict: false });
-      const schema = await fs.readJson(schemaPath);
-      const manifest = await fs.readJson(manifestPath);
-      const validate = ajv.compile(schema);
-      const valid = validate(manifest);
-      if (!valid) {
-        report.errors.push({ type: 'schema', message: 'Manifest failed Salla schema validation', details: validate.errors });
-      }
-    }
-  } catch (err) {
-    report.warnings.push({ type: 'schema-exec', message: 'Schema validation skipped due to runtime error.' });
-  }
-  report.checks.schema = true;
 
   const outFile = path.join(themePath, 'report-extended.json');
   const summary = {

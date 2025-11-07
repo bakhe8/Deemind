@@ -1,16 +1,17 @@
 ---
 name: Enhancement
-about: Improve existing functionality or docs
+about: Suggest an enhancement or improvement
 labels: enhancement
 ---
 
-### Area
-core | config | docs | automation | qa | ai
+## Summary
 
-### Description
-What should be improved and why.
+Describe the enhancement and motivation.
 
-### Acceptance Criteria
-- [ ] Criterion 1
-- [ ] Criterion 2
+## Proposed changes
 
+-
+
+## Additional context
+
+-

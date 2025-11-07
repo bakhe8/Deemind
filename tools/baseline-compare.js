@@ -2,11 +2,6 @@ import fs from 'fs-extra';
 import path from 'path';
 import { globSync } from 'glob';
 
-/**
- * Load a set of known standard components for comparison.
- * Why: Lets reports distinguish standard vs. custom components,
- * which helps assess complexity and reuse quickly.
- */
 export function loadBaselineSet() {
   const set = new Set();
   const baseDir = path.resolve('baseline', 'raed', 'partials');
@@ -25,11 +20,6 @@ export function loadBaselineSet() {
   return set;
 }
 
-/**
- * Compute include usage of partials across pages.
- * Why: Identifies hotspots and validates that partialization
- * is working; classifies components as standard or custom.
- */
 export function computeComponentUsage(themePath, baselineSet) {
   const pagesDir = path.join(themePath, 'pages');
   const includes = globSync('**/*.twig', { cwd: pagesDir, nodir: true })

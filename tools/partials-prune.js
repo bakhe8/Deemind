@@ -2,11 +2,6 @@ import fs from 'fs-extra';
 import path from 'path';
 import { globSync } from 'glob';
 
-/**
- * Remove unused partials (with optional archiving).
- * Why: Keeps themes lean and avoids shipping dead code; archiving
- * to a local folder provides a reversible safety net.
- */
 export async function prunePartials(themePath, { force = false, dryRun = false, archive = true } = {}) {
   const pagesDir = path.join(themePath, 'pages');
   const partialsDir = path.join(themePath, 'partials');
@@ -58,3 +53,4 @@ if (process.argv[1] && process.argv[1].endsWith('partials-prune.js')) {
     if (res.removed.length) console.log(' - ' + res.removed.join('\n - '));
   }).catch(e => { console.error(e); process.exit(1); });
 }
+

@@ -1,11 +1,6 @@
 // Extract inline JS from HTML safely without executing
 // Returns mapping per page: [{ index, bytes, hint }]
 
-/**
- * Extract inline <script> blocks without executing code.
- * Why: Inline handlers/scripts are sanitized later; here we inventory
- * them to create assets and provide transparency in reports.
- */
 export function extractInlineJs(pages) {
   const result = {};
   for (const p of pages) {
@@ -21,3 +16,4 @@ export function extractInlineJs(pages) {
   }
   return result;
 }
+

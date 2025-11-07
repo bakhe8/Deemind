@@ -10,14 +10,6 @@ function md5(text) {
   return crypto.createHash('md5').update(text, 'utf8').digest('hex');
 }
 
-/**
- * Run the hybrid parser pipeline (scan → template hints → conflicts → maps).
- * Why: This staging trades a small amount of complexity for resilience.
- * - Stage 1 gives a fast, deterministic baseline.
- * - Stage 2 adds pattern confidence without hard dependencies on a platform.
- * - Stage 3 surfaces conflicts early so we fail predictably rather than silently.
- * We also persist per‑file checksums to short‑circuit unchanged inputs on rebuild.
- */
 export async function runHybridParser(inputPath, { logDir = path.join(process.cwd(), 'logs') } = {}) {
   await fs.ensureDir(logDir);
 
@@ -91,8 +83,6 @@ export async function runHybridParser(inputPath, { logDir = path.join(process.cw
   await fs.writeFile(path.join(logDir, 'conflict-summary.md'), lines.join('\n'), 'utf8');
 
   // Build a simple layout map (sections by order)
-  // Why: downstream stages (adapter, reports) rely on a stable component list
-  // even if the HTML is messy; using signature + order is a practical compromise.
   const layoutMap = stage1.pages.map(p => ({
     page: p.rel,
     order: 0,
@@ -117,11 +107,6 @@ export async function runHybridParser(inputPath, { logDir = path.join(process.cw
   return { inputPath, pages: stage1.pages, conflicts, confidence, templateHints, cssMap, jsMap, layoutMap, unchanged, failed: stage1.failed };
 }
 
-/**
- * Extracts section components with a stable signature.
- * Why: Using a class‑set signature lets us approximate reuse across pages
- * without requiring strict HTML equality (robust to attribute ordering).
- */
 function collectComponents(html) {
   const out = [];
   const sectionRe = /<section([^>]*)>([\\s\\S]*?)<\/section>/gi;
@@ -136,11 +121,6 @@ function collectComponents(html) {
   return out;
 }
 
-/**
- * Stable short id per page component.
- * Why: IDs persist across rebuilds for the same rel+index, useful in
- * per‑page reports and for mapping any manual annotations.
- */
 function stableId(rel, idx) {
   return crypto.createHash('md5').update(`${rel}:${idx}`).digest('hex').slice(0,8);
 }

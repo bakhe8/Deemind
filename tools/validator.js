@@ -92,13 +92,7 @@ async function countFiles(dir) {
 
 // Integrated manifest generation (consolidated tracking)
 import crypto from 'crypto';
-import { spawnSync } from 'node:child_process';
 
-/**
- * Generate a reproducible build manifest.
- * Why: Encodes counts and a content checksum so we can verify output
- * integrity across environments and detect drift without re‑parsing.
- */
 export async function generateBuildManifest(outputPath, { coreReport, elapsedSec, layoutMap, inputChecksum } = {}) {
   const pagesDir = path.join(outputPath, 'pages');
   const layoutDir = path.join(outputPath, 'layout');
@@ -110,13 +104,6 @@ export async function generateBuildManifest(outputPath, { coreReport, elapsedSec
   const assets = await listFilesRecursive(assetsDir);
 
   const checksum = await hashOfContents([...pages, ...components, ...assets]);
-
-  // try to resolve git commit (optional)
-  let commit = undefined;
-  try {
-    const out = spawnSync('git', ['rev-parse', '--short', 'HEAD'], { encoding: 'utf8' });
-    if (out.status === 0) commit = out.stdout.trim();
-  } catch (err) { void err; }
 
   return {
     theme,
@@ -134,7 +121,6 @@ export async function generateBuildManifest(outputPath, { coreReport, elapsedSec
     pageOrder: layoutMap?.map(l => l.page) || [],
     failedFiles: (coreReport?.issues || []).filter(i => i.level==='critical').map(i => i.file).filter(Boolean),
     inputChecksum,
-    commit,
   };
 }
 

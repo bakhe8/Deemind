@@ -18,11 +18,6 @@ export async function archiveTheme(outputPath) {
   return dest;
 }
 
-/**
- * Create a zip archive from a directory, excluding specified subpaths.
- * Why: Avoids bundling logs or caches into deliverables without having
- * to restructure the output tree.
- */
 async function zipFolder(srcDir, zipPath, excludeDirs = []) {
   const output = fs.createWriteStream(zipPath);
   const archive = archiver('zip', { zlib: { level: 9 } });

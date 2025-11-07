@@ -4,12 +4,6 @@ import postcss from 'postcss';
 
 const PROPS = new Set(['display', 'grid-template-columns', 'grid-template-rows', 'flex', 'flex-direction', 'position']);
 
-/**
- * Extract a minimal CSS property map from inline <style> blocks.
- * Why: We only record a small set of layout-affecting props to inform
- * downstream heuristics (e.g., component signatures) without depending
- * on full CSS asset parsing at this stage.
- */
 export async function extractCssMap(inputPath, pages) {
   const cssMap = {};
   // Inline <style> tags only for MVP; external assets are copied by adapter
@@ -37,3 +31,4 @@ export async function extractCssMap(inputPath, pages) {
   }
   return cssMap;
 }
+

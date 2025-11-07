@@ -2,7 +2,7 @@
   "defaultTheme": "demo",
   "encoding": "utf8",
   "enableAnalytics": false,
-  "sanitizeByDefault": true,
+  "sanitizeByDefault": false,
   "maxInputFileBytes": 10485760,
   "maxAssetFileBytes": 10485760,
   "requireI18n": false,

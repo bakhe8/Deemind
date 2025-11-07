@@ -1,25 +1,12 @@
 import fs from 'fs-extra';
 import path from 'path';
-import crypto from 'crypto';
 
-/**
- * Guard against writing outside the intended output root.
- * Why: Prevents accidental path traversal when rewriting asset paths
- * or creating partials based on input content.
- */
 function ensureInside(base, target) {
   const b = path.resolve(base) + path.sep;
   const t = path.resolve(target);
   if (!t.startsWith(b)) throw new Error(`Refusing to write outside output: ${t}`);
 }
 
-/**
- * Convert normalized HTML pages to Salla Twig layout/pages/partials.
- * Why: Keeps the output opinionated but predictable:
- * - lockUnchanged skips rewrites for identical inputs to speed rebuilds.
- * - partialize promotes shared components to partials to reduce duplication.
- * Asset paths are normalized conservatively; CSS url(...) is left to a later pass.
- */
 export async function adaptToSalla(parsed, outputPath, { lockUnchanged = false, partialize = false } = {}) {
   const layoutDir = path.join(outputPath, 'layout');
   const pagesDir = path.join(outputPath, 'pages');
@@ -134,18 +121,12 @@ export async function adaptToSalla(parsed, outputPath, { lockUnchanged = false, 
   };
   for (const p of parsed.pages) {
     const relTwig = p.rel.replace(/\\/g, '/').replace(/\.html$/i, '.twig');
-    const pageNode = `pages/${relTwig}`;
-    graph.nodes.push(pageNode);
-    graph.edges.push({ from: pageNode, to: 'layout/default.twig', type: 'extends' });
-    // Add include edges if partialization inserted includes
-    const includes = (await extractIncludesFromPage(outputPath, pageNode)).map(t => ({ from: pageNode, to: t, type: 'include' }));
-    graph.edges.push(...includes);
+    graph.nodes.push(`pages/${relTwig}`);
+    graph.edges.push({ from: `pages/${relTwig}`, to: 'layout/default.twig', type: 'extends' });
   }
-  // Compute a topological order (best-effort) for pages -> layout/partials
-  const topoOrder = topologicalOrder(graph.nodes, graph.edges);
   const cacheDir = path.join(process.cwd(), '.factory-cache');
   await fs.ensureDir(cacheDir);
-  await fs.writeJson(path.join(cacheDir, 'graph.json'), { ...graph, topoOrder }, { spaces: 2 });
+  await fs.writeJson(path.join(cacheDir, 'graph.json'), graph, { spaces: 2 });
 
   // Write partial files if any
   if (partialize && sharedSignatures.size) {
@@ -174,22 +155,16 @@ async function normalizeAssetsInHtml(html, inputRoot, pageDirRel, assetsDir, out
   let out = html;
   for (const ref of assetRefs) {
     const absSrc = path.resolve(inputRoot, pageDirRel, ref.url);
-    const originalRel = ref.url.replace(/^\.+\//, '');
-    const baseRel = path.join('normalized', originalRel).replace(/\\/g,'/');
+    const targetRel = path.join('normalized', ref.url.replace(/^\.+\//, ''));
+    const dest = path.join(assetsDir, targetRel);
     try {
       const stat = await fs.stat(absSrc);
       if (stat.isFile()) {
-        const buf = await fs.readFile(absSrc);
-        const hash = crypto.createHash('md5').update(buf).digest('hex').slice(0,8);
-        const ext = path.extname(baseRel);
-        const nameNoExt = baseRel.slice(0, -ext.length);
-        const fingerRel = `${nameNoExt}.${hash}${ext}`;
-        const dest = path.join(assetsDir, fingerRel);
         await fs.ensureDir(path.dirname(dest));
         ensureInside(outputPath, dest);
-        await fs.writeFile(dest, buf);
+        await fs.copy(absSrc, dest, { overwrite: true });
         const re = new RegExp(`${ref.attr}=["']${escapeRegExp(ref.url)}["']`, 'g');
-        out = out.replace(re, `${ref.attr}="assets/${fingerRel.replace(/\\/g,'/')}"`);
+        out = out.replace(re, `${ref.attr}="assets/${targetRel.replace(/\\/g,'/')}"`);
       }
     } catch (err) { void err; }
   }
@@ -198,37 +173,4 @@ async function normalizeAssetsInHtml(html, inputRoot, pageDirRel, assetsDir, out
 
 function escapeRegExp(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-async function extractIncludesFromPage(outputRoot, pageNode) {
-  try {
-    const pagePath = path.join(outputRoot, pageNode);
-    const text = await fs.readFile(pagePath, 'utf8');
-    const matches = Array.from(text.matchAll(/\{%\s*include\s*["']([^"']+)["']\s*%\}/g));
-    return matches.map(m => m[1]);
-  } catch { return []; }
-}
-
-function topologicalOrder(nodes, edges) {
-  const inDeg = new Map(nodes.map(n => [n, 0]));
-  const adj = new Map(nodes.map(n => [n, []]));
-  for (const e of edges) {
-    if (!adj.has(e.from)) adj.set(e.from, []);
-    if (!adj.has(e.to)) adj.set(e.to, []);
-    adj.get(e.from).push(e.to);
-    inDeg.set(e.to, (inDeg.get(e.to) || 0) + 1);
-  }
-  const q = [];
-  for (const [n, d] of inDeg.entries()) if (d === 0) q.push(n);
-  const order = [];
-  while (q.length) {
-    const n = q.shift();
-    order.push(n);
-    for (const v of adj.get(n) || []) {
-      const d = (inDeg.get(v) || 0) - 1;
-      inDeg.set(v, d);
-      if (d === 0) q.push(v);
-    }
-  }
-  return order;
 }
