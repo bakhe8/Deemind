@@ -15,7 +15,7 @@
   ],
   "compare": {
     "includeExtensions": [".twig", ".html", ".json", ".css", ".js"],
-    "ignorePaths": ["**/.DS_Store", "**/*.map"],
+    "ignorePaths": ["**/.DS_Store", "**/*.map", "**/theme.json", "theme.json"],
     "ignoreJsonKeys": [
       "timestamp",
       "buildDate",

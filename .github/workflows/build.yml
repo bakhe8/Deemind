@@ -1,5 +1,8 @@
 name: Deemind CI
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
 
 jobs:
   build:
@@ -86,4 +89,3 @@ jobs:
         with:
           name: telemetry
           path: logs/telemetry.json
-
