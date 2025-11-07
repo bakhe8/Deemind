@@ -71,6 +71,7 @@ async function run() {
   const prune = args.includes('--prune-partials');
   const partialize = args.includes('--partialize');
   const sanitize = args.includes('--sanitize');
+  const autofix = args.includes('--autofix');
 
   try {
     console.log(chalk.yellow("🔍 Parsing HTML structure (hybrid)..."));
@@ -108,7 +109,23 @@ async function run() {
     }
 
     console.log(chalk.yellow("🔬 Running extended QA..."));
-    await validateExtended(outputPath);
+    let extReport = await validateExtended(outputPath);
+
+    // Optional auto-fix cycle for common issues
+    if (autofix) {
+      const hasMissingAssets = (extReport.errors || []).some(e => e.type === 'missing-assets');
+      const hasSampleStrings = (extReport.errors || []).some(e => e.type === 'sample-strings');
+      if (hasMissingAssets || hasSampleStrings) {
+        try {
+          const theme = path.basename(outputPath);
+          console.log(chalk.yellow("🛠  Auto-fix: attempting to remediate common issues..."));
+          const { fixMissingAssets } = await import('./tools/fix-missing-assets.js');
+          await fixMissingAssets(theme);
+        } catch (_) { /* noop */ }
+        // Re-run extended validation after fixes
+        extReport = await validateExtended(outputPath);
+      }
+    }
 
     if (prune) {
       console.log(chalk.yellow("🧹 Pruning orphan partials..."));
@@ -149,11 +166,11 @@ async function run() {
     const pageReportsDir = path.join(outputPath, 'reports', 'pages');
     await fs.ensureDir(pageReportsDir);
     const layoutByPage = new Map((parsed.layoutMap || []).map(l => [l.page.replace(/\\/g,'/'), l.components || []]));
-    const writtenSet = new Set(adaptRes.written.map(w => w.replace(/\\/g,'/')));
-    const skippedSet = new Set(adaptRes.skipped.map(s => s.replace(/\\/g,'/')));
+    const writtenSet2 = new Set(adaptRes.written.map(w => w.replace(/\\/g,'/')));
+    const skippedSet2 = new Set(adaptRes.skipped.map(s => s.replace(/\\/g,'/')));
     for (const htmlPage of (parsed.pages || []).map(p => p.rel.replace(/\\/g,'/'))) {
       const pageTwig = htmlPage.replace(/\.html$/i, '.twig');
-      const action = writtenSet.has(pageTwig) ? 'written' : (skippedSet.has(htmlPage) ? 'skipped' : 'pending');
+      const action = writtenSet2.has(pageTwig) ? 'written' : (skippedSet2.has(htmlPage) ? 'skipped' : 'pending');
       const components = layoutByPage.get(htmlPage) || [];
       const jsCount = (parsed.jsMap && parsed.jsMap[htmlPage]) ? parsed.jsMap[htmlPage].length : 0;
       const pageReport = { pageHtml: htmlPage, pageTwig, action, components, jsExtracted: jsCount };
@@ -164,10 +181,6 @@ async function run() {
     const baseline = loadBaselineSet();
     const usage = computeComponentUsage(outputPath, baseline);
     await fs.writeJson(path.join(outputPath, 'reports', 'component-usage.json'), usage, { spaces: 2 });
-
-    // Console summary
-    console.log(chalk.gray(`\nSummary: ${convReport.totals.pagesWritten}/${convReport.totals.pagesDetected} pages written, ${convReport.totals.pagesSkipped} skipped, ${convReport.totals.conflicts} conflicts, ${convReport.totals.failedInputs} failed, ${convReport.totals.jsExtracted} JS blocks extracted.`));
-
     console.log(chalk.greenBright(`\n✅ Deemind build complete in ${elapsed}s`));
     console.log(chalk.gray(`Output → ${outputPath}`));
 
@@ -181,8 +194,9 @@ run();
 
 async function hashInputDir(dir) {
   const crypto = await import('crypto');
-  const { glob } = await import('glob');
-  const files = await glob('**/*', { cwd: dir, nodir: true });
+  const gm = await import('glob');
+  const syncFn = gm.globSync || (gm.default && gm.default.sync);
+  const files = syncFn ? syncFn('**/*', { cwd: dir, nodir: true }) : [];
   const h = crypto.createHash('md5');
   for (const rel of files) {
     try {

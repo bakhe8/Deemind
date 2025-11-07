@@ -15,18 +15,6 @@ function withTimeout(promise, ms, onTimeout) {
   });
 }
 
-function withTimeout(promise, ms, onTimeout) {
-  return new Promise((resolve, reject) => {
-    const t = setTimeout(() => {
-      if (onTimeout) {
-        try { onTimeout(); } catch (err) { void err; }
-      }
-      reject(new Error(`Parse timed out after ${ms}ms`));
-    }, ms);
-    promise.then(v => { clearTimeout(t); resolve(v); }).catch(err => { clearTimeout(t); reject(err); });
-  });
-}
-
 /**
  * Parse an input folder of HTML files into normalized page objects.
  * Why: We standardize encoding/line endings up front and enforce a

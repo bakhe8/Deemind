@@ -52,7 +52,6 @@ export async function validateTheme(outputPath) {
       }
     }
   } catch (err) { void err; }
-
   // Manifest fingerprint check (warning)
   const manifestFile = path.join(outputPath, 'manifest.json');
   if (await exists(manifestFile)) {

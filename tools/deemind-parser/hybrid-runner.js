@@ -43,9 +43,7 @@ export async function runHybridParser(inputPath, { logDir = path.join(process.cw
 
   // Checksums + confidence
   const checksums = {};
-  for (const p of stage1.pages) {
-    checksums[p.rel] = md5(p.html);
-  }
+  for (const p of stage1.pages) checksums[p.rel] = md5(p.html);
   const total = stage1.pages.length || 1;
   const confidentFiles = templateHints.filter(h => h.hints.length > 0).length;
   const confidence = Number((confidentFiles / total).toFixed(2));
@@ -109,11 +107,11 @@ export async function runHybridParser(inputPath, { logDir = path.join(process.cw
 
 function collectComponents(html) {
   const out = [];
-  const sectionRe = /<section([^>]*)>([\\s\\S]*?)<\/section>/gi;
+  const sectionRe = /<section([^>]*)>([\s\S]*?)<\/section>/gi;
   let m;
   while ((m = sectionRe.exec(html))) {
     const attrs = m[1] || '';
-    const classes = (attrs.match(/class="([^"]*)"/)||[])[1] || '';
+    const classes = (attrs.match(/class=\"([^\"]*)\"/)||[])[1] || '';
     const signature = classes.split(/\s+/).filter(Boolean).sort().join('.');
     const full = m[0];
     out.push({ selector: 'section', classes, signature, html: full });
@@ -124,6 +122,4 @@ function collectComponents(html) {
 function stableId(rel, idx) {
   return crypto.createHash('md5').update(`${rel}:${idx}`).digest('hex').slice(0,8);
 }
-
-
 

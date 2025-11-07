@@ -60,6 +60,20 @@ export async function adaptToSalla(parsed, outputPath, { lockUnchanged = false, 
     await fs.ensureDir(path.dirname(outFile));
     // Asset URL normalization: rewrite relative src/href to assets/normalized and copy
     let pageHtml = await normalizeAssetsInHtml(p.html, parsed.inputPath, path.dirname(p.rel), assetsDir, outputPath);
+    // DOM-aware partialization pre-pass to avoid brittle string matching
+    if (partialize && sharedSignatures.size) {
+      try { pageHtml = await (async () => {
+        const mod = await import('cheerio');
+        const $ = mod.load(pageHtml, { decodeEntities: false });
+        const repl = new Map(Array.from(sharedSignatures).map(sig => [sig, partialNameFor(sig)]));
+        $('section').each((_, el) => {
+          const cls = ($(el).attr('class') || '').split(/\s+/).filter(Boolean).sort().join('.');
+          const inc = repl.get(cls);
+          if (inc) $(el).replaceWith(`{% include "partials/${inc}" %}`);
+        });
+        return $.html();
+      })(); } catch (e) { /* noop */ }
+    }
     // Partialize shared components
     if (partialize && sharedSignatures.size) {
       for (const sig of sharedSignatures) {
@@ -151,6 +165,14 @@ async function normalizeAssetsInHtml(html, inputRoot, pageDirRel, assetsDir, out
     const url = m[2];
     if (/^https?:\/\//i.test(url) || url.startsWith('//') || url.startsWith('assets/')) continue;
     assetRefs.push({ attr: m[1], url });
+  }
+  // Also scan CSS url(...) patterns in inline styles
+  const cssUrlRe = /url\((['"]?)([^)'"]+)\1\)/gi;
+  let cm;
+  while ((cm = cssUrlRe.exec(html))) {
+    const url = cm[2];
+    if (/^https?:\/\//i.test(url) || url.startsWith('//') || url.startsWith('assets/')) continue;
+    assetRefs.push({ attr: 'url', url });
   }
   let out = html;
   for (const ref of assetRefs) {

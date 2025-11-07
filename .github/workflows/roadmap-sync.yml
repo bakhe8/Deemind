@@ -1,0 +1,21 @@
+name: Roadmap → Issues Sync
+on:
+  push:
+    paths: ["docs/deemind_checklist.md"]
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci || npm i
+      - run: node tools/sync-roadmap-to-issues.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: EvaniaDeemind
+          REPO: deemind
+

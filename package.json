@@ -4,8 +4,13 @@
   "description": "Deemind — The Intelligent Theming Engine for Salla and beyond.",
   "type": "module",
   "private": true,
+  "engines": {
+    "node": "^20.10.0"
+  },
+  "engineStrict": true,
   "scripts": {
     "deemind:build": "node cli.js",
+    "roadmap:sync": "node tools/sync-roadmap-to-issues.js",
     "factory:build": "node cli.js",
     "factory:build:all": "node tools/build-all.js",
     "factory:prune": "node tools/partials-prune.js",
@@ -22,6 +27,7 @@
     "cheerio": "^1.0.0-rc.12",
     "fs-extra": "^11.2.0",
     "glob": "^10.3.10",
+    "octokit": "^4.0.0",
     "p-limit": "^4.0.0",
     "postcss": "^8.5.6"
   },
@@ -40,4 +46,3 @@
     "*.{json,md,css,scss,html}": "prettier --write"
   }
 }
-
