@@ -175,7 +175,7 @@ ${allFiles.join('\n')}
     const historyFile = path.join(analyticsDir, 'build-history.json');
     await fs.ensureDir(analyticsDir);
     let history = [];
-    if (await fs.pathExists(historyFile)) { try { history = await fs.readJson(historyFile); } catch {} }
+    if (await fs.pathExists(historyFile)) { try { history = await fs.readJson(historyFile); } catch (e) { /* ignore */ } }
     const summary = { timestamp: new Date().toISOString(), validationPassed };
     history.push(summary);
     await fs.writeJson(historyFile, history, { spaces: 2 });
@@ -212,7 +212,7 @@ ${allFiles.join('\n')}
         await octokit.rest.issues.createComment({ owner, repo, issue_number: issue.number, body: '✅ Automatically resolved by Deemind agent after validation' });
         await octokit.rest.issues.update({ owner, repo, issue_number: issue.number, state: 'closed' });
       } catch (err) {
-        // eslint-disable-next-line no-console
+         
         console.error('Issue close failed:', err?.message || err);
       }
     }
@@ -276,7 +276,7 @@ async function ensurePullRequest(octokit, owner, repo, headBranch, baseBranch) {
     const created = await octokit.rest.pulls.create({ owner, repo, head: headBranch, base: baseBranch, title: '🤖 Deemind Agent — Automated Update', body: 'This PR was opened by the Deemind autonomous agent.' });
     return created.data;
   } catch (e) {
-    // eslint-disable-next-line no-console
+     
     console.error('PR create failed:', e?.message || e);
     return null;
   }

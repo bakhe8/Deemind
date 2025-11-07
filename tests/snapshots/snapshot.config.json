@@ -5,6 +5,12 @@
       "input": "input/fixtures/demo",
       "expected": "output/snapshots_expected/demo",
       "buildCommand": "npm run deemind:build demo"
+    },
+    {
+      "name": "gimni",
+      "input": "input/fixtures/gimni",
+      "expected": "output/snapshots_expected/gimni",
+      "buildCommand": "npm run deemind:build gimni"
     }
   ],
   "compare": {

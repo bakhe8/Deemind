@@ -39,14 +39,29 @@ export async function mapSemantics(parsed, { i18n = false, client, sanitize = fa
       const $ = cheerio.load(html, { decodeEntities: false });
       let sels = Array.isArray(settings.i18nSelectors) ? settings.i18nSelectors : [];
       if (!sels.length) {
-        sels = ['h1','h2','h3','h4','h5','h6','p','button','label','a','li','span'];
+        sels = ['title','h1','h2','h3','h4','h5','h6','p','button','label','a','li','span','small','strong','em','option'];
       }
-      const attrs = Array.isArray(settings.i18nAttrAllowlist) ? settings.i18nAttrAllowlist : [];
+      let attrs = Array.isArray(settings.i18nAttrAllowlist) ? settings.i18nAttrAllowlist : [];
+      if (!attrs.length) {
+        attrs = ['title','aria-label','placeholder','alt'];
+      }
       // Wrap inner text
       for (const s of sels) {
         $(s).each((_, el) => {
+          const rawHtml = ($(el).html() || '').trim();
           const txt = ($(el).text() || '').trim();
           if (!txt) return;
+          // Heuristic: if mixed literal + single Twig expression, convert to interpolation form
+          const mixed = rawHtml.match(/^\s*([^{}%]*)\{\{\s*([^}]+?)\s*\}\}([^{}%]*)\s*$/s);
+          if (mixed) {
+            const left = (mixed[1] || '').trimEnd();
+            const expr = mixed[2].trim();
+            const right = (mixed[3] || '').trimStart();
+            const template = (left + (left && right ? ' ' : '') + '%value%' + (left && right ? ' ' : '') + right).replace(/'/g, "\\'");
+            $(el).text('');
+            $(el).append(`{{ '${template}' | t({'%value%': ${expr}}) }}`);
+            return;
+          }
           if (/[{}%]/.test(txt)) return; // skip if likely Twig already
           if (/^\d+[\s\w%]*$/.test(txt)) return; // numeric-only or trivial counters
           const wrapped = `{% trans %}${txt}{% endtrans %}`;
@@ -55,14 +70,15 @@ export async function mapSemantics(parsed, { i18n = false, client, sanitize = fa
         });
       }
       // Wrap selected attributes as {{ 'text'|t }}
-      if (attrs.length) {
-        $('*').each((_, el) => {
-          for (const a of attrs) {
-            const v = $(el).attr(a);
-            if (v && !/[{}%]/.test(v)) $(el).attr(a, `{{ '${v.replace(/'/g, "\\'")}' | t }}`);
-          }
-        });
-      }
+      $('*').each((_, el) => {
+        for (const a of attrs) {
+          const v = $(el).attr(a);
+          if (!v) continue;
+          if (/[{}%]/.test(v)) continue; // skip existing twig
+          const safe = v.replace(/'/g, "\\'");
+          $(el).attr(a, `{{ '${safe}' | t }}`);
+        }
+      });
       html = $.html();
     }
     if (sanitize) {

@@ -8,7 +8,7 @@ function run(cmd, opts = {}) {
 }
 
 async function readJsonSafe(p, fallback = null) {
-  try { return await fs.readJson(p); } catch { return fallback; }
+  try { return await fs.readJson(p); } catch (e) { return fallback; }
 }
 
 async function listThemes(root) {
@@ -96,18 +96,18 @@ async function doctorTheme(theme, { octokit, owner, repo }) {
     try {
       const { fixMissingAssets } = await import('./fix-missing-assets.js');
       await fixMissingAssets(theme);
-    } catch {}
+    } catch (e) { /* ignore */ }
 
     try {
       const { normalizeCssAssets } = await import('./normalize-css-assets.js');
       await normalizeCssAssets({ outputPath, inputPath });
-    } catch {}
+    } catch (e) { /* ignore */ }
 
     // Rebuild with autofix flags
     run(`node cli.js ${theme} --sanitize --i18n --autofix`);
   } catch (e) {
     // keep going to gather after-state
-    // eslint-disable-next-line no-console
+     
     console.error('Doctor rebuild failed:', e?.message || e);
   }
 
@@ -127,7 +127,7 @@ async function doctorTheme(theme, { octokit, owner, repo }) {
           await octokit.rest.issues.createComment({ owner, repo, issue_number: existing.number, body: '✅ All clear — doctor fixed remaining errors.' });
           await octokit.rest.issues.update({ owner, repo, issue_number: existing.number, state: 'closed' });
         }
-      } catch {}
+      } catch (e) { /* ignore */ }
     }
   }
   return { theme, before, after };
@@ -142,7 +142,7 @@ async function main() {
     const token = process.env.GITHUB_TOKEN || process.env.TOKEN;
     const repoInfo = getRepo();
     if (token && repoInfo) { octokit = new Octokit({ auth: token }); owner = repoInfo.owner; repo = repoInfo.repo; }
-  } catch {}
+  } catch (e) { /* ignore */ }
   for (const t of themes) {
     const themeOut = path.join(outRoot, t);
     if (!(await hasErrors(themeOut))) continue; // skip healthy

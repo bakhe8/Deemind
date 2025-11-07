@@ -11,7 +11,7 @@ for (const file of listTrackedFiles()) {
   try {
     const txt = fs.readFileSync(file, 'utf8');
     if (/^[<]{7}|^[>]{7}|^={7}/m.test(txt)) found.push(file);
-  } catch {}
+  } catch (e) { /* ignore unreadable file */ void e; }
 }
 
 if (found.length) {
@@ -19,4 +19,3 @@ if (found.length) {
   process.exit(1);
 }
 console.log('✅ No conflict markers found.');
-

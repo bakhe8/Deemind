@@ -1,5 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
+import { createHash } from 'crypto';
 
 // Scans output assets/**/*.css and rewrites url(...) to assets/normalized/* paths,
 // copying missing referenced files from the input tree when possible.
@@ -9,7 +10,7 @@ export async function normalizeCssAssets({ outputPath, inputPath }) {
   const cacheFile = path.join(process.cwd(), '.factory-cache', 'css-normalize.json');
   await fs.ensureDir(path.dirname(cacheFile));
   let cache = {};
-  try { cache = await fs.readJson(cacheFile); } catch {}
+  try { cache = await fs.readJson(cacheFile); } catch (e) { /* ignore */ }
   let rewrites = 0, copies = 0;
   for (const file of files) {
     let css = await fs.readFile(file, 'utf8');
@@ -30,7 +31,7 @@ export async function normalizeCssAssets({ outputPath, inputPath }) {
     await fs.writeFile(file, css, 'utf8');
     cache[file] = hash;
   }
-  try { await fs.writeJson(cacheFile, cache, { spaces: 0 }); } catch {}
+  try { await fs.writeJson(cacheFile, cache, { spaces: 0 }); } catch (e) { /* ignore */ }
   return { rewrites, copies };
 }
 
@@ -65,7 +66,7 @@ function tryCopy(src, dest) {
     if (!fs.existsSync(src)) return;
     fs.ensureDirSync(path.dirname(dest));
     fs.copyFileSync(src, dest);
-  } catch {}
+  } catch (e) { /* ignore */ }
 }
 
 // CLI

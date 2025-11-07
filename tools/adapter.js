@@ -23,7 +23,7 @@ export async function adaptToSalla(parsed, outputPath, { lockUnchanged = false, 
   
 
   // Ensure a default layout shell
-  const defaultLayout = `{# Deemind default layout #}\n<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="utf-8"/>\n  <title>{% block title %}Salla Theme{% endblock %}</title>\n</head>\n<body>\n  {% block content %}{% endblock %}\n</body>\n</html>\n`;
+  const defaultLayout = `{# Deemind default layout #}\n<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="utf-8"/>\n  <title>{% block title %}{{ 'Salla Theme' | t }}{% endblock %}</title>\n</head>\n<body>\n  {% block content %}{% endblock %}\n</body>\n</html>\n`;
   const defaultLayoutPath = path.join(layoutDir, 'default.twig');
   ensureInside(outputPath, defaultLayoutPath);
   await fs.writeFile(defaultLayoutPath, defaultLayout, 'utf8');
@@ -35,7 +35,7 @@ export async function adaptToSalla(parsed, outputPath, { lockUnchanged = false, 
       const hooks = Array.isArray(hints?.layouts?.masterHooks) ? hints.layouts.masterHooks : [];
       if (hooks.length) {
         const bodyBlocks = hooks.map(h => `  {% block ${h} %}{% endblock %}`).join("\n");
-        const enriched = `{# Deemind default layout #}\n<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="utf-8"/>\n  <title>{% block title %}Salla Theme{% endblock %}</title>\n  {% block head %}{% endblock %}\n</head>\n<body>\n${bodyBlocks}\n  {% block scripts %}{% endblock %}\n</body>\n</html>\n`;
+        const enriched = `{# Deemind default layout #}\n<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="utf-8"/>\n  <title>{% block title %}{{ 'Salla Theme' | t }}{% endblock %}</title>\n  {% block head %}{% endblock %}\n</head>\n<body>\n${bodyBlocks}\n  {% block scripts %}{% endblock %}\n</body>\n</html>\n`;
         await fs.writeFile(defaultLayoutPath, enriched, 'utf8');
       }
     }

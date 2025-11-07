@@ -4,7 +4,7 @@ import path from 'path';
 async function main() {
   const telemetryPath = path.join('logs', 'telemetry.json');
   let telemetry = null;
-  try { telemetry = await fs.readJson(telemetryPath); } catch {}
+  try { telemetry = await fs.readJson(telemetryPath); } catch (e) { /* ignore */ }
   const out = [];
   out.push('# Deemind — Weekly Status');
   out.push(`Generated: ${new Date().toISOString()}`);
@@ -39,4 +39,3 @@ async function main() {
 }
 
 main().catch(e => { console.error(e); process.exit(1); });
-

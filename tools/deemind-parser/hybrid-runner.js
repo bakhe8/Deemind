@@ -23,7 +23,7 @@ export async function runHybridParser(inputPath, { logDir = path.join(process.cw
       if (cached && Array.isArray(cached.pages)) {
         return { ...cached, fromCache: true };
       }
-    } catch {}
+    } catch (e) { void e; }
   }
 
   // Load previous run for change detection
@@ -117,7 +117,7 @@ export async function runHybridParser(inputPath, { logDir = path.join(process.cw
 
   const result = { inputPath, pages: stage1.pages, conflicts, confidence, templateHints, cssMap, jsMap, layoutMap, unchanged, failed: stage1.failed };
   if (cacheFile) {
-    try { await fs.writeJson(cacheFile, result, { spaces: 0 }); } catch {}
+    try { await fs.writeJson(cacheFile, result, { spaces: 0 }); } catch (e) { void e; }
   }
   return result;
 }
@@ -128,7 +128,7 @@ function collectComponents(html) {
   let m;
   while ((m = sectionRe.exec(html))) {
     const attrs = m[1] || '';
-    const classes = (attrs.match(/class=\"([^\"]*)\"/)||[])[1] || '';
+    const classes = (attrs.match(/class="([^"]*)"/)||[])[1] || '';
     const signature = classes.split(/\s+/).filter(Boolean).sort().join('.');
     const full = m[0];
     out.push({ selector: 'section', classes, signature, html: full });
