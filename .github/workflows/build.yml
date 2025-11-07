@@ -30,3 +30,10 @@ jobs:
 
       - name: Validate Code
         run: node tools/validator.js
+      - name: Write Success Report
+        if: success()
+        run: node tools/build-tracker.js success "✅ Deemind CI passed all checks"
+
+      - name: Write Failure Report
+        if: failure()
+        run: node tools/build-tracker.js failure "❌ One or more CI steps failed"
