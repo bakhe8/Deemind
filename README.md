@@ -1,4 +1,4 @@
-# 🧠 Deemind — The Intelligent Theming Engine ![CI](https://github.com/EvaniaDeemind/deemind/actions/workflows/build.yml/badge.svg)
+﻿# 🧠 Deemind — The Intelligent Theming Engine ![CI](https://github.com/EvaniaDeemind/deemind/actions/workflows/build.yml/badge.svg)
 
 > A local tool that understands, converts, and validates static HTML prototypes into Salla-compatible themes.
 
@@ -21,6 +21,13 @@ Quick VS Code Setup
 - Ensure Node v20.10.0 (`nvm use`)
 - Recommended extensions installed (ESLint + Prettier, GitLens, Copilot)
 - Run task: “Run Deemind Build” from the Terminal → Run Task menu
+
+Windows/PowerShell notes
+
+- Prefer Git Bash or PowerShell 7 in VS Code. We force Git Bash for tasks in `.vscode/tasks.json`.
+- Chaining: Windows PowerShell 5.x doesn’t support `&&`. Use `; if ($LASTEXITCODE -eq 0) { <next> }` or run in Git Bash.
+- Helpers: import `./scripts/ps-helpers.ps1` for `Invoke-Chain`, `Write-HereString`, and `Replace-InFile`.
+- Node version: use Node 20 (`nvm install 20.10.0 && nvm use 20.10.0`).
 
 🧩 Modules Overview
 Module Purpose

@@ -5,12 +5,24 @@
       "label": "Run Deemind Build",
       "type": "shell",
       "command": "npm run deemind:build demo",
+      "options": {
+        "shell": {
+          "executable": "bash",
+          "args": ["-lc"]
+        }
+      },
       "problemMatcher": []
     },
     {
       "label": "Run Deemind Validate",
       "type": "shell",
       "command": "npm run deemind:validate",
+      "options": {
+        "shell": {
+          "executable": "bash",
+          "args": ["-lc"]
+        }
+      },
       "problemMatcher": []
     }
   ]
