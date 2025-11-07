@@ -1,4 +1,16 @@
 echo "🧠  Running Deemind pre-commit checks..."
+
+# Advisory: suggest PowerShell 7 (pwsh) on Windows for better shell support
+if command -v uname >/dev/null 2>&1 && uname | grep -qi 'mingw\|msys\|cygwin'; then
+  if ! command -v pwsh >/dev/null 2>&1; then
+    if command -v powershell >/dev/null 2>&1; then
+      PSVER=$(powershell -NoProfile -Command "$PSVersionTable.PSVersion.Major" 2>/dev/null | tr -d '\r')
+      if [ -n "$PSVER" ] && [ "$PSVER" -lt 7 ]; then
+        echo "⚠️  Tip: Install PowerShell 7 (pwsh) for better chaining and CI parity." >&2
+      fi
+    fi
+  fi
+fi
 node tools/check-conflicts.js || exit 1
 npx lint-staged || exit 1
 npm run deemind:test || exit 1

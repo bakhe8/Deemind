@@ -28,6 +28,14 @@ Windows/PowerShell notes
 - Chaining: Windows PowerShell 5.x doesn’t support `&&`. Use `; if ($LASTEXITCODE -eq 0) { <next> }` or run in Git Bash.
 - Helpers: import `./scripts/ps-helpers.ps1` for `Invoke-Chain`, `Write-HereString`, and `Replace-InFile`.
 - Node version: use Node 20 (`nvm install 20.10.0 && nvm use 20.10.0`).
+- One‑time setup: run `scripts/windows-setup.ps1` to install Git Bash, PowerShell 7, nvm‑windows and Node 20 via winget.
+
+Windows/PowerShell notes
+
+- Prefer Git Bash or PowerShell 7 in VS Code. We force Git Bash for tasks in `.vscode/tasks.json`.
+- Chaining: Windows PowerShell 5.x doesn’t support `&&`. Use `; if ($LASTEXITCODE -eq 0) { <next> }` or run in Git Bash.
+- Helpers: import `./scripts/ps-helpers.ps1` for `Invoke-Chain`, `Write-HereString`, and `Replace-InFile`.
+- Node version: use Node 20 (`nvm install 20.10.0 && nvm use 20.10.0`).
 
 🧩 Modules Overview
 Module Purpose
