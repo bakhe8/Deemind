@@ -19,6 +19,14 @@ jobs:
       - run: npm run lint
       - run: npm run deemind:build demo
       - run: npm run deemind:test
+      - name: Run Doctor (post-failure or errors)
+        run: |
+          node tools/doctor.js || echo "doctor exit code non-zero (remaining issues)"
+      - name: Commit doctor fixes (if any)
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(doctor): auto-fix build outputs"
+          branch: ${{ github.ref_name }}
       - name: Attest Build Provenance
         uses: actions/attest-build-provenance@v3.0.0
         with:
