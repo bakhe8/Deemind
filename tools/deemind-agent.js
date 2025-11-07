@@ -167,6 +167,27 @@ ${allFiles.join('\n')}
     console.warn('⚠️ Validation failed, keeping report open.');
   }
 
+  // Append telemetry and write a short summary
+  try {
+    const fs = await import('fs-extra');
+    const path = await import('path');
+    const analyticsDir = path.join(process.cwd(), 'analytics');
+    const historyFile = path.join(analyticsDir, 'build-history.json');
+    await fs.ensureDir(analyticsDir);
+    let history = [];
+    if (await fs.pathExists(historyFile)) { try { history = await fs.readJson(historyFile); } catch {} }
+    const summary = { timestamp: new Date().toISOString(), validationPassed };
+    history.push(summary);
+    await fs.writeJson(historyFile, history, { spaces: 2 });
+    const summaryText = `Deemind Agent run\nValidation: ${validationPassed ? 'passed' : 'failed'}\nItems: implemented=${(audit.implemented||[]).length}, partial=${(audit.partial||[]).length}, missing=${(audit.missing||[]).length}`;
+    const out = path.join(process.cwd(), 'logs', 'deemind_agent_summary.md');
+    await fs.ensureDir(path.dirname(out));
+    await fs.writeFile(out, summaryText);
+    if (process.env.GITHUB_STEP_SUMMARY) {
+      await fs.appendFile(process.env.GITHUB_STEP_SUMMARY, `\n\n${summaryText}\n`);
+    }
+  } catch (e) { /* ignore */ }
+
   // STEP 7 — Commit and push
   console.log('📦 Committing updates...');
   try { execSync("git config user.name 'Deemind Agent'"); } catch (e) { /* ignore */ }

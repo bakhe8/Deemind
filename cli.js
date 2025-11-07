@@ -83,6 +83,12 @@ async function run() {
     console.log(chalk.yellow("🪄 Adapting to Salla theme format..."));
     const adaptRes = await adaptToSalla(mapped, outputPath, { lockUnchanged, partialize });
 
+    // Post-process CSS assets for deterministic url(...) rewrites
+    try {
+      const { normalizeCssAssets } = await import('./tools/normalize-css-assets.js');
+      await normalizeCssAssets({ outputPath, inputPath });
+    } catch (_) { /* optional */ }
+
     // Verbose per-page, per-component progress
     if (verbose) {
       const writtenSet = new Set(adaptRes.written.map(w => w.replace(/\.twig$/,'').replace(/\\/g,'/')));

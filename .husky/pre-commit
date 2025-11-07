@@ -1,4 +1,5 @@
 echo "🧠  Running Deemind pre-commit checks..."
+node tools/check-conflicts.js || exit 1
 npx lint-staged || exit 1
 npm run deemind:test || exit 1
 node tools/validator-extended.js || exit 1

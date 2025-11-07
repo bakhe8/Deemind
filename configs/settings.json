@@ -6,6 +6,8 @@
   "maxInputFileBytes": 10485760,
   "maxAssetFileBytes": 10485760,
   "requireI18n": false,
+  "i18nSelectors": ["title", "h1", "h2", "h3", "p", "button", "a", "span"],
+  "i18nAttrAllowlist": ["title", "alt", "aria-label"],
   "rawAllowlist": [],
   "failOnBudget": false
 }
