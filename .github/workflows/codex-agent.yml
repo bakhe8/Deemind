@@ -18,8 +18,9 @@ jobs:
           node-version: 20
       - run: npm ci
       - name: Run Deemind Agent
-        run: node tools/deemind-agent.js
+        run: node tools/codex-auto-docs.js\n      - run: node tools/deemind-agent.js
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
