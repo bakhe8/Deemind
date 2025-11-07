@@ -1,0 +1,7 @@
+{
+  "layoutDir": "src/views/layout",
+  "pagesDir": "src/views/pages",
+  "partialsDir": "src/views/components",
+  "assetsDir": "src/assets",
+  "locales": ["src/locales/ar.json", "src/locales/en.json"]
+}

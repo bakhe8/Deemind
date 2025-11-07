@@ -8,6 +8,7 @@ export default [
       "output/**",
       "archives/**",
       "logs/**",
+      ".baselines/**",
       "node_modules/**",
     ],
   },

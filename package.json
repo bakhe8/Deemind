@@ -10,6 +10,7 @@
   "engineStrict": true,
   "scripts": {
     "deemind:build": "node cli.js",
+    "baseline:import:raed": "node tools/import-raed-baseline.js",
     "roadmap:sync": "node tools/sync-roadmap-to-issues.js",
     "factory:build": "node cli.js",
     "factory:build:all": "node tools/build-all.js",

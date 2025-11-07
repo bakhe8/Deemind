@@ -4,12 +4,30 @@ import { globSync } from 'glob';
 
 export function loadBaselineSet() {
   const set = new Set();
-  const baseDir = path.resolve('baseline', 'raed', 'partials');
-  if (fs.existsSync(baseDir)) {
-    for (const f of globSync('**/*.twig', { cwd: baseDir, nodir: true })) {
-      set.add(normalizeKey('partials/' + f));
+  // Prefer generated baseline from Raed importer if available
+  const raedGraph = path.resolve('configs', 'baselines', 'raed', 'graph.json');
+  if (fs.existsSync(raedGraph)) {
+    try {
+      const graph = JSON.parse(fs.readFileSync(raedGraph, 'utf8')) || {};
+      for (const rel of Object.keys(graph)) {
+        // Treat any component path as a standard component
+        if (rel.includes('/components/')) {
+          // Normalize to our partials namespace key if adapter mirrors it
+          const name = rel.split('/components/')[1];
+          if (name) set.add(normalizeKey('partials/' + name));
+        }
+      }
+    } catch (e) { void e; }
+  } else {
+    // Legacy fallback: local baseline folder
+    const baseDir = path.resolve('baseline', 'raed', 'partials');
+    if (fs.existsSync(baseDir)) {
+      for (const f of globSync('**/*.twig', { cwd: baseDir, nodir: true })) {
+        set.add(normalizeKey('partials/' + f));
+      }
     }
   }
+  // Add any manually declared standards
   const cfg = path.resolve('configs', 'standard-components.json');
   if (fs.existsSync(cfg)) {
     try {
