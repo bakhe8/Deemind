@@ -1,151 +1,21 @@
-# Codex Full Assessment
+# Codex Full Assessment (Pre-Harmony)
 
-## Build & Validation
+## Build & Toolchain Validation
 
-### demo/report-extended.json
+- Node: v22.20.0 • npm: 10.9.3
+- Build time: demo 769 ms, gimni 758 ms
+- Files: demo 14, assets 5 • gimni 82, assets 73
+- Lint: errors 0, warnings 37
+- Stylelint: True
 
-```json
-{
-  "errors": [],
-  "warnings": [
-    {
-      "type": "i18n",
-      "message": "1 files with unwrapped visible text."
-    }
-  ],
-  "checks": {
-    "encoding": true,
-    "scripts": true,
-    "dependencies": true,
-    "assets": true,
-    "budgets": true,
-    "i18n": true,
-    "baseline": true,
-    "sdk": true,
-    "webComponents": true,
-    "manifest": true
-  },
-  "summary": {
-    "passed": true,
-    "errors": 0,
-    "warnings": 1,
-    "timestamp": "2025-11-07T22:39:40.711Z"
-  }
-}
-```
+## Module & Dependency Integrity (Pre-Harmony)
 
-### gimni/report-extended.json
+- Core modules (parser, mapper, adapter, validator, tools) present; no missing runtime imports in builds
+- Suggestion: add madge/depcheck for static analysis of cycles/unused deps
 
-```json
-{
-  "errors": [],
-  "warnings": [],
-  "checks": {
-    "encoding": true,
-    "scripts": true,
-    "dependencies": true,
-    "assets": true,
-    "budgets": true,
-    "i18n": true,
-    "baseline": true,
-    "sdk": true,
-    "webComponents": true,
-    "manifest": true
-  },
-  "summary": {
-    "passed": true,
-    "errors": 0,
-    "warnings": 0,
-    "timestamp": "2025-11-07T22:39:41.678Z"
-  }
-}
-```
+## CI/CD Pipeline Review
 
-## Tests
-
-- Snapshots: pass (demo, gimni)
-- Flaky detector: no recurring patterns
-
-## Lint Summary
-
-```
-
-C:\Users\Bakheet\Documents\peojects\deemind\cli.js
-  103:13  warning  'tCssStart' is assigned a value but never used  no-unused-vars
-  106:14  warning  '_' is defined but never used                   no-unused-vars
-  148:18  warning  '_' is defined but never used                   no-unused-vars
-
-C:\Users\Bakheet\Documents\peojects\deemind\tools\adapter.js
-  96:22  warning  'e' is defined but never used  no-unused-vars
-
-C:\Users\Bakheet\Documents\peojects\deemind\tools\codex-auto-eval.js
-  56:12  warning  'e' is defined but never used  no-unused-vars
-
-C:\Users\Bakheet\Documents\peojects\deemind\tools\create-issues.js
-  110:9  warning  'msMap' is assigned a value but never used  no-unused-vars
-
-C:\Users\Bakheet\Documents\peojects\deemind\tools\deemind-agent.js
-   58:12   warning  'err' is defined but never used          no-unused-vars
-   65:12   warning  'err' is defined but never used          no-unused-vars
-   70:74   warning  'err' is defined but never used          no-unused-vars
-   99:12   warning  'e' is defined but never used            no-unused-vars
-  223:14   warning  'e' is defined but never used            no-unused-vars
-  249:59   warning  'e' is defined but never used            no-unused-vars
-  415:102  warning  'e' is defined but never used            no-unused-vars
-  426:12   warning  'e' is defined but never used            no-unused-vars
-  430:68   warning  'e' is defined but never used            no-unused-vars
-  431:75   warning  'e' is defined but never used            no-unused-vars
-  481:10   warning  'extractCode' is defined but never used  no-unused-vars
-  517:14   warning  'e' is defined but never used            no-unused-vars
-  566:14   warning  'e' is defined but never used            no-unused-vars
-
-C:\Users\Bakheet\Documents\peojects\deemind\tools\deemind-parser\css-parser.js
-  1:8  warning  'fs' is defined but never used    no-unused-vars
-  2:8  warning  'path' is defined but never used  no-unused-vars
-
-C:\Users\Bakheet\Documents\peojects\deemind\tools\deemind-parser\hybrid-runner.js
-  33:59  warning  'e' is defined but never used  no-unused-vars
-
-C:\Users\Bakheet\Documents\peojects\deemind\tools\deemind-parser\parser.js
-  49:14  warning  'e' is defined but never used  no-unused-vars
-
-C:\Users\Bakheet\Documents\peojects\deemind\tools\deemind-parser\semantic-mapper.js
-  93:10  warning  'escapeRegExp' is defined but never used  no-unused-vars
-
-C:\Users\Bakheet\Documents\peojects\deemind\tools\doctor.js
-   11:47  warning  'e' is defined but never used  no-unused-vars
-   99:14  warning  'e' is defined but never used  no-unused-vars
-  104:14  warning  'e' is defined but never used  no-unused-vars
-  130:16  warning  'e' is defined but never used  no-unused-vars
-  145:12  warning  'e' is defined but never used  no-unused-vars
-
-C:\Users\Bakheet\Documents\peojects\deemind\tools\fetch-salla-docs.js
-  110:14  warning  'e' is defined but never used  no-unused-vars
-
-C:\Users\Bakheet\Documents\peojects\deemind\tools\fix-missing-assets.js
-  13:9  warning  'report' is assigned a value but never used  no-unused-vars
-
-C:\Users\Bakheet\Documents\peojects\deemind\tools\fixit-runner.js
-  17:14  warning  'e' is defined but never used  no-unused-vars
-
-C:\Users\Bakheet\Documents\peojects\deemind\tools\normalize-css-assets.js
-  13:56  warning  'e' is defined but never used  no-unused-vars
-  34:71  warning  'e' is defined but never used  no-unused-vars
-  69:12  warning  'e' is defined but never used  no-unused-vars
-
-C:\Users\Bakheet\Documents\peojects\deemind\tools\synthesize-status.js
-  7:64  warning  'e' is defined but never used  no-unused-vars
-
-C:\Users\Bakheet\Documents\peojects\deemind\tools\update-telemetry.js
-  12:64  warning  'e' is defined but never used  no-unused-vars
-
-✖ 37 problems (0 errors, 37 warnings)
-
-```
-
-## CI/CD Consistency
-
-- Workflows on main push only (selected):
+- Active workflows:
   - actions-digest.yml
   - ai-docs.yml
   - auto-labeler.yml
@@ -166,33 +36,47 @@ C:\Users\Bakheet\Documents\peojects\deemind\tools\update-telemetry.js
   - salla-validate.yml
   - semantic-release.yml
   - weekly-status.yml
+- Most workflows restricted to main; packaging and doctor stages active
+
+## Validation & Testing
+
+- Snapshots: True • Flaky: clean
+- demo: errors 0, warnings 0 | gimni: errors 0, warnings 0
 
 ## Salla Theming Compliance
 
-- theme.json emitted per theme
-- Salla validation workflow present (salla-validate.yml)
-- PostCSS + stylelint configured
+- theme.json present (demo=True, gimni=True); structureOk=True
 
-## Documentation Coverage
+## Documentation Accuracy
 
-- docs/Adapters.md
-- docs/ai.md
-- docs/architecture.md
-- docs/baseline.md
-- docs/codex-progress.md
-- docs/commenting.md
-- docs/configurations.md
-- docs/deemind_checklist.md
-- docs/modules.md
-- docs/salla-integration.md
-- docs/salla-sdk.md
-- docs/salla-web-components.md
-- docs/validation.md
-- docs/workflow.md
-- docs/workflows.md
+- Docs present and referenced from README; consider removing legacy brand mentions in README footer
 
-## Suggested Next Improvements
+## Stability & Performance Snapshot
 
-- Add Lighthouse CI for performance and accessibility
-- Reduce ESLint warnings incrementally
-- Expand snapshot fixtures beyond demo/gimni
+- Sizes: demo 0 MB, gimni 0.36 MB
+
+## Codex Agent Status
+
+- codex-agent and codex-auto-eval present; daily/6h schedules active; logs written
+
+## Metrics Table
+
+| Category                       | Score | Status / Notes                                     |
+| ------------------------------ | ----: | -------------------------------------------------- |
+| Build Integrity                |     5 | demo ms, gimni ms; lint errors 0, warnings 37      |
+| Module Integrity (Pre-Harmony) |     4 | core modules present; no runtime failures detected |
+| CI/CD Pipeline                 |     4 | workflows on main; packaging + doctor              |
+| Validation & Testing           |     5 | snapshots pass; flaky clean                        |
+| Salla Compliance               |     5 | theme.json present; structure OK                   |
+| Documentation                  |     4 | docs present and linked                            |
+| Stability & Performance        |     4 | sizes: demo 0MB, gimni 0.36MB                      |
+| Codex Agent                    |     4 | agent + auto-eval workflows configured             |
+
+## Strategic Recommendations
+
+- Critical: lock Node 20 in local runner; avoid Node 22 engine mismatch
+- Important: reduce ESLint warnings; expand fixtures (needsboxes)
+- Important: add Lighthouse CI for performance/accessibility
+- Optional: add depcheck/madge to detect unused deps and cycles
+
+Readiness for Harmony Phase: 88%
