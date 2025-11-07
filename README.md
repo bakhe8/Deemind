@@ -107,3 +107,19 @@ Review /output/<theme>/report-extended.json
 
 You can now rename your local folder to deemind, run the CLI as-is, and you’ll have a consistent, brand-aligned personal engine —
 💡 “Deemind — Theming Salla Edition” is officially alive.
+
+## 📚 Documentation Index
+
+- [ai.md](docs\ai.md)
+- [architecture.md](docs\architecture.md)
+- [baseline.md](docs\baseline.md)
+- [commenting.md](docs\commenting.md)
+- [configurations.md](docs\configurations.md)
+- [deemind_checklist.md](docs\deemind_checklist.md)
+- [modules.md](docs\modules.md)
+- [salla-integration.md](docs\salla-integration.md)
+- [salla-sdk.md](docs\salla-sdk.md)
+- [salla-web-components.md](docs\salla-web-components.md)
+- [validation.md](docs\validation.md)
+- [workflow.md](docs\workflow.md)
+- [workflows.md](docs\workflows.md)
