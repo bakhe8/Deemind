@@ -2,13 +2,16 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Auto Commit & Push",
+      "label": "Run Deemind Build",
       "type": "shell",
-      "command": "git add . && git commit -m \"Auto-commit: $(date +'%Y-%m-%d %H:%M:%S')\" && git push",
-      "problemMatcher": [],
-      "runOptions": {
-        "runOn": "fileSave"
-      }
+      "command": "npm run deemind:build demo",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Deemind Validate",
+      "type": "shell",
+      "command": "npm run deemind:validate",
+      "problemMatcher": []
     }
   ]
 }

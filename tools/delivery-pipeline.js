@@ -1,33 +1,15 @@
-// tools/delivery-pipeline.js
+// Placeholder zip/archival to archives/ (install 'archiver' later for real zips)
+import fs from 'fs-extra';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
-// ES Module equivalent of __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Accept arguments from npm run
-const args = process.argv.slice(2);
-const target = args[0] || 'default';
-
-async function runBuild(targetName) {
-  console.log(`Starting Deemind build for target: ${targetName}`);
-
-  // Placeholder for future build logic
-  console.log(`Running parser...`);
-  await new Promise(resolve => setTimeout(resolve, 200)); // simulate work
-
-  console.log(`Running mapper...`);
-  await new Promise(resolve => setTimeout(resolve, 200));
-
-  console.log(`Running adapter...`);
-  await new Promise(resolve => setTimeout(resolve, 200));
-
-  console.log(`Validating...`);
-  await new Promise(resolve => setTimeout(resolve, 200));
-
-  console.log(`Deemind build executed successfully for target: ${targetName}`);
+export async function archiveTheme(outputPath) {
+  const archives = path.join(process.cwd(), 'archives');
+  await fs.ensureDir(archives);
+  const theme = path.basename(outputPath);
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const dest = path.join(archives, `${theme}-${stamp}.zip`);
+  // Not creating a real zip in MVP; write a note instead
+  await fs.writeFile(dest + '.NOTE', `Zip skipped in MVP. Archive ${outputPath} manually.`);
+  return dest + '.NOTE';
 }
 
-// Run the build
-runBuild(target);

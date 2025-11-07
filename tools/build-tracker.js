@@ -1,27 +1,54 @@
-/**
- * Deemind CI Build Reporter
- * Logs the status of build/test/validation tasks into /logs/ci-report.json
- */
+import fs from 'fs-extra';
+import path from 'path';
+import crypto from 'crypto';
 
-import fs from "fs";
-import path from "path";
+export async function generateBuildManifest(outputPath) {
+  const theme = path.basename(outputPath);
+  const pagesDir = path.join(outputPath, 'pages');
+  const layoutDir = path.join(outputPath, 'layout');
+  const assetsDir = path.join(outputPath, 'assets');
 
-const logDir = path.resolve("logs");
-const logFile = path.join(logDir, "ci-report.json");
+  const pages = await listFiles(pagesDir, '.twig');
+  const components = await listFiles(layoutDir, '.twig');
+  const assets = await listAllFiles(assetsDir);
 
-if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+  const checksum = hashOf([...pages, ...components, ...assets]);
 
-function writeReport(status, details) {
-  const report = {
+  return {
+    theme,
+    version: '1.0.0',
+    engine: 'Deemind 1.0',
+    adapter: 'Salla',
     timestamp: new Date().toISOString(),
-    status,
-    details,
+    pages: pages.length,
+    components: components.length,
+    assets: assets.length,
+    checksum,
   };
-
-  fs.writeFileSync(logFile, JSON.stringify(report, null, 2), "utf8");
-  console.log(`🧠 CI report written to ${logFile}`);
 }
 
-// read arguments from CLI
-const [,, status, ...info] = process.argv;
-writeReport(status, info.join(" "));
+async function listFiles(dir, ext) {
+  const out = [];
+  async function walk(d) {
+    if (!(await fs.pathExists(d))) return;
+    const entries = await fs.readdir(d, { withFileTypes: true });
+    for (const e of entries) {
+      const p = path.join(d, e.name);
+      if (e.isDirectory()) await walk(p);
+      else if (!ext || p.endsWith(ext)) out.push(p);
+    }
+  }
+  await walk(dir);
+  return out;
+}
+
+async function listAllFiles(dir) {
+  return listFiles(dir);
+}
+
+function hashOf(files) {
+  const h = crypto.createHash('md5');
+  for (const f of files) h.update(f);
+  return h.digest('hex');
+}
+

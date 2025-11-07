@@ -1,0 +1,9 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "engine": { "type": "string" },
+    "adapter": { "type": "string", "enum": ["Salla"] }
+  },
+  "required": ["engine", "adapter"]
+}

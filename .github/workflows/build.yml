@@ -1,39 +1,13 @@
 name: Deemind CI
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
+on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run Deemind Build
-        run: npm run deemind:build demo
-
-      - name: Run Tests
-        run: npm run deemind:test
-
-      - name: Validate Code
-        run: node tools/validator.js
-      - name: Write Success Report
-        if: success()
-        run: node tools/build-tracker.js success "✅ Deemind CI passed all checks"
-
-      - name: Write Failure Report
-        if: failure()
-        run: node tools/build-tracker.js failure "❌ One or more CI steps failed"
+      - run: npm ci
+      - run: npm run deemind:build demo
+      - run: npm run deemind:test

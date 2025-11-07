@@ -1,0 +1,5 @@
+{
+  "placeholders": {
+    "PRODUCT_NAME": "{{ product.name }}"
+  }
+}

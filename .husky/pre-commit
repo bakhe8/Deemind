@@ -1,0 +1,8 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🧠  Running Deemind pre-commit checks..."
+npm run lint || exit 1
+npm run deemind:test || exit 1
+node tools/validator.js || exit 1
+echo "✅  Deemind pre-commit passed."
