@@ -1,0 +1,20 @@
+{
+  "all": true,
+  "reporter": ["text-summary", "lcov"],
+  "exclude": [
+    "node_modules/**",
+    "tests/**",
+    "output/**",
+    "archives/**",
+    "logs/**",
+    "configs/**",
+    "**/*.config.js",
+    "**/eslint.config.js"
+  ],
+  "extension": [".js"],
+  "include": [
+    "cli.js",
+    "tools/**/*.js"
+  ]
+}
+

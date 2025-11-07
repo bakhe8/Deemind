@@ -1,9 +1,11 @@
-# 🧠 Deemind — The Intelligent Theming Engine
+# 🧠 Deemind — The Intelligent Theming Engine ![CI](https://github.com/EvaniaDeemind/deemind/actions/workflows/build.yml/badge.svg)
+
 > A local tool that understands, converts, and validates static HTML prototypes into Salla-compatible themes.
 
 ---
 
 ## 🚀 Quick Start
+
 ```
 npm install
 npm run deemind:build demo
@@ -13,14 +15,21 @@ Input folder → /input/demo
 Output folder → /output/demo
 ```
 
+Quick VS Code Setup
+
+- Open the folder in VS Code
+- Ensure Node v20.10.0 (`nvm use`)
+- Recommended extensions installed (ESLint + Prettier, GitLens, Copilot)
+- Run task: “Run Deemind Build” from the Terminal → Run Task menu
+
 🧩 Modules Overview
-Module	Purpose
-deemind-parser/	Understands messy HTML and extracts structure
-semantic-mapper.js	Maps text content into Twig variables
-adapter-salla.js	Generates Salla Twig layouts, pages, and partials
-validator-extended.js	Checks encoding, assets, translations, budgets
-build-tracker.js	Tracks build reproducibility
-delivery-pipeline.js	Zips and archives completed themes
+Module Purpose
+deemind-parser/ Understands messy HTML and extracts structure
+semantic-mapper.js Maps text content into Twig variables
+adapter-salla.js Generates Salla Twig layouts, pages, and partials
+validator-extended.js Checks encoding, assets, translations, budgets
+build-tracker.js Tracks build reproducibility
+delivery-pipeline.js Zips and archives completed themes
 ⚙️ Config Files
 
 configs/mappings.json → static-to-Twig replacements
@@ -32,13 +41,13 @@ configs/salla-schema.json → theme validation schema
 configs/settings.json → basic tool settings
 
 📂 Folder Structure
-input/    → HTML prototypes
-output/   → Converted themes
-tools/    → Core Deemind engine
-configs/  → Settings and mappings
-tests/    → QA fixtures and test runner
+input/ → HTML prototypes
+output/ → Converted themes
+tools/ → Core Deemind engine
+configs/ → Settings and mappings
+tests/ → QA fixtures and test runner
 archives/ → Zipped builds
-logs/     → Reports and conflict logs
+logs/ → Reports and conflict logs
 
 💡 Philosophy
 
@@ -46,7 +55,6 @@ Deemind doesn’t just parse — it deems meaning.
 It interprets structure, resolves conflicts, and delivers a complete, validated theme you can trust.
 
 © 2025 Beto Harire — Personal Edition
-
 
 ---
 
@@ -67,10 +75,10 @@ It interprets structure, resolves conflicts, and delivers a complete, validated 
 ```
 
 ✅ 6️⃣ CLI Commands Summary
-Command	Description
-npm run deemind:build demo	Parse, map, adapt, validate, and output theme
-npm run deemind:validate	Run extended QA validator only
-npm run deemind:test	Execute test fixtures for regression checking
+Command Description
+npm run deemind:build demo Parse, map, adapt, validate, and output theme
+npm run deemind:validate Run extended QA validator only
+npm run deemind:test Execute test fixtures for regression checking
 
 🧠 7️⃣ What’s Next
 

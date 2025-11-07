@@ -1,0 +1,206 @@
+[
+  {
+    "title": "Setup folder structure (input/tools/output)",
+    "labels": ["core"],
+    "milestone": "🧱 Week 1 — Foundation",
+    "body": "Create base folders: input/, tools/, output/, logs/, configs/, tests/, .vscode/, .husky/, .github/."
+  },
+  {
+    "title": "Pin Node version with .nvmrc (v20.10.0)",
+    "labels": ["core"],
+    "milestone": "🧱 Week 1 — Foundation",
+    "body": "Add .nvmrc with v20.10.0 and use nvm for reproducible runtime."
+  },
+  {
+    "title": "Mark package as private + ESM only",
+    "labels": ["core"],
+    "milestone": "🧱 Week 1 — Foundation",
+    "body": "Set package.json { \"type\": \"module\", \"private\": true } to lock ESM and prevent accidental publish."
+  },
+  {
+    "title": "VS Code workspace configuration",
+    "labels": ["docs"],
+    "milestone": "🧱 Week 1 — Foundation",
+    "body": "Add .vscode/settings.json, extensions.json, tasks.json to streamline builds and validation."
+  },
+  {
+    "title": "Husky pre-commit hook (lint, fixtures, validator)",
+    "labels": ["automation", "qa"],
+    "milestone": "🧱 Week 1 — Foundation",
+    "body": "Hook runs: lint-staged, npm run deemind:test, node tools/validator.js; fail on errors."
+  },
+  {
+    "title": "Minimal CI workflow (build demo + fixtures)",
+    "labels": ["automation"],
+    "milestone": "🧱 Week 1 — Foundation",
+    "body": "Add .github/workflows/build.yml to run npm ci, build demo, run fixtures on push/PR."
+  },
+  {
+    "title": "Implement hybrid parser with timeout + size caps + quarantine",
+    "labels": ["core", "qa"],
+    "milestone": "🧱 Week 1 — Foundation",
+    "body": "Parse HTML via Cheerio; 5s timeout; skip files \u003e settings.maxInputFileBytes; copy failures to input/_failed; record in conversion-report.json."
+  },
+  {
+    "title": "Generate conflict summary + layout map",
+    "labels": ["core", "qa"],
+    "milestone": "🧱 Week 1 — Foundation",
+    "body": "Write logs/conflict-summary.md and logs/layout-map.json for per-page component order and basic conflicts."
+  },
+  {
+    "title": "Semantic mapper with mappings.json + client overrides + --i18n",
+    "labels": ["core", "config"],
+    "milestone": "🧱 Week 1 — Foundation",
+    "body": "Replace placeholders from configs/mappings.json and configs/\u003cclient\u003e/mappings.json; optional i18n wraps titles."
+  },
+  {
+    "title": "Sanitize mode to strip inline handlers + http scripts",
+    "labels": ["qa", "core"],
+    "milestone": "🧱 Week 1 — Foundation",
+    "body": "--sanitize removes on* attributes and insecure http script tags during mapping."
+  },
+  {
+    "title": "Adapter with path guards, asset copy, unchanged lock",
+    "labels": ["core"],
+    "milestone": "🧱 Week 1 — Foundation",
+    "body": "Ensure writes stay under output/\u003ctheme\u003e; copy assets/ skipping symlinks and oversize; support --lock-unchanged."
+  },
+  {
+    "title": "Asset URL normalizer (rewrite relative src/href to assets/normalized)",
+    "labels": ["core", "qa"],
+    "milestone": "🧠 Week 2 — Intelligence",
+    "body": "Scan page HTML and copy referenced files into assets/normalized; rewrite refs to theme_asset path."
+  },
+  {
+    "title": "Core validator with levels and required pages",
+    "labels": ["qa", "core"],
+    "milestone": "🧱 Week 1 — Foundation",
+    "body": "Critical vs warning; read configs/routes.json to warn on required page missing; twig lint for extends/content block."
+  },
+  {
+    "title": "Extended validator: encoding, handlers, insecure scripts, cycles, assets, budgets, i18n, samples, svg, collisions",
+    "labels": ["qa"],
+    "milestone": "🧱 Week 1 — Foundation",
+    "body": "Fail on inline handlers/http scripts/assets 404; detect cycles; budgets (warn/error via settings); i18n gaps; sample strings; unsafe SVG; case-insensitive partial collisions."
+  },
+  {
+    "title": "Manifest generation with content checksum + input checksum",
+    "labels": ["core", "qa"],
+    "milestone": "🧱 Week 1 — Foundation",
+    "body": "Move generateBuildManifest into validator; hash file contents; add input folder checksum; include page order and warnings count."
+  },
+  {
+    "title": "Conversion and per-page reports",
+    "labels": ["qa"],
+    "milestone": "🧱 Week 1 — Foundation",
+    "body": "Write output/\u003ctheme\u003e/conversion-report.json and output/\u003ctheme\u003e/reports/pages/*.json; include written/skipped/failed and components."
+  },
+  {
+    "title": "Settings switches (requireI18n, rawAllowlist, failOnBudget, size caps)",
+    "labels": ["config"],
+    "milestone": "🧱 Week 1 — Foundation",
+    "body": "configs/settings.json adds requireI18n, rawAllowlist, failOnBudget, maxInputFileBytes, maxAssetFileBytes, sanitizeByDefault."
+  },
+  {
+    "title": "Routes map (configs/routes.json)",
+    "labels": ["config"],
+    "milestone": "🧱 Week 1 — Foundation",
+    "body": "List required pages (e.g., index.twig, product.twig, category.twig, search.twig) for validator checks."
+  },
+  {
+    "title": "Baseline compare utility + component usage report",
+    "labels": ["qa", "core"],
+    "milestone": "🧠 Week 2 — Intelligence",
+    "body": "Scan baseline/raed/partials or configs/standard-components.json; produce reports/component-usage.json labeled standard/custom."
+  },
+  {
+    "title": "Partialization pass (flagged) + prune tool",
+    "labels": ["core", "qa"],
+    "milestone": "🧠 Week 2 — Intelligence",
+    "body": "--partialize promotes components used on ≥2 pages; replace inline by includes; prune unused with factory:prune."
+  },
+  {
+    "title": "Hybrid parser runner: template hints + CSS/JS maps",
+    "labels": ["core"],
+    "milestone": "🧠 Week 2 — Intelligence",
+    "body": "Template hints (hero/product/footer/header), CSS map via PostCSS (inline styles), inline JS extraction saved to assets/js."
+  },
+  {
+    "title": "Factory build all script (build-all.js)",
+    "labels": ["automation"],
+    "milestone": "⚙️ Week 3 — Automation",
+    "body": "Add npm run factory:build:all to iterate input/ and build each theme."
+  },
+  {
+    "title": "Labels and milestones in GitHub",
+    "labels": ["automation"],
+    "milestone": "⚙️ Week 3 — Automation",
+    "body": "Create labels: core, config, docs, automation, qa, ai. Create milestones: Week 1/2/3 per plan."
+  },
+  {
+    "title": "Project board setup (To Do/In Progress/Review/Done)",
+    "labels": ["automation"],
+    "milestone": "⚙️ Week 3 — Automation",
+    "body": "Create a GitHub Projects board and add all issues; keep updated daily."
+  },
+  {
+    "title": "Regression test (double-run diff of pages/layout)",
+    "labels": ["qa"],
+    "milestone": "⚙️ Week 3 — Automation",
+    "body": "Add script to rebuild twice and diff pages/**/*.twig and layout/**/*.twig ignoring timestamps."
+  },
+  {
+    "title": "Stress test (50+ HTML files mock)",
+    "labels": ["qa"],
+    "milestone": "⚙️ Week 3 — Automation",
+    "body": "Measure build time and memory; ensure timeouts and caps protect parser."
+  },
+  {
+    "title": "Schema failure test (broken manifest)",
+    "labels": ["qa"],
+    "milestone": "⚙️ Week 3 — Automation",
+    "body": "Intentionally write invalid manifest and verify extended validator errors."
+  },
+  {
+    "title": "Preview generator (optional)",
+    "labels": ["docs"],
+    "milestone": "⚙️ Week 3 — Automation",
+    "body": "Generate a simple local preview HTML to browse output/\u003ctheme\u003e/pages/ for smoke visual checks."
+  },
+  {
+    "title": "AI usage note (VS Code assistant only — no runtime)",
+    "labels": ["ai", "docs"],
+    "milestone": "🧠 Week 2 — Intelligence",
+    "body": "Add docs/ai.md stating guidelines for using GPT Codex/Copilot in refactor/tests only; no runtime AI dependencies."
+  },
+  {
+    "title": "Docs snapshot: quickstart + architecture + configs + validation",
+    "labels": ["docs"],
+    "milestone": "🧱 Week 1 — Foundation",
+    "body": "Ensure README quickstart with 3 commands; keep docs/architecture.md, docs/configurations.md, docs/validation.md accurate."
+  },
+  {
+    "body": "Create .gitattributes with \u0027* text eol=lf\u0027 to normalize line endings across platforms.",
+    "title": "Add .gitattributes to enforce LF line endings",
+    "labels": ["core"],
+    "milestone": "🧱 Week 1 — Foundation"
+  },
+  {
+    "body": "Detect overly long paths and reserved filenames; sanitize or warn during copy.",
+    "title": "Windows path/reserved-name guard",
+    "labels": ["qa", "core"],
+    "milestone": "🧱 Week 1 — Foundation"
+  },
+  {
+    "body": "Add CI status badge to README and a concise Quick Start section for VS Code setup.",
+    "title": "README: add CI badge + quick-start checklist",
+    "labels": ["docs"],
+    "milestone": "🧱 Week 1 — Foundation"
+  },
+  {
+    "body": "Document that AI is used for code suggestions/tests in editor only; no runtime dependencies.",
+    "title": "docs/ai.md: define AI usage policy (editor assist only)",
+    "labels": ["ai", "docs"],
+    "milestone": "🧠 Week 2 — Intelligence"
+  }
+]

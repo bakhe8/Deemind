@@ -1,0 +1,3 @@
+{
+  "required": ["index.twig", "product.twig", "category.twig", "search.twig"]
+}

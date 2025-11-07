@@ -1,30 +1,22 @@
 // tests/run-fixtures.js
-import fs from 'fs/promises';
+import fs from 'fs-extra';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { validateExtended } from '../tools/validator-extended.js';
 
-// ES Module equivalent of __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Path to fixtures folder
-const fixturesDir = path.join(__dirname, 'fixtures');
-
-async function runFixtures() {
-  console.log(`Looking for test fixtures in: ${fixturesDir}`);
-
-  try {
-    const files = await fs.readdir(fixturesDir);
-    console.log(`Found ${files.length} fixture(s):`);
-    files.forEach(file => console.log('- ' + file));
-
-    // Placeholder: here you can run actual validation logic
-    console.log("Deemind tests executed successfully.");
-  } catch (err) {
-    console.error("Error reading fixtures:", err);
-    process.exit(1);
+async function run() {
+  const outputDir = path.join(process.cwd(), 'output');
+  if (!(await fs.pathExists(outputDir))) {
+    console.log('No output directory; nothing to validate.');
+    return;
   }
+  const entries = await fs.readdir(outputDir, { withFileTypes: true });
+  const dirs = entries.filter(e => e.isDirectory()).map(e => e.name);
+  for (const theme of dirs) {
+    const themePath = path.join(outputDir, theme);
+    console.log(`\n🧩 Running Extended Validation on: ${theme}`);
+    await validateExtended(themePath);
+  }
+  console.log('\nDeemind fixtures validation completed.');
 }
 
-// Execute the test runner
-await runFixtures();
+await run();

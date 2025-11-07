@@ -1,5 +1,11 @@
 // Very basic conflict detection: duplicate basenames and empty pages
 
+/**
+ * Detect simple conflicts across pages.
+ * Why: Duplicate basenames often hide divergent versions of the same
+ * page (platform reviewers dislike this), and empty files pass silently
+ * unless we flag them here for early correction.
+ */
 export function detectConflicts(pages) {
   const issues = [];
   const seen = new Map();
@@ -17,4 +23,3 @@ export function detectConflicts(pages) {
   }
   return issues;
 }
-

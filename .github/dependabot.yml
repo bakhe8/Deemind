@@ -1,8 +1,21 @@
 version: 2
 updates:
+  # Weekly npm dependency updates for the root project
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 5
-    versioning-strategy: increase
+    labels:
+      - automation
+      - dependencies
+    open-pull-requests-limit: 10
+  # Keep GitHub Actions up to date as well (optional but useful)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - automation
+      - dependencies
+    open-pull-requests-limit: 10
+

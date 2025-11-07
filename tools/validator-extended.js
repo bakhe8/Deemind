@@ -1,55 +1,207 @@
+/**
+ * DEEMIND — THEMING ENGINE — Extended Validator
+ * Adds deep checks for encoding, assets, translation, cycles, and budgets.
+ */
 import fs from 'fs-extra';
 import path from 'path';
+import { globSync } from 'glob';
+import { createHash } from 'crypto';
 import Ajv from 'ajv';
 
-export async function validateExtended(outputPath) {
-  const reportPath = path.join(outputPath, 'report-extended.json');
-  const configsDir = path.resolve('configs');
-  const schemaFile = path.join(configsDir, 'salla-schema.json');
-  const budgetsFile = path.join(configsDir, 'budgets.json');
+/**
+ * Deep validator for encoding, unsafe patterns, dependencies, assets, budgets, i18n.
+ * Why: These checks catch review-time failures (e.g., inline handlers, cycles,
+ * missing assets) that the core validator intentionally skips for speed.
+ * Budgets default to warn to avoid blocking iteration; can be escalated via config.
+ */
+export async function validateExtended(themePath) {
+  const report = {
+    errors: [],
+    warnings: [],
+    checks: {}
+  };
+  // Load settings
+  let settings = { rawAllowlist: [], failOnBudget: false, requireI18n: false };
+  try { settings = await fs.readJson(path.resolve('configs', 'settings.json')); } catch (err) { void err; }
 
-  const result = { checks: {}, warnings: [], errors: [] };
-
-  // Load optional schema and budgets
-  const hasSchema = await fs.pathExists(schemaFile);
-  const hasBudgets = await fs.pathExists(budgetsFile);
-
-  if (hasBudgets) {
-    try {
-      const budgets = await fs.readJson(budgetsFile);
-      result.checks.budgets = budgets;
-    } catch (e) {
-      result.warnings.push({ type: 'budgets-parse', message: e.message });
+  // 1) UTF-8 encoding check
+  for (const file of globSync(`${themePath}/**/*.{html,twig,css,js}`, { nodir: true })) {
+    const buf = await fs.readFile(file);
+    const text = buf.toString('utf8');
+    if (/�/.test(text)) {
+      report.errors.push({ type: 'encoding', file, message: 'Invalid UTF-8 characters detected.' });
     }
   }
+  report.checks.encoding = true;
 
-  if (hasSchema) {
-    try {
-      const schema = await fs.readJson(schemaFile);
-      const ajv = new Ajv();
-      const validate = ajv.compile(schema);
-      // Example data to validate: minimal theme meta
-      const data = { engine: 'Deemind 1.0', adapter: 'Salla' };
-      const valid = validate(data);
-      if (!valid) result.warnings.push({ type: 'schema', details: validate.errors });
-    } catch (e) {
-      result.warnings.push({ type: 'schema-parse', message: e.message });
+  // 2) Inline handlers / unsafe scripts
+  const twigs = globSync(`${themePath}/**/*.twig`, { nodir: true });
+  for (const file of twigs) {
+    const content = await fs.readFile(file, 'utf8');
+    if (/\son[a-z]+\s*=\s*["']/i.test(content)) {
+      report.errors.push({ type: 'inline-handler', file, message: 'Inline JS event handler found.' });
+    }
+    if (/<script[^>]+src=['"]http:\/\//i.test(content)) {
+      report.errors.push({ type: 'insecure-script', file, message: 'Insecure script source (HTTP) detected.' });
+    }
+    // raw filter usage check
+    const rawUsages = Array.from(content.matchAll(/\|\s*raw\b/g)).length;
+    if (rawUsages) {
+      // allowlist check
+      const allowed = (settings.rawAllowlist || []).some(a => content.includes(a));
+      if (!allowed) report.errors.push({ type: 'raw-disallowed', file, message: '| raw used without allowlist' });
     }
   }
+  report.checks.scripts = true;
 
-  await fs.writeJson(reportPath, { status: result.errors.length ? 'fail' : 'ok', ...result }, { spaces: 2 });
-  return result;
-}
+  // 3) Include / extends cycles
+  const deps = {};
+  for (const file of twigs) {
+    const content = await fs.readFile(file, 'utf8');
+    const matches = Array.from(content.matchAll(/{%\s*(include|extends)\s*['"]([^'"]+)['"]/g));
+    const includes = matches.map(m => path.join(themePath, m[2]).replace(/\\/g,'/'));
+    deps[file.replace(/\\/g,'/')] = includes;
+  }
+  if (detectCycle(deps)) {
+    report.errors.push({ type: 'dependency-cycle', message: 'Include/extends cycle detected.' });
+  }
+  report.checks.dependencies = true;
 
-// CLI mode support when run via npm script
-if (process.argv[1] && process.argv[1].endsWith('validator-extended.js')) {
-  const theme = process.argv[2] || 'demo';
-  const out = path.join(process.cwd(), 'output', theme);
-  validateExtended(out).then(() => {
-    console.log(`Extended validation written for ${out}`);
-  }).catch((e) => {
-    console.error('Extended validation failed', e);
-    process.exit(1);
+  // 4) Asset link validation
+  // const assets = globSync(`${themePath}/assets/**/*`, { nodir: true });
+  const twigsContent = twigs.map(f => fs.readFileSync(f, 'utf8')).join('\n');
+  const missing = [];
+  for (const match of twigsContent.matchAll(/assets\/([^"')\s]+)/g)) {
+    const ref = path.join(themePath, 'assets', match[1]);
+    if (!fs.existsSync(ref)) missing.push(ref);
+  }
+  if (missing.length) {
+    report.errors.push({ type: 'missing-assets', message: `${missing.length} asset references not found.` });
+  }
+  report.checks.assets = true;
+
+  // 5) Budget enforcement
+  const budgets = await loadBudgets();
+  const css = globSync(`${themePath}/assets/**/*.css`).map(f => fs.statSync(f).size);
+  const js = globSync(`${themePath}/assets/**/*.js`).map(f => fs.statSync(f).size);
+  const totalCSS = css.reduce((a, b) => a + b, 0);
+  const totalJS = js.reduce((a, b) => a + b, 0);
+  if (totalCSS > budgets.maxCSS) {
+    (settings.failOnBudget ? report.errors : report.warnings).push({ type: 'budget-css', message: `Total CSS ${totalCSS}B exceeds ${budgets.maxCSS}B.` });
+  }
+  if (totalJS > budgets.maxJS) {
+    (settings.failOnBudget ? report.errors : report.warnings).push({ type: 'budget-js', message: `Total JS ${totalJS}B exceeds ${budgets.maxJS}B.` });
+  }
+  report.checks.budgets = true;
+
+  // 6) Translation check (simple visible text check)
+  const untranslated = twigs.filter(f => {
+    const text = fs.readFileSync(f, "utf8");
+    const hasFilter = /\|\s*t\b/.test(text);
+        const hasBlock = /\{%\s*trans\s*%\}[\s\S]*?\{%\s*endtrans\s*%\}/.test(text);
+    const hasI18n = hasFilter || hasBlock;
+    return />[^<]{8,}</.test(text) && !hasI18n;
   });
+  // Record potential untranslated content as warnings
+  for (const f of untranslated) {
+    report.warnings.push({ type: 'i18n-untranslated-heuristic', file: f, message: 'Possible untranslated text detected.' });
+  }
+  
+  report.checks.i18n = true;
+
+  // Sample string detection
+  const samples = /(Lorem ipsum|Sample Product|PRODUCT_NAME)/i;
+  for (const f of twigs) {
+    const text = fs.readFileSync(f, 'utf8');
+    if (samples.test(text)) report.errors.push({ type: 'sample-strings', file: f, message: 'Sample placeholder string found.' });
+  }
+
+  // Case-insensitive partial name collisions
+  const partialsDir = path.join(themePath, 'partials');
+  if (fs.existsSync(partialsDir)) {
+    const parts = globSync('**/*.twig', { cwd: partialsDir, nodir: true });
+    const seen = new Map();
+    for (const p of parts) {
+      const key = p.toLowerCase();
+      if (seen.has(key) && seen.get(key) !== p) {
+        report.errors.push({ type: 'partial-collision', files: [seen.get(key), p], message: 'Case-insensitive collision in partials.' });
+      } else {
+        seen.set(key, p);
+      }
+    }
+  }
+
+  // SVG sanitize: forbid <script> or on* attributes
+  const svgs = globSync(`${themePath}/assets/**/*.svg`, { nodir: true });
+  for (const f of svgs) {
+    const s = await fs.readFile(f, 'utf8');
+    if (/<script\b/i.test(s) || /\son[a-z]+\s*=\s*["']/i.test(s)) {
+      report.errors.push({ type: 'svg-unsafe', file: f, message: 'SVG includes script or inline handlers.' });
+    }
+  }
+
+  // 7) Manifest + version integrity
+  const manifestPath = path.join(themePath, 'manifest.json');
+  if (fs.existsSync(manifestPath)) {
+    const manifest = await fs.readJson(manifestPath);
+    manifest.checksum = createHash('md5').update(JSON.stringify(manifest)).digest('hex');
+    await fs.writeJson(manifestPath, manifest, { spaces: 2 });
+  } else {
+    report.errors.push({ type: 'manifest-missing', message: 'manifest.json not found.' });
+  }
+  report.checks.manifest = true;
+
+  // 8) Schema validation (manifest against cached Salla schema)
+  try {
+    const schemaPath = path.resolve('configs', 'salla-schema.json');
+    if (await fs.pathExists(schemaPath) && await fs.pathExists(manifestPath)) {
+      const ajv = new Ajv({ allErrors: true, strict: false });
+      const schema = await fs.readJson(schemaPath);
+      const manifest = await fs.readJson(manifestPath);
+      const validate = ajv.compile(schema);
+      const valid = validate(manifest);
+      if (!valid) {
+        report.errors.push({ type: 'schema', message: 'Manifest failed Salla schema validation', details: validate.errors });
+      }
+    }
+  } catch (err) {
+    report.warnings.push({ type: 'schema-exec', message: 'Schema validation skipped due to runtime error.' });
+  }
+  report.checks.schema = true;
+
+  const outFile = path.join(themePath, 'report-extended.json');
+  const summary = {
+    passed: report.errors.length === 0,
+    errors: report.errors.length,
+    warnings: report.warnings.length,
+    timestamp: new Date().toISOString(),
+  };
+  await fs.writeJson(outFile, { ...report, summary }, { spaces: 2 });
+
+  console.log(`\n🧪 Extended Validation Complete\nErrors: ${report.errors.length}\nWarnings: ${report.warnings.length}\nReport: ${outFile}\n`);
+  return report;
 }
 
+function detectCycle(graph) {
+  const visited = new Set();
+  const stack = new Set();
+  function dfs(node) {
+    if (stack.has(node)) return true;
+    if (visited.has(node)) return false;
+    visited.add(node); stack.add(node);
+    for (const dep of graph[node] || []) {
+      if (dfs(dep)) return true;
+    }
+    stack.delete(node);
+    return false;
+  }
+  return Object.keys(graph).some(dfs);
+}
+
+async function loadBudgets() {
+  try {
+    return await fs.readJson('configs/budgets.json');
+  } catch {
+    return { maxCSS: 300000, maxJS: 400000 };
+  }
+}

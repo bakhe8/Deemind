@@ -1,0 +1,17 @@
+name: Deploy (optional)
+on:
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build demo theme
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run deemind:build demo
+      - name: Placeholder deploy step
+        run: echo "Add your deploy steps here (Vercel/Netlify/AWS/Pages)"
+

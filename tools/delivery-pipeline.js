@@ -1,15 +1,41 @@
-// Placeholder zip/archival to archives/ (install 'archiver' later for real zips)
 import fs from 'fs-extra';
 import path from 'path';
+import archiver from 'archiver';
 
+/**
+ * Zip a built theme into archives/ with a timestamped name.
+ * Why: Provides deterministic packaging and a breadcrumb (last-success.txt)
+ * for quick retrieval and handoff.
+ */
 export async function archiveTheme(outputPath) {
   const archives = path.join(process.cwd(), 'archives');
   await fs.ensureDir(archives);
   const theme = path.basename(outputPath);
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');
   const dest = path.join(archives, `${theme}-${stamp}.zip`);
-  // Not creating a real zip in MVP; write a note instead
-  await fs.writeFile(dest + '.NOTE', `Zip skipped in MVP. Archive ${outputPath} manually.`);
-  return dest + '.NOTE';
+  await zipFolder(outputPath, dest, [ 'logs', '.factory-cache' ]);
+  await fs.writeFile(path.join(archives, 'last-success.txt'), dest, 'utf8');
+  return dest;
 }
 
+/**
+ * Create a zip archive from a directory, excluding specified subpaths.
+ * Why: Avoids bundling logs or caches into deliverables without having
+ * to restructure the output tree.
+ */
+async function zipFolder(srcDir, zipPath, excludeDirs = []) {
+  const output = fs.createWriteStream(zipPath);
+  const archive = archiver('zip', { zlib: { level: 9 } });
+  const excludes = new Set(excludeDirs.map(d => path.resolve(srcDir, d)));
+  await new Promise((resolve, reject) => {
+    output.on('close', resolve);
+    archive.on('error', reject);
+    archive.pipe(output);
+    archive.glob('**/*', {
+      cwd: srcDir,
+      dot: false,
+      ignore: Array.from(excludes).map(p => path.relative(srcDir, p) + '/**')
+    });
+    archive.finalize();
+  });
+}

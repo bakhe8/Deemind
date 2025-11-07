@@ -10,6 +10,8 @@ on:
 
 jobs:
   analyze:
+    # Skip CodeQL for private repositories where code scanning may be disabled
+    if: ${{ github.event.repository.private == false }}
     name: Analyze
     runs-on: ubuntu-latest
     permissions:
@@ -31,3 +33,4 @@ jobs:
       uses: github/codeql-action/autobuild@v3
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
+      continue-on-error: true

@@ -1,21 +1,25 @@
 ---
 name: Bug report
-about: Report a problem in Deemind
+about: Create a report to help us improve
 labels: bug
 ---
 
-## Description
-A clear description of the bug.
+### Describe the bug
+A clear and concise description of what the bug is.
 
-## Steps To Reproduce
-1. 
-2. 
+### To Reproduce
+Steps to reproduce the behavior:
+1. Command executed
+2. Input used
+3. Output observed
 
-## Expected behavior
+### Expected behavior
+What you expected to happen.
 
-## Logs / Screenshots
+### Logs / Reports
+Attach relevant files from `output/<theme>/report-extended.json` or console output.
 
-## Environment
+### Environment
 - OS:
-- Node:
+- Node version:
 

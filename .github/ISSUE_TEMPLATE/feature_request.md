@@ -1,14 +1,18 @@
 ---
 name: Feature request
 about: Suggest an idea for Deemind
-labels: enhancement
+labels: feature
 ---
 
-## Summary
+### Problem
+What problem does this feature solve?
 
-## Use case / Motivation
+### Proposal
+Describe the solution you'd like (CLI flags, configs, modules).
 
-## Proposal
+### Alternatives
+Any alternative solutions or features you've considered.
 
-## Alternatives considered
+### Additional context
+Links, examples, or references.
 

@@ -14,15 +14,24 @@ import path from "path";
 import chalk from "chalk";
 import { fileURLToPath } from "url";
 
-import { parseFolder } from "./tools/deemind-parser/parser.js";
+import { runHybridParser } from "./tools/deemind-parser/hybrid-runner.js";
 import { mapSemantics } from "./tools/deemind-parser/semantic-mapper.js";
-import { adaptToSalla } from "./tools/adapter-salla.js";
-import { validateTheme } from "./tools/validator.js";
+import { adaptToSalla } from "./tools/adapter.js";
+import { validateTheme, generateBuildManifest } from "./tools/validator.js";
 import { validateExtended } from "./tools/validator-extended.js";
-import { generateBuildManifest } from "./tools/build-tracker.js";
+import { prunePartials } from "./tools/partials-prune.js";
+import { loadBaselineSet, computeComponentUsage } from "./tools/baseline-compare.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/**
+ * Orchestrates the full Deemind pipeline.
+ * Why: Centralizes flags and stage order so we can keep a single
+ * entrypoint that enforces stability first (parse → map → adapt → validate),
+ * with guardrails like sanitize-by-default and a fail gate on critical
+ * validator errors. This function intentionally keeps side‑effects (FS writes)
+ * grouped per stage to simplify debugging and rollback.
+ */
 async function run() {
   console.log(chalk.cyanBright(`
 ██████╗ ███████╗███████╗███╗   ███╗██╗███╗   ██╗ ██████╗
@@ -52,27 +61,126 @@ async function run() {
   const start = Date.now();
   console.log(chalk.gray(`\n📦 Starting Deemind build for: ${themeName}\n`));
 
+  // Parse extra flags
+  const args = process.argv.slice(3);
+  const i18n = args.includes('--i18n');
+  const lockUnchanged = args.includes('--lock-unchanged');
+  const verbose = args.includes('--verbose') || args.includes('-v');
+  const clientFlag = args.find(a => a.startsWith('--client='));
+  const client = clientFlag ? clientFlag.split('=')[1] : undefined;
+  const prune = args.includes('--prune-partials');
+  const partialize = args.includes('--partialize');
+  const doArchive = args.includes('--archive');
+
   try {
-    console.log(chalk.yellow("🔍 Parsing HTML structure..."));
-    const parsed = await parseFolder(inputPath);
+    console.log(chalk.yellow("🔍 Parsing HTML structure (hybrid)..."));
+    const parsed = await runHybridParser(inputPath);
 
     console.log(chalk.yellow("🧠 Mapping semantics and Twig variables..."));
-    const mapped = await mapSemantics(parsed);
+    // Apply sanitizeByDefault from settings unless explicitly disabled
+    let sanitizeUsed = args.includes('--sanitize');
+    try {
+      const cfg = await fs.readJson(path.join(__dirname, "configs", "settings.json"));
+      if (cfg && cfg.sanitizeByDefault) sanitizeUsed = true;
+    } catch (err) { void err; }
+    const mapped = await mapSemantics(parsed, { i18n, client, sanitize: sanitizeUsed });
 
     console.log(chalk.yellow("🪄 Adapting to Salla theme format..."));
-    await adaptToSalla(mapped, outputPath);
+    const adaptRes = await adaptToSalla(mapped, outputPath, { lockUnchanged, partialize });
+
+    // Verbose per-page, per-component progress
+    if (verbose) {
+      const writtenSet = new Set(adaptRes.written.map(w => w.replace(/\.twig$/,'').replace(/\\/g,'/')));
+      const skippedSet = new Set(adaptRes.skipped.map(s => s.replace(/\\/g,'/')));
+      for (const l of (parsed.layoutMap || [])) {
+        const relHtml = l.page.replace(/\\/g,'/');
+        const twigKey = relHtml.replace(/\.html$/i,'');
+        const status = writtenSet.has(twigKey) ? 'written' : (skippedSet.has(relHtml) ? 'skipped' : 'pending');
+        console.log(chalk.gray(`  • Page ${relHtml} → ${status}`));
+        (l.components || []).forEach((c, idx) => {
+          const sig = c.signature || c.classes || '';
+          console.log(chalk.gray(`     - [${idx}] ${c.selector || 'section'} ${sig ? `(${sig})` : ''}`));
+        });
+      }
+    }
 
     console.log(chalk.yellow("🧪 Running core validation..."));
-    await validateTheme(outputPath);
+    const coreReport = await validateTheme(outputPath);
+    // Fail gate on criticals unless --force
+    const hasCritical = (coreReport.issues || []).some(i => i.level === 'critical');
+    if (hasCritical && !args.includes('--force')) {
+      console.error(chalk.red('Build failed: critical validator errors present. Use --force to override.'));
+      process.exit(1);
+    }
 
     console.log(chalk.yellow("🔬 Running extended QA..."));
     await validateExtended(outputPath);
 
-    console.log(chalk.yellow("📜 Generating build manifest..."));
-    const manifest = await generateBuildManifest(outputPath);
-    await fs.writeJson(path.join(outputPath, "manifest.json"), manifest, { spaces: 2 });
+    if (prune) {
+      console.log(chalk.yellow("🧹 Pruning orphan partials..."));
+      const res = await prunePartials(outputPath, { archive: true, force: false });
+      console.log(chalk.gray(`Removed ${res.removed.length} unused partial(s)`));
+    }
 
-    const elapsed = ((Date.now() - start) / 1000).toFixed(2);
+    console.log(chalk.yellow("📜 Generating build manifest..."));
+    const elapsed = Number(((Date.now() - start) / 1000).toFixed(2));
+    const inputChecksum = await hashInputDir(inputPath);
+    const manifest = await generateBuildManifest(outputPath, { coreReport, elapsedSec: elapsed, layoutMap: parsed.layoutMap, inputChecksum });
+    await fs.writeJson(path.join(outputPath, "manifest.json"), manifest, { spaces: 2 });
+    if (doArchive) {
+      const { archiveTheme } = await import('./tools/delivery-pipeline.js');
+      console.log(chalk.yellow("📦 Archiving build output..."));
+      const zipPath = await archiveTheme(outputPath);
+      await fs.writeJson(path.join(outputPath, 'delivery-report.json'), { zipPath, timestamp: new Date().toISOString() }, { spaces: 2 });
+      console.log(chalk.gray(`Archive → ${zipPath}`));
+    }
+
+    // Conversion report (what succeeded vs not)
+    const critical = (coreReport.issues || []).filter(i => i.level === 'critical').length;
+    const warnings = (coreReport.issues || []).filter(i => i.level !== 'critical').length;
+    const convReport = {
+      theme: path.basename(outputPath),
+      timestamp: new Date().toISOString(),
+      totals: {
+        pagesDetected: parsed.pages.length,
+        pagesWritten: adaptRes.written.length,
+        pagesSkipped: adaptRes.skipped.length,
+        conflicts: parsed.conflicts.length,
+        failedInputs: parsed.failed.length,
+        jsExtracted: Object.values(parsed.jsMap || {}).reduce((a,b)=>a+(b?.length||0),0)
+      },
+      files: {
+        writtenPages: adaptRes.written,
+        skippedPages: adaptRes.skipped,
+        failedInputs: parsed.failed
+      },
+      validator: { critical, warnings }
+    };
+    await fs.writeJson(path.join(outputPath, 'conversion-report.json'), convReport, { spaces: 2 });
+
+    // Per-page reports (action + components)
+    const pageReportsDir = path.join(outputPath, 'reports', 'pages');
+    await fs.ensureDir(pageReportsDir);
+    const layoutByPage = new Map((parsed.layoutMap || []).map(l => [l.page.replace(/\\/g,'/'), l.components || []]));
+    const writtenSet = new Set(adaptRes.written.map(w => w.replace(/\\/g,'/')));
+    const skippedSet = new Set(adaptRes.skipped.map(s => s.replace(/\\/g,'/')));
+    for (const htmlPage of (parsed.pages || []).map(p => p.rel.replace(/\\/g,'/'))) {
+      const pageTwig = htmlPage.replace(/\.html$/i, '.twig');
+      const action = writtenSet.has(pageTwig) ? 'written' : (skippedSet.has(htmlPage) ? 'skipped' : 'pending');
+      const components = layoutByPage.get(htmlPage) || [];
+      const jsCount = (parsed.jsMap && parsed.jsMap[htmlPage]) ? parsed.jsMap[htmlPage].length : 0;
+      const pageReport = { pageHtml: htmlPage, pageTwig, action, components, jsExtracted: jsCount };
+      await fs.writeJson(path.join(pageReportsDir, `${pageTwig.replace(/[\\/]/g,'_')}.json`), pageReport, { spaces: 2 });
+    }
+
+    // Component usage report (standard vs custom)
+    const baseline = loadBaselineSet();
+    const usage = computeComponentUsage(outputPath, baseline);
+    await fs.writeJson(path.join(outputPath, 'reports', 'component-usage.json'), usage, { spaces: 2 });
+
+    // Console summary
+    console.log(chalk.gray(`\nSummary: ${convReport.totals.pagesWritten}/${convReport.totals.pagesDetected} pages written, ${convReport.totals.pagesSkipped} skipped, ${convReport.totals.conflicts} conflicts, ${convReport.totals.failedInputs} failed, ${convReport.totals.jsExtracted} JS blocks extracted.`));
+
     console.log(chalk.greenBright(`\n✅ Deemind build complete in ${elapsed}s`));
     console.log(chalk.gray(`Output → ${outputPath}`));
 
@@ -83,3 +191,24 @@ async function run() {
 }
 
 run();
+
+/**
+ * Compute an MD5 checksum of the input directory contents.
+ * Why: We persist this into manifest.json to capture the exact
+ * source state used for the build, enabling reproducibility and
+ * quick change detection without walking git history.
+ */
+async function hashInputDir(dir) {
+  const crypto = await import('crypto');
+  const { glob } = await import('glob');
+  const files = await glob('**/*', { cwd: dir, nodir: true });
+  const h = crypto.createHash('md5');
+  for (const rel of files) {
+    try {
+      const buf = await fs.readFile(path.join(dir, rel));
+      h.update(buf);
+    } catch (err) { void err; }
+  }
+  return h.digest('hex');
+}
+

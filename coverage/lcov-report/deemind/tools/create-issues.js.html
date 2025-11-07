@@ -1,0 +1,655 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for deemind/tools/create-issues.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">deemind/tools</a> create-issues.js</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/68</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/44</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/10</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/56</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">#!/usr/bin/env node
+// Create labels, milestones, and issues from .github/deemind-issues.json via GitHub REST API
+// Usage: node tools/create-issues.js &lt;owner/repo&gt; [jsonPath]
+&nbsp;
+import fs from 'fs';
+import path from 'path';
+import { spawnSync } from 'node:child_process';
+&nbsp;
+async function <span class="fstat-no" title="function not covered" >main(</span>) {
+  const [repo, jsonPathArg] = <span class="cstat-no" title="statement not covered" >process.argv.slice(2);</span>
+  const isBuiltin = (<span class="cstat-no" title="statement not covered" >jsonPathArg === 'builtin:comprehensive' || jsonPathArg === 'builtin:advanced')</span>;
+<span class="cstat-no" title="statement not covered" >  if (!repo) {</span>
+<span class="cstat-no" title="statement not covered" >    console.error('Usage: node tools/create-issues.js &lt;owner/repo&gt; [jsonPath|builtin:comprehensive|builtin:advanced]');</span>
+<span class="cstat-no" title="statement not covered" >    process.exit(1);</span>
+  }
+  const jsonPath = <span class="cstat-no" title="statement not covered" >isBuiltin ? null : (jsonPathArg || path.join('.github', 'deemind-issues.json'));</span>
+<span class="cstat-no" title="statement not covered" >  if (!isBuiltin &amp;&amp; !fs.existsSync(jsonPath)) {</span>
+<span class="cstat-no" title="statement not covered" >    console.error(`Issues file not found: ${jsonPath}`);</span>
+<span class="cstat-no" title="statement not covered" >    process.exit(1);</span>
+  }
+&nbsp;
+  const token = <span class="cstat-no" title="statement not covered" >getGhToken();</span>
+  const api = <span class="cstat-no" title="statement not covered" >buildApi(token, repo);</span>  let issues; <span class="cstat-no" title="statement not covered" >if (isBuiltin) {</span>
+<span class="cstat-no" title="statement not covered" >    issues = [</span>
+      { title: 'Identity: Project name set to Deemind — The Intelligent Theming Engine', labels:['docs'], milestone:'🧱 Week 1 — Foundation', body:'Ensure README and metadata consistently use the name.' },
+      { title: 'Identity: Core purpose documented', labels:['docs'], milestone:'🧱 Week 1 — Foundation', body:'Convert messy static HTML/CSS/JS into Salla-ready Twig themes.' },
+      { title: 'Identity: Local-only mode enforced', labels:['core','qa'], milestone:'🧱 Week 1 — Foundation', body:'No internet dependency; settings + package.json private.' },
+      { title: 'Identity: Integration target Salla Theme System', labels:['docs'], milestone:'🧱 Week 1 — Foundation', body:'Adapter maps output to Salla expectations.' },
+      { title: 'Identity: Vision statement added', labels:['docs'], milestone:'🧱 Week 1 — Foundation', body:'Self-healing intelligent parser.' },
+      { title: 'Identity: Philosophy added', labels:['docs'], milestone:'🧱 Week 1 — Foundation', body:'Deemind doesn’t just parse — it deems meaning.' },
+      { title: 'Pipeline: Input stage verified', labels:['core'], milestone:'🧱 Week 1 — Foundation', body:'Accepts raw folder with HTML/CSS/JS/images.' },
+      { title: 'Pipeline: Parser stage verified', labels:['core'], milestone:'🧱 Week 1 — Foundation', body:'Normalize, detect structure, conflicts, reusable blocks.' },
+      { title: 'Pipeline: Semantic mapper stage verified', labels:['core'], milestone:'🧱 Week 1 — Foundation', body:'Map static text to Twig vars and translations.' },
+      { title: 'Pipeline: Adapter stage verified', labels:['core'], milestone:'🧱 Week 1 — Foundation', body:'Build Salla-compatible layout/pages/partials.' },
+      { title: 'Pipeline: Validator stage verified', labels:['core'], milestone:'🧱 Week 1 — Foundation', body:'Schema, deps, assets, i18n checks.' },
+      { title: 'Pipeline: Output stage verified', labels:['core'], milestone:'🧱 Week 1 — Foundation', body:'Manifest + reports, reproducible.' },
+      { title: 'Folders: Ensure /input', labels:['core'], milestone:'🧱 Week 1 — Foundation', body:'User drops prototypes here.' },
+      { title: 'Folders: Ensure /output', labels:['core'], milestone:'🧱 Week 1 — Foundation', body:'Generated themes mirror input name.' },
+      { title: 'Folders: Ensure /tools', labels:['core'], milestone:'🧱 Week 1 — Foundation', body:'All engine logic.' },
+      { title: 'Folders: Ensure /configs', labels:['core'], milestone:'🧱 Week 1 — Foundation', body:'Mappings, schema, budgets, settings.' },
+      { title: 'Folders: Ensure /tests', labels:['core'], milestone:'🧱 Week 1 — Foundation', body:'Fixtures and runner.' },
+      { title: 'Folders: Ensure /logs', labels:['core'], milestone:'🧱 Week 1 — Foundation', body:'Conflict and reports.' },
+      { title: 'Folders: Ensure /archives', labels:['core'], milestone:'🧱 Week 1 — Foundation', body:'Optional delivery zips.' },
+      { title: 'Folders: Automation layers present', labels:['automation'], milestone:'🧱 Week 1 — Foundation', body:'.github, .vscode, .husky configured.' },
+      { title: 'CLI: Detect theme and run stages', labels:['core'], milestone:'🧱 Week 1 — Foundation', body:'cli.js orchestrates parse→map→adapt→validate.' },
+      { title: 'CLI: Progress logs and manifest', labels:['core'], milestone:'🧱 Week 1 — Foundation', body:'Print clear steps and write manifest.json.' },
+      { title: 'Core tools listed and integrated', labels:['core'], milestone:'🧱 Week 1 — Foundation', body:'parser, mapper, conflict-detector, adapter (adapter.js), validator, validator-extended.' },
+      { title: 'Config: mappings.json present', labels:['config'], milestone:'🧱 Week 1 — Foundation', body:'Placeholders → Twig vars.' },
+      { title: 'Config: settings.json present', labels:['config'], milestone:'🧱 Week 1 — Foundation', body:'Behavior toggles and caps.' },
+      { title: 'Config: budgets.json present', labels:['config'], milestone:'🧱 Week 1 — Foundation', body:'Size thresholds.' },
+      { title: 'Config: salla-schema.json present', labels:['config'], milestone:'🧱 Week 1 — Foundation', body:'Validation schema.' },
+      { title: 'Dev: Node v20.10.0 pinned', labels:['core'], milestone:'🧱 Week 1 — Foundation', body:'.nvmrc updated.' },
+      { title: 'Dev: Dependencies verified', labels:['core'], milestone:'🧱 Week 1 — Foundation', body:'fs-extra, cheerio, chalk, ajv, glob, p-limit.' },
+      { title: 'Dev: ESLint + Prettier set', labels:['core'], milestone:'🧱 Week 1 — Foundation', body:'Flat config + formatting.' },
+      { title: 'Dev: .gitignore entries', labels:['core'], milestone:'🧱 Week 1 — Foundation', body:'node_modules, output, logs.' },
+      { title: 'VS Code: workspace config present', labels:['docs'], milestone:'🧱 Week 1 — Foundation', body:'settings, extensions, tasks.' },
+      { title: 'GitHub: Private repo confirmed', labels:['automation'], milestone:'⚙️ Week 3 — Automation', body:'Repo privacy checked.' },
+      { title: 'GitHub: Actions workflow active', labels:['automation'], milestone:'⚙️ Week 3 — Automation', body:'Build + fixtures on push/PR.' },
+      { title: 'GitHub: Issue templates added', labels:['automation'], milestone:'⚙️ Week 3 — Automation', body:'Bug/feature templates present.' },
+      { title: 'GitHub: Projects milestones planned', labels:['automation'], milestone:'⚙️ Week 3 — Automation', body:'Week 1/2/3 milestones set.' },
+      { title: 'GitHub: Wiki enabled', labels:['automation'], milestone:'⚙️ Week 3 — Automation', body:'Internal docs area.' },
+      { title: 'GitHub: Dependabot weekly updates', labels:['automation'], milestone:'⚙️ Week 3 — Automation', body:'Dependabot config present.' },
+      { title: 'GitHub: Branch protection rules', labels:['automation'], milestone:'⚙️ Week 3 — Automation', body:'Require passing CI before merge.' },
+      { title: 'GitHub: Security alerts enabled', labels:['automation'], milestone:'⚙️ Week 3 — Automation', body:'Dependency alerts on.' },
+      { title: 'GitHub: Insights monitored', labels:['automation'], milestone:'⚙️ Week 3 — Automation', body:'Track CI and activity.' },
+      { title: 'Pre-commit: lint, tests, validator', labels:['automation','qa'], milestone:'🧱 Week 1 — Foundation', body:'Hook fails on validator errors.' },
+      { title: 'CI: build demo + fixtures', labels:['automation'], milestone:'🧱 Week 1 — Foundation', body:'Workflow validated.' },
+      { title: 'Parser: Conflict detection', labels:['core'], milestone:'🧠 Week 2 — Intelligence', body:'Inconsistent sections across pages.' },
+      { title: 'Parser: Template matching', labels:['core'], milestone:'🧠 Week 2 — Intelligence', body:'Known Salla patterns.' },
+      { title: 'Parser: Progressive and multi-pass', labels:['core'], milestone:'🧠 Week 2 — Intelligence', body:'Structure→semantics merges.' },
+      { title: 'Parser: Interactive resolution (optional)', labels:['core'], milestone:'🧠 Week 2 — Intelligence', body:'Ask once, store decisions.' },
+      { title: 'Parser: Pattern learning (optional)', labels:['core'], milestone:'🧠 Week 2 — Intelligence', body:'Log patterns for future confidence.' },
+      { title: 'Parser: JS extraction to assets', labels:['core'], milestone:'🧠 Week 2 — Intelligence', body:'Extract inline &lt;script&gt; safely.' },
+      { title: 'Parser: Conflict reporting JSON', labels:['core'], milestone:'🧠 Week 2 — Intelligence', body:'Human-readable report.' },
+      { title: 'Parser resilience: caching/retry/skip/async/throttle', labels:['core','qa'], milestone:'🧠 Week 2 — Intelligence', body:'Hash cache, retry, skip bad inputs.' },
+      { title: 'Mapper: replace static labels with Twig vars', labels:['core'], milestone:'🧠 Week 2 — Intelligence', body:'mappings.json driven.' },
+      { title: 'Mapper: detect dynamic placeholders', labels:['core'], milestone:'🧠 Week 2 — Intelligence', body:'user, price, currency, etc.' },
+      { title: 'Mapper: wrap text for translation', labels:['core'], milestone:'🧠 Week 2 — Intelligence', body:'Add i18n wrappers.' },
+      { title: 'Mapper: Arabic/English i18n support', labels:['core'], milestone:'🧠 Week 2 — Intelligence', body:'Optional pass.' },
+      { title: 'Adapter: convert HTML to partials', labels:['core'], milestone:'🧠 Week 2 — Intelligence', body:'Header/footer/cards to partials (flagged).' },
+      { title: 'Adapter: dependency graph topological order', labels:['core'], milestone:'🧠 Week 2 — Intelligence', body:'Order includes/extends.' },
+      { title: 'Adapter: place templates in layout/pages/partials', labels:['core'], milestone:'🧠 Week 2 — Intelligence', body:'Salla structure.' },
+      { title: 'Adapter: copy &amp; fingerprint assets', labels:['core'], milestone:'🧠 Week 2 — Intelligence', body:'Content hash names to dedupe.' },
+      { title: 'Adapter: generate theme.json', labels:['core'], milestone:'🧠 Week 2 — Intelligence', body:'Salla schema metadata.' },
+      { title: 'Validation: core checks', labels:['qa'], milestone:'🧱 Week 1 — Foundation', body:'Twig syntax, assets exist, required pages.' },
+      { title: 'Validation: extended checks', labels:['qa'], milestone:'🧱 Week 1 — Foundation', body:'Budgets, encoding, images, collisions.' },
+      { title: 'Validation: schema sync (cached)', labels:['qa'], milestone:'🧱 Week 1 — Foundation', body:'Use salla-schema.json.' },
+      { title: 'Validation: error taxonomy', labels:['qa'], milestone:'🧱 Week 1 — Foundation', body:'parseError, conversionError, validationError, assetError.' },
+      { title: 'Validation: QA summary reports', labels:['qa'], milestone:'🧱 Week 1 — Foundation', body:'report.json and report-extended.json.' },
+      { title: 'Manifest: include version/commit/timestamp/tool/checksum', labels:['qa','core'], milestone:'🧱 Week 1 — Foundation', body:'Content-based checksums and input checksum.' },
+      { title: 'Build: repeatable checksums', labels:['qa'], milestone:'🧱 Week 1 — Foundation', body:'Identical outputs except timestamps.' },
+      { title: 'Delivery: validate → (optional) zip → release', labels:['automation'], milestone:'⚙️ Week 3 — Automation', body:'Optional delivery pipeline.' },
+      { title: 'Performance: caches and concurrency', labels:['qa','core'], milestone:'⚙️ Week 3 — Automation', body:'Asset dedupe; parsing cache; limit concurrency.' },
+      { title: 'Security: sanitize and path guards', labels:['qa'], milestone:'🧱 Week 1 — Foundation', body:'Inline JS strip; traversal prevention; local only.' },
+      { title: 'Metrics (later): build time, conflicts, error freq, cache, success %', labels:['qa'], milestone:'⚙️ Week 3 — Automation', body:'Collect locally in JSON.' },
+      { title: 'Future: multi-platform adapter/ML/GUI/brand/incremental', labels:['docs'], milestone:'⚙️ Week 3 — Automation', body:'Capture extension requirements.' },
+      { title: 'AI usage: VS Code assistant only', labels:['ai','docs'], milestone:'🧠 Week 2 — Intelligence', body:'No runtime AI dependencies.' },
+      { title: 'Testing &amp; QA: fixtures/automated/smoke/visual/CI', labels:['qa'], milestone:'🧱 Week 1 — Foundation', body:'End-to-end QA plan.' },
+      { title: 'Docs: quickstart/architecture/configurations/validation/workflow', labels:['docs'], milestone:'🧱 Week 1 — Foundation', body:'Ensure docs complete and updated.' },
+      { title: 'Plan: week sequencing tracked', labels:['docs'], milestone:'🧱 Week 1 — Foundation', body:'Week1/2/3 deliverables tracked.' },
+      { title: 'Principles applied: resilient/transparent/efficient/learning/isolated/readable', labels:['docs'], milestone:'🧱 Week 1 — Foundation', body:'Confirm in code and docs.' },
+      { title: 'Go-live checkpoints verified', labels:['qa'], milestone:'⚙️ Week 3 — Automation', body:'Env ready, CI, hooks, sample build, manifest, reports, docs, AI, CI passing.' },
+      { title: 'Completion: Deemind 1.0 Personal Build Complete', labels:['docs'], milestone:'⚙️ Week 3 — Automation', body:'CLI build passes locally and in CI; validator OK; manifest present.' }
+    ];
+  } else {
+<span class="cstat-no" title="statement not covered" >    issues = isBuiltin ? issues : JSON.parse(fs.readFileSync(jsonPath,'utf8'));</span>
+  }
+&nbsp;
+  // Milestones: title -&gt; number
+  const msMap = <span class="cstat-no" title="statement not covered" >await ensureMilestones(api, [...new Set(issues.map(<span class="fstat-no" title="function not covered" >i </span>=&gt; <span class="cstat-no" title="statement not covered" >i.milestone)</span>.filter(Boolean))]);</span>
+  // Labels
+<span class="cstat-no" title="statement not covered" >  await ensureLabels(api, unique(issues.flatMap(<span class="fstat-no" title="function not covered" >i </span>=&gt; <span class="cstat-no" title="statement not covered" >i.labels || [])</span>));</span>
+  // Existing issues titles (state=all)\n  const existingTitles = new Set();\n  {\n    let page = 1;\n    while (true) {\n      const data = await api(/issues?state=all&amp;per_page=100&amp;page=);\n      if (!Array.isArray(data) || data.length === 0) break;\n      for (const it of data) existingTitles.add((it.title||'').toLowerCase());\n      page++;\n    }\n  }\n  // Issues\n  for (const it of issues) {\n    if (existingTitles.has((it.title||'').toLowerCase())) {\n      process.stdout.write(Skip duplicate: \n);\n      continue;\n    }\n    const milestoneNumber = it.milestone ? msMap.get(it.milestone) : undefined;\n    await api('/issues', {\n      method: 'POST',\n      body: {\n        title: it.title,\n        body: it.body || '',\n        labels: it.labels || [],\n        milestone: milestoneNumber,\n      },\n    });\n    process.stdout.write(Created: \n);\n  }\n  console.log('All issues created.');
+}
+&nbsp;
+function <span class="fstat-no" title="function not covered" >unique(</span>arr) { <span class="cstat-no" title="statement not covered" >return Array.from(new Set(arr)); </span>}
+&nbsp;
+function <span class="fstat-no" title="function not covered" >getGhToken(</span>) {
+  // Prefer env var, else gh auth token
+<span class="cstat-no" title="statement not covered" >  if (process.env.GITHUB_TOKEN) <span class="cstat-no" title="statement not covered" >return process.env.GITHUB_TOKEN.trim();</span></span>
+  const out = <span class="cstat-no" title="statement not covered" >spawnSync('gh', ['auth', 'token'], { encoding: 'utf8' });</span>
+<span class="cstat-no" title="statement not covered" >  if (out.status !== 0) {</span>
+<span class="cstat-no" title="statement not covered" >    console.error('Unable to retrieve GitHub token. Run `gh auth login` or set GITHUB_TOKEN.');</span>
+<span class="cstat-no" title="statement not covered" >    process.exit(1);</span>
+  }
+<span class="cstat-no" title="statement not covered" >  return out.stdout.trim();</span>
+}
+&nbsp;
+function <span class="fstat-no" title="function not covered" >buildApi(</span>token, repo) {
+  const base = <span class="cstat-no" title="statement not covered" >`https://api.github.com/repos/${repo}`;</span>
+<span class="cstat-no" title="statement not covered" >  return async function <span class="fstat-no" title="function not covered" >api(</span>pathname, { method = <span class="branch-0 cbranch-no" title="branch not covered" >'GET',</span> body } = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {</span>
+    const headers = <span class="cstat-no" title="statement not covered" >{</span>
+      'Accept': 'application/vnd.github+json',
+      'Authorization': `Bearer ${token}`,
+      'X-GitHub-Api-Version': '2022-11-28',
+      'Content-Type': 'application/json',
+    };
+    const res = <span class="cstat-no" title="statement not covered" >await fetch(base + pathname, {</span>
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+<span class="cstat-no" title="statement not covered" >    if (!res.ok) {</span>
+      const text = <span class="cstat-no" title="statement not covered" >await res.text();</span>
+<span class="cstat-no" title="statement not covered" >      throw new Error(`${method} ${pathname} -&gt; ${res.status} ${res.statusText}: ${text}`);</span>
+    }
+<span class="cstat-no" title="statement not covered" >    if (res.status === 204) <span class="cstat-no" title="statement not covered" >return null;</span></span>
+<span class="cstat-no" title="statement not covered" >    return res.json();</span>
+  };
+}
+&nbsp;
+async function <span class="fstat-no" title="function not covered" >ensureMilestones(</span>api, titles) {
+  const map = <span class="cstat-no" title="statement not covered" >new Map();</span>
+  // list existing
+  let page = <span class="cstat-no" title="statement not covered" >1;</span>
+  const existing = <span class="cstat-no" title="statement not covered" >[];</span>
+<span class="cstat-no" title="statement not covered" >  while (true) {</span>
+    const data = <span class="cstat-no" title="statement not covered" >await api(`/milestones?state=open&amp;per_page=100&amp;page=${page}`);</span>
+<span class="cstat-no" title="statement not covered" >    if (!Array.isArray(data) || data.length === 0) <span class="cstat-no" title="statement not covered" >break;</span></span>
+<span class="cstat-no" title="statement not covered" >    existing.push(...data);</span>
+<span class="cstat-no" title="statement not covered" >    page++;</span>
+  }
+<span class="cstat-no" title="statement not covered" >  for (const m of existing) <span class="cstat-no" title="statement not covered" >map.set(m.title, m.number);</span></span>
+<span class="cstat-no" title="statement not covered" >  for (const title of titles) {</span>
+<span class="cstat-no" title="statement not covered" >    if (!map.has(title)) {</span>
+      const created = <span class="cstat-no" title="statement not covered" >await api('/milestones', { method: 'POST', body: { title } });</span>
+<span class="cstat-no" title="statement not covered" >      map.set(created.title, created.number);</span>
+    }
+  }
+<span class="cstat-no" title="statement not covered" >  return map;</span>
+}
+&nbsp;
+async function <span class="fstat-no" title="function not covered" >ensureLabels(</span>api, labels) {
+  // get existing labels
+  let page = <span class="cstat-no" title="statement not covered" >1;</span> const existing = <span class="cstat-no" title="statement not covered" >new Set();</span>
+<span class="cstat-no" title="statement not covered" >  while (true) {</span>
+    const data = <span class="cstat-no" title="statement not covered" >await api(`/labels?per_page=100&amp;page=${page}`);</span>
+<span class="cstat-no" title="statement not covered" >    if (!Array.isArray(data) || data.length === 0) <span class="cstat-no" title="statement not covered" >break;</span></span>
+<span class="cstat-no" title="statement not covered" >    for (const l of data) <span class="cstat-no" title="statement not covered" >existing.add(l.name);</span></span>
+<span class="cstat-no" title="statement not covered" >    page++;</span>
+  }
+<span class="cstat-no" title="statement not covered" >  for (const name of labels) {</span>
+<span class="cstat-no" title="statement not covered" >    if (!existing.has(name)) {</span>
+<span class="cstat-no" title="statement not covered" >      await api('/labels', { method: 'POST', body: { name, color: 'FFFFFF' } });</span>
+<span class="cstat-no" title="statement not covered" >      existing.add(name);</span>
+    }
+  }
+}
+&nbsp;
+<span class="cstat-no" title="statement not covered" >main().catch(<span class="fstat-no" title="function not covered" >er</span>r =&gt; { <span class="cstat-no" title="statement not covered" >console.error(err.message || err); <span class="cstat-no" title="statement not covered" ></span>process.exit(1); </span>});</span>
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2025-11-07T09:30:00.780Z
+            </div>
+        <script src="../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
+    </body>
+</html>
+    

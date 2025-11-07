@@ -1,4 +1,11 @@
 {
   "defaultTheme": "demo",
-  "encoding": "utf8"
+  "encoding": "utf8",
+  "enableAnalytics": false,
+  "sanitizeByDefault": true,
+  "maxInputFileBytes": 10485760,
+  "maxAssetFileBytes": 10485760,
+  "requireI18n": false,
+  "rawAllowlist": [],
+  "failOnBudget": false
 }

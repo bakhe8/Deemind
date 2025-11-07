@@ -1,0 +1,29 @@
+labels:
+  core:
+    - title: '/\b(parser|mapper|adapter|validator)\b/i'
+    - body: '/\b(parser|mapper|adapter|validator)\b/i'
+  parser:
+    - title: '/\bparser\b/i'
+    - body: '/\bparser\b/i'
+  mapper:
+    - title: '/\bmapper\b/i'
+    - body: '/\bmapper\b/i'
+  adapter:
+    - title: '/\badapter\b/i'
+    - body: '/\badapter\b/i'
+  validator:
+    - title: '/\bvalidator\b/i'
+    - body: '/\bvalidator\b/i'
+  docs:
+    - title: '/\bdocs?|readme|documentation\b/i'
+    - body: '/\bdocs?|readme|documentation\b/i'
+  automation:
+    - title: '/\b(ci|github actions|workflow|dependabot)\b/i'
+    - body: '/\b(ci|github actions|workflow|dependabot)\b/i'
+  ai:
+    - title: '/\b(ai|openai|codex|copilot)\b/i'
+    - body: '/\b(ai|openai|codex|copilot)\b/i'
+  config:
+    - title: '/\bconfig(s)?|schema|mappings\b/i'
+    - body: '/\bconfig(s)?|schema|mappings\b/i'
+

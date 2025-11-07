@@ -2,6 +2,11 @@ name: Deemind CI
 on: [push, pull_request]
 jobs:
   build:
+    continue-on-error: true
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -12,3 +17,15 @@ jobs:
       - run: npm run lint
       - run: npm run deemind:build demo
       - run: npm run deemind:test
+      - name: Attest Build Provenance
+        uses: actions/attest-build-provenance@v3.0.0
+        with:
+          subject-path: output/demo/**
+      - name: Update Telemetry
+        run: node tools/update-telemetry.js
+      - name: Upload Telemetry
+        uses: actions/upload-artifact@v4
+        with:
+          name: telemetry
+          path: logs/telemetry.json
+

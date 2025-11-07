@@ -1,0 +1,26 @@
+name: PR Comment Summarizer
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: PR number to summarize
+        required: true
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+jobs:
+  summarize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - name: Summarize PR discussion
+        run: node tools/comment-summarizer.js ${{ inputs.pr_number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+

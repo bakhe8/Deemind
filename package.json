@@ -3,13 +3,17 @@
   "version": "1.0.0",
   "description": "Deemind — The Intelligent Theming Engine for Salla and beyond.",
   "type": "module",
+  "private": true,
   "scripts": {
     "deemind:build": "node cli.js",
+    "factory:build": "node cli.js",
+    "factory:build:all": "node tools/build-all.js",
+    "factory:prune": "node tools/partials-prune.js",
     "deemind:test": "node tests/run-fixtures.js",
+    "coverage": "nyc npm run deemind:test",
     "deemind:validate": "node tools/validator-extended.js",
     "test": "node tests/run-fixtures.js",
     "lint": "eslint . --ext .js",
-    "archive": "node tools/archive.js",
     "prepare": "husky"
   },
   "dependencies": {
@@ -18,7 +22,10 @@
     "cheerio": "^1.0.0-rc.12",
     "fs-extra": "^11.2.0",
     "glob": "^10.3.10",
-    "p-limit": "^4.0.0"
+    "p-limit": "^4.0.0",
+    "postcss": "^8.5.6",
+    "octokit": "^3.1.2",
+    "openai": "^4.67.3"
   },
   "author": "Beto Harire",
   "license": "UNLICENSED",
@@ -26,6 +33,14 @@
     "@eslint/js": "^9.39.1",
     "eslint": "^9.39.1",
     "globals": "^16.5.0",
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.6",
+    "prettier": "^3.6.2",
+    "nyc": "^15.1.0"
+  },
+  "lint-staged": {
+    "*.{js,cjs,mjs}": "eslint --fix",
+    "*.{json,md,css,scss,html}": "prettier --write"
   }
 }
+

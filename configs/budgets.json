@@ -1,5 +1,4 @@
 {
-  "maxCssKb": 500,
-  "maxJsKb": 800,
-  "maxImageKb": 2048
+  "maxCSS": 300000,
+  "maxJS": 400000
 }
