@@ -15,9 +15,11 @@
     "factory:build:all": "node tools/build-all.js",
     "factory:prune": "node tools/partials-prune.js",
     "deemind:test": "node tests/run-fixtures.js",
+    "test:snapshot": "node tests/snapshot.js",
+    "test:css": "node tests/css-assets.test.js",
     "coverage": "nyc npm run deemind:test",
     "deemind:validate": "node tools/validator-extended.js",
-    "test": "node tests/run-fixtures.js",
+    "test": "node tests/run-fixtures.js && node tests/snapshot.js && node tests/css-assets.test.js",
     "lint": "eslint . --ext .js",
     "prepare": "husky"
   },
