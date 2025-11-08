@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deemind Command Bridge — Status</title>
+  <link rel="stylesheet" href="assets/style.css" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body data-page="status">
+  <div class="layout">
+    <header>
+      <h1 class="text-3xl font-semibold">Schema & Settings</h1>
+      <p class="text-slate-400">Auto-detected from configs/salla-schema.json and configs/settings.json.</p>
+      <div class="nav">
+        <a href="index.html" data-nav="index">Overview</a>
+        <a href="commands.html" data-nav="commands">Commands</a>
+        <a href="customization.html" data-nav="customization">Customization</a>
+        <a href="status.html" data-nav="status" class="active">Status</a>
+        <a href="logs.html" data-nav="logs">Logs</a>
+      </div>
+    </header>
+
+    <section class="panel">
+      <h2>Salla Schema Fields</h2>
+      <ul class="list" id="schema-list">
+        <li>Loading schema…</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>Settings Keys</h2>
+      <ul class="list" id="settings-list">
+        <li>Loading settings…</li>
+      </ul>
+    </section>
+  </div>
+
+  <footer class="footer">
+    Reflects the current configs folder state
+  </footer>
+
+  <script type="module" src="assets/ui.js"></script>
+  <script type="module" src="assets/bridge.js"></script>
+  <script type="module" src="assets/autodetect.js"></script>
+</body>
+</html>

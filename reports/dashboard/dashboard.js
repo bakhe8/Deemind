@@ -1,4 +1,5 @@
-const noop = () => {};
+/* eslint-env browser */
+/* global Chart */
 
 async function fetchJSON(path) {
   try {

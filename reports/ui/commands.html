@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deemind Command Bridge — Commands</title>
+  <link rel="stylesheet" href="assets/style.css" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body data-page="commands">
+  <div class="layout">
+    <header>
+      <h1 class="text-3xl font-semibold">Command Index</h1>
+      <p class="text-slate-400 mb-2">All scripts and tools detected from package.json and /tools.</p>
+      <div class="nav">
+        <a href="index.html" data-nav="index">Overview</a>
+        <a href="commands.html" data-nav="commands" class="active">Commands</a>
+        <a href="customization.html" data-nav="customization">Customization</a>
+        <a href="status.html" data-nav="status">Status</a>
+        <a href="logs.html" data-nav="logs">Logs</a>
+      </div>
+    </header>
+
+    <section class="panel">
+      <h2>NPM Scripts</h2>
+      <p>Direct instructions Codex can run via CLI or workflow dispatch.</p>
+      <div class="grid grid-2" id="script-list">
+        <div class="code-card">Loading scripts…</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Tool Modules</h2>
+      <ul class="list" id="tool-list">
+        <li>Detecting tools…</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>Config Files</h2>
+      <ul class="list" id="config-list">
+        <li>Loading configs…</li>
+      </ul>
+    </section>
+  </div>
+
+  <footer class="footer">
+    Auto-syncs every 60s • Source: package.json, /tools, /configs
+  </footer>
+
+  <script type="module" src="assets/ui.js"></script>
+  <script type="module" src="assets/bridge.js"></script>
+  <script type="module" src="assets/autodetect.js"></script>
+</body>
+</html>

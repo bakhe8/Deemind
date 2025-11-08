@@ -1,0 +1,674 @@
+{
+  "generatedAt": "2025-11-08T05:59:57.415Z",
+  "scripts": [
+    {
+      "name": "deemind:build",
+      "command": "node cli.js"
+    },
+    {
+      "name": "deemind:new",
+      "command": "node tools/new-theme-pipeline.js --detect"
+    },
+    {
+      "name": "deemind:watch",
+      "command": "node tools/watch-new-themes.js"
+    },
+    {
+      "name": "deemind:mockup",
+      "command": "node tools/mockup-generator.js"
+    },
+    {
+      "name": "deemind:promote",
+      "command": "node tools/promote-mockup.js"
+    },
+    {
+      "name": "baseline:import:raed",
+      "command": "node tools/import-raed-baseline.js"
+    },
+    {
+      "name": "salla:docs:sync",
+      "command": "node tools/fetch-salla-docs.js"
+    },
+    {
+      "name": "roadmap:sync",
+      "command": "node tools/sync-roadmap-to-issues.js"
+    },
+    {
+      "name": "factory:build",
+      "command": "node cli.js"
+    },
+    {
+      "name": "factory:build:all",
+      "command": "node tools/build-all.js"
+    },
+    {
+      "name": "factory:prune",
+      "command": "node tools/partials-prune.js"
+    },
+    {
+      "name": "deemind:harmony",
+      "command": "node tools/codex-harmony-check.js"
+    },
+    {
+      "name": "deemind:test",
+      "command": "node tests/run-fixtures.js"
+    },
+    {
+      "name": "test:snapshot",
+      "command": "node tests/snapshot.js"
+    },
+    {
+      "name": "test:css",
+      "command": "node tests/css-assets.test.js"
+    },
+    {
+      "name": "coverage",
+      "command": "nyc npm run deemind:test"
+    },
+    {
+      "name": "deemind:validate",
+      "command": "node tools/validator-extended.js > logs/deemind_validation.log 2>&1 || true"
+    },
+    {
+      "name": "deemind:fix",
+      "command": "node tools/fixit-runner.js"
+    },
+    {
+      "name": "deemind:doctor",
+      "command": "npm run deemind:validate && npm run deemind:fix && npm run deemind:validate"
+    },
+    {
+      "name": "test",
+      "command": "node tests/run-fixtures.js && node tests/snapshot.js && node tests/css-assets.test.js && node tests/pending/verify-exports.js && node tests/salla-demo-fixture/run.js"
+    },
+    {
+      "name": "doctor",
+      "command": "node tools/doctor.js"
+    },
+    {
+      "name": "test:snapshots",
+      "command": "node tests/snapshots/run-snapshots.js"
+    },
+    {
+      "name": "test:flaky",
+      "command": "node tests/flaky-detector.js"
+    },
+    {
+      "name": "lint",
+      "command": "eslint . --ext .js"
+    },
+    {
+      "name": "stylelint",
+      "command": "stylelint \"**/*.css\" --allow-empty-input"
+    },
+    {
+      "name": "postcss:process",
+      "command": "node tools/postcss-process.js"
+    },
+    {
+      "name": "salla:zip",
+      "command": "node tools/salla-cli.js zip"
+    },
+    {
+      "name": "salla:serve",
+      "command": "node tools/salla-cli.js serve"
+    },
+    {
+      "name": "salla:push",
+      "command": "node tools/salla-cli.js push"
+    },
+    {
+      "name": "prepare",
+      "command": "husky"
+    },
+    {
+      "name": "audit:static",
+      "command": "node tools/build/static-analysis.js"
+    },
+    {
+      "name": "audit:dups",
+      "command": "node tools/build/duplication-scan.js"
+    },
+    {
+      "name": "audit:graph",
+      "command": "node tools/build/architecture-graph.js"
+    },
+    {
+      "name": "audit:coverage",
+      "command": "node tools/build/test-coverage-scan.js"
+    },
+    {
+      "name": "docs:modules",
+      "command": "node tools/build/modules-docgen.js"
+    },
+    {
+      "name": "salla:validate:schema",
+      "command": "node tools/validate-theme-schema.js --all"
+    },
+    {
+      "name": "salla:demo:compare",
+      "command": "node tools/salla-demo-compare.js raed demo"
+    },
+    {
+      "name": "salla:validate",
+      "command": "node tools/validate-salla.js demo"
+    },
+    {
+      "name": "salla:version",
+      "command": "node tools/validate-salla.js"
+    },
+    {
+      "name": "salla:schema:sync",
+      "command": "node tools/salla-schema-sync.js"
+    },
+    {
+      "name": "salla:baselines:import",
+      "command": "node tools/import-salla-baselines.js"
+    },
+    {
+      "name": "lint:twig",
+      "command": "node tools/twig-lint.js demo"
+    },
+    {
+      "name": "mockup:validate",
+      "command": "node tools/mockup-validate.js modern-blue"
+    },
+    {
+      "name": "visual:screens",
+      "command": "node tools/screenshot-pages.js salla-new-theme"
+    },
+    {
+      "name": "visual:diff",
+      "command": "node tools/visual-regression.js reports/visual/mockups reports/visual/diffs reports/visual/output"
+    },
+    {
+      "name": "lhci:run",
+      "command": "npx @lhci/cli autorun"
+    },
+    {
+      "name": "codex:run",
+      "command": "node tools/run-codex-task.js"
+    },
+    {
+      "name": "codex:update-dashboard",
+      "command": "node tools/update-dashboard.js"
+    },
+    {
+      "name": "codex:update-harmony",
+      "command": "node tools/update-harmony-summary.js"
+    },
+    {
+      "name": "codex:dashboard",
+      "command": "node tools/dashboard-open.js"
+    },
+    {
+      "name": "codex:agent",
+      "command": "gh workflow run codex-agent.yml --ref main"
+    },
+    {
+      "name": "codex:auto-eval",
+      "command": "gh workflow run codex-auto-eval.yml --ref main"
+    },
+    {
+      "name": "codex:hygiene",
+      "command": "gh workflow run code-hygiene.yml --ref main"
+    },
+    {
+      "name": "codex:lighthouse",
+      "command": "gh workflow run lighthouse.yml --ref main"
+    },
+    {
+      "name": "dashboard",
+      "command": "node tools/dashboard-open.js"
+    }
+  ],
+  "tools": [
+    {
+      "name": "adapter-salla",
+      "path": "../../tools/adapter-salla.js"
+    },
+    {
+      "name": "adapter",
+      "path": "../../tools/adapter.js"
+    },
+    {
+      "name": "baseline-compare",
+      "path": "../../tools/baseline-compare.js"
+    },
+    {
+      "name": "build-all",
+      "path": "../../tools/build-all.js"
+    },
+    {
+      "name": "build-tracker",
+      "path": "../../tools/build-tracker.js"
+    },
+    {
+      "name": "check-conflicts",
+      "path": "../../tools/check-conflicts.js"
+    },
+    {
+      "name": "check-domain-boundary",
+      "path": "../../tools/check-domain-boundary.js"
+    },
+    {
+      "name": "close-open-issues",
+      "path": "../../tools/close-open-issues.js"
+    },
+    {
+      "name": "codex-apply-suggestions",
+      "path": "../../tools/codex-apply-suggestions.js"
+    },
+    {
+      "name": "codex-auto-docs",
+      "path": "../../tools/codex-auto-docs.js"
+    },
+    {
+      "name": "codex-auto-eval",
+      "path": "../../tools/codex-auto-eval.js"
+    },
+    {
+      "name": "codex-deep-reeval",
+      "path": "../../tools/codex-deep-reeval.js"
+    },
+    {
+      "name": "codex-full-assessment",
+      "path": "../../tools/codex-full-assessment.js"
+    },
+    {
+      "name": "codex-harmony-check",
+      "path": "../../tools/codex-harmony-check.js"
+    },
+    {
+      "name": "comment-summarizer",
+      "path": "../../tools/comment-summarizer.js"
+    },
+    {
+      "name": "compare-to-raed-structure",
+      "path": "../../tools/compare-to-raed-structure.js"
+    },
+    {
+      "name": "create-customization-directive-issue",
+      "path": "../../tools/create-customization-directive-issue.js"
+    },
+    {
+      "name": "create-improvement-issues",
+      "path": "../../tools/create-improvement-issues.js"
+    },
+    {
+      "name": "create-issues",
+      "path": "../../tools/create-issues.js"
+    },
+    {
+      "name": "create-new-theme-directive-issue",
+      "path": "../../tools/create-new-theme-directive-issue.js"
+    },
+    {
+      "name": "create-permissions-secrets-issue",
+      "path": "../../tools/create-permissions-secrets-issue.js"
+    },
+    {
+      "name": "css-token-diff",
+      "path": "../../tools/css-token-diff.js"
+    },
+    {
+      "name": "dashboard-open",
+      "path": "../../tools/dashboard-open.js"
+    },
+    {
+      "name": "deemind-agent",
+      "path": "../../tools/deemind-agent.js"
+    },
+    {
+      "name": "delivery-pipeline",
+      "path": "../../tools/delivery-pipeline.js"
+    },
+    {
+      "name": "doctor",
+      "path": "../../tools/doctor.js"
+    },
+    {
+      "name": "enforce-salla-gates",
+      "path": "../../tools/enforce-salla-gates.js"
+    },
+    {
+      "name": "enforce-visual-gate",
+      "path": "../../tools/enforce-visual-gate.js"
+    },
+    {
+      "name": "fetch-salla-docs",
+      "path": "../../tools/fetch-salla-docs.js"
+    },
+    {
+      "name": "fix-i18n-output",
+      "path": "../../tools/fix-i18n-output.js"
+    },
+    {
+      "name": "fix-inline-handlers",
+      "path": "../../tools/fix-inline-handlers.js"
+    },
+    {
+      "name": "fix-missing-assets",
+      "path": "../../tools/fix-missing-assets.js"
+    },
+    {
+      "name": "fixit-runner",
+      "path": "../../tools/fixit-runner.js"
+    },
+    {
+      "name": "flaky-detector",
+      "path": "../../tools/flaky-detector.js"
+    },
+    {
+      "name": "import-raed-baseline",
+      "path": "../../tools/import-raed-baseline.js"
+    },
+    {
+      "name": "import-salla-baselines",
+      "path": "../../tools/import-salla-baselines.js"
+    },
+    {
+      "name": "mockup-generator",
+      "path": "../../tools/mockup-generator.js"
+    },
+    {
+      "name": "mockup-validate",
+      "path": "../../tools/mockup-validate.js"
+    },
+    {
+      "name": "monitor-actions",
+      "path": "../../tools/monitor-actions.js"
+    },
+    {
+      "name": "new-theme-pipeline",
+      "path": "../../tools/new-theme-pipeline.js"
+    },
+    {
+      "name": "normalize-css-assets",
+      "path": "../../tools/normalize-css-assets.js"
+    },
+    {
+      "name": "open-pr",
+      "path": "../../tools/open-pr.js"
+    },
+    {
+      "name": "open-schema-drift-issue",
+      "path": "../../tools/open-schema-drift-issue.js"
+    },
+    {
+      "name": "partials-prune",
+      "path": "../../tools/partials-prune.js"
+    },
+    {
+      "name": "postcss-process",
+      "path": "../../tools/postcss-process.js"
+    },
+    {
+      "name": "promote-mockup",
+      "path": "../../tools/promote-mockup.js"
+    },
+    {
+      "name": "publish-release-from-notes",
+      "path": "../../tools/publish-release-from-notes.js"
+    },
+    {
+      "name": "report-salla-assets",
+      "path": "../../tools/report-salla-assets.js"
+    },
+    {
+      "name": "run-all-workflows",
+      "path": "../../tools/run-all-workflows.js"
+    },
+    {
+      "name": "run-codex-task",
+      "path": "../../tools/run-codex-task.js"
+    },
+    {
+      "name": "salla-cli",
+      "path": "../../tools/salla-cli.js"
+    },
+    {
+      "name": "salla-demo-compare",
+      "path": "../../tools/salla-demo-compare.js"
+    },
+    {
+      "name": "salla-schema-diff",
+      "path": "../../tools/salla-schema-diff.js"
+    },
+    {
+      "name": "salla-schema-sync",
+      "path": "../../tools/salla-schema-sync.js"
+    },
+    {
+      "name": "screenshot-mockup",
+      "path": "../../tools/screenshot-mockup.js"
+    },
+    {
+      "name": "screenshot-pages",
+      "path": "../../tools/screenshot-pages.js"
+    },
+    {
+      "name": "separation-audit",
+      "path": "../../tools/separation-audit.js"
+    },
+    {
+      "name": "sync-roadmap-to-issues",
+      "path": "../../tools/sync-roadmap-to-issues.js"
+    },
+    {
+      "name": "synthesize-status",
+      "path": "../../tools/synthesize-status.js"
+    },
+    {
+      "name": "twig-lint",
+      "path": "../../tools/twig-lint.js"
+    },
+    {
+      "name": "twig-validate",
+      "path": "../../tools/twig-validate.js"
+    },
+    {
+      "name": "update-dashboard",
+      "path": "../../tools/update-dashboard.js"
+    },
+    {
+      "name": "update-harmony-summary",
+      "path": "../../tools/update-harmony-summary.js"
+    },
+    {
+      "name": "update-knowledge-from-reports",
+      "path": "../../tools/update-knowledge-from-reports.js"
+    },
+    {
+      "name": "update-telemetry",
+      "path": "../../tools/update-telemetry.js"
+    },
+    {
+      "name": "validate-salla-assets",
+      "path": "../../tools/validate-salla-assets.js"
+    },
+    {
+      "name": "validate-salla",
+      "path": "../../tools/validate-salla.js"
+    },
+    {
+      "name": "validate-theme-schema",
+      "path": "../../tools/validate-theme-schema.js"
+    },
+    {
+      "name": "validator-extended",
+      "path": "../../tools/validator-extended.js"
+    },
+    {
+      "name": "visual-regression",
+      "path": "../../tools/visual-regression.js"
+    },
+    {
+      "name": "watch-new-themes",
+      "path": "../../tools/watch-new-themes.js"
+    }
+  ],
+  "configs": [
+    {
+      "name": "agent.json",
+      "path": "../../configs/agent.json"
+    },
+    {
+      "name": "budgets.json",
+      "path": "../../configs/budgets.json"
+    },
+    {
+      "name": "constants.js",
+      "path": "../../configs/constants.js"
+    },
+    {
+      "name": "design-tokens.json",
+      "path": "../../configs/design-tokens.json"
+    },
+    {
+      "name": "harmony.json",
+      "path": "../../configs/harmony.json"
+    },
+    {
+      "name": "mappings.json",
+      "path": "../../configs/mappings.json"
+    },
+    {
+      "name": "routes.json",
+      "path": "../../configs/routes.json"
+    },
+    {
+      "name": "salla-schema.json",
+      "path": "../../configs/salla-schema.json"
+    },
+    {
+      "name": "sample-data.json",
+      "path": "../../configs/sample-data.json"
+    },
+    {
+      "name": "settings.json",
+      "path": "../../configs/settings.json"
+    },
+    {
+      "name": "tools-version.json",
+      "path": "../../configs/tools-version.json"
+    },
+    {
+      "name": "twig-allowlist.json",
+      "path": "../../configs/twig-allowlist.json"
+    }
+  ],
+  "docs": [
+    {
+      "name": "Adapters — Salla Alignment",
+      "path": "../../docs/Adapters.md"
+    },
+    {
+      "name": "Deemind — Stable Architecture (No Harmony)",
+      "path": "../../docs/DEEMIND_STABLE.md"
+    },
+    {
+      "name": "Harmony Engine — Reference",
+      "path": "../../docs/Harmony.md"
+    },
+    {
+      "name": "Deemind Tools",
+      "path": "../../docs/Tools.md"
+    },
+    {
+      "name": "AI Usage Policy",
+      "path": "../../docs/ai.md"
+    },
+    {
+      "name": "Deemind Architecture (Current Stage)",
+      "path": "../../docs/architecture.md"
+    },
+    {
+      "name": "Baseline-Driven Alignment (Raed)",
+      "path": "../../docs/baseline.md"
+    },
+    {
+      "name": "🎨 Codex Directive: Apply Customizations to the Generated Salla Theme",
+      "path": "../../docs/codex-customization-directive.md"
+    },
+    {
+      "name": "🧠 Codex Official Directive: New Theme Generation Protocol",
+      "path": "../../docs/codex-new-theme-directive.md"
+    },
+    {
+      "name": "📈 Codex Progress Report",
+      "path": "../../docs/codex-progress.md"
+    },
+    {
+      "name": "Deemind Commenting Guide",
+      "path": "../../docs/commenting.md"
+    },
+    {
+      "name": "Configurations",
+      "path": "../../docs/configurations.md"
+    },
+    {
+      "name": "🧭 Deemind Roadmap — Implementation Checklist",
+      "path": "../../docs/deemind_checklist.md"
+    },
+    {
+      "name": "Modules Map",
+      "path": "../../docs/modules.md"
+    },
+    {
+      "name": "Salla Docs Integration",
+      "path": "../../docs/salla-integration.md"
+    },
+    {
+      "name": "Salla Reference — Deemind Alignment",
+      "path": "../../docs/salla-reference.md"
+    },
+    {
+      "name": "Salla SDK Integration (Hints)",
+      "path": "../../docs/salla-sdk.md"
+    },
+    {
+      "name": "Salla JS Web Components (Hints)",
+      "path": "../../docs/salla-web-components.md"
+    },
+    {
+      "name": "Validation",
+      "path": "../../docs/validation.md"
+    },
+    {
+      "name": "Developer Workflow",
+      "path": "../../docs/workflow.md"
+    },
+    {
+      "name": "Workflows",
+      "path": "../../docs/workflows.md"
+    }
+  ],
+  "schemaFields": [
+    "engine",
+    "adapter"
+  ],
+  "settingsKeys": [
+    "defaultTheme",
+    "encoding",
+    "enableAnalytics",
+    "sanitizeByDefault",
+    "maxInputFileBytes",
+    "maxAssetFileBytes",
+    "requireI18n",
+    "i18nSelectors",
+    "i18nAttrAllowlist",
+    "rawAllowlist",
+    "failOnBudget"
+  ],
+  "customRequests": [],
+  "taskLog": [],
+  "systemLog": "",
+  "features": [
+    "55 npm scripts",
+    "71 tooling modules",
+    "12 config files",
+    "2 schema fields",
+    "21 docs"
+  ]
+}

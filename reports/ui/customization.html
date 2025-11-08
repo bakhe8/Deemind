@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deemind Command Bridge — Customization</title>
+  <link rel="stylesheet" href="assets/style.css" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body data-page="customization">
+  <div class="layout">
+    <header>
+      <h1 class="text-3xl font-semibold">Customization Requests</h1>
+      <p class="text-slate-400">Live view of /logs/customization-requests.json</p>
+      <div class="nav">
+        <a href="index.html" data-nav="index">Overview</a>
+        <a href="commands.html" data-nav="commands">Commands</a>
+        <a href="customization.html" data-nav="customization" class="active">Customization</a>
+        <a href="status.html" data-nav="status">Status</a>
+        <a href="logs.html" data-nav="logs">Logs</a>
+      </div>
+    </header>
+
+    <section class="panel">
+      <h2>Request Queue</h2>
+      <div class="overflow-x-auto">
+        <table class="table" id="requests-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Target</th>
+              <th>Status</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="4">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <footer class="footer">
+    Updates as Codex logs new customization entries
+  </footer>
+
+  <script type="module" src="assets/ui.js"></script>
+  <script type="module" src="assets/bridge.js"></script>
+  <script type="module" src="assets/autodetect.js"></script>
+</body>
+</html>

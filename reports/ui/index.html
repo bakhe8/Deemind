@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deemind Command Bridge — Hub</title>
+  <link rel="stylesheet" href="assets/style.css" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body data-page="index">
+  <div class="layout">
+    <header>
+      <p class="text-xs uppercase tracking-[0.4em] text-slate-400">Deemind Command Bridge</p>
+      <h1 class="text-3xl font-semibold mt-2">🧠 Interactive Instruction Hub</h1>
+      <div class="nav">
+        <a href="index.html" data-nav="index" class="active">Overview</a>
+        <a href="commands.html" data-nav="commands">Commands</a>
+        <a href="customization.html" data-nav="customization">Customization</a>
+        <a href="status.html" data-nav="status">Status</a>
+        <a href="logs.html" data-nav="logs">Logs</a>
+        <a href="../dashboard/index.html" target="_blank">Dashboard</a>
+      </div>
+    </header>
+
+    <section class="panel">
+      <h2>Bridge Summary</h2>
+      <p>Auto-detected commands, tools, and schema data synced from the repository.</p>
+      <div class="grid grid-2 mt-4">
+        <div class="code-card">
+          <p class="text-slate-400 text-xs uppercase mb-2">Scripts & Tools</p>
+          <div id="summary-scripts">—</div>
+        </div>
+        <div class="code-card">
+          <p class="text-slate-400 text-xs uppercase mb-2">Tooling</p>
+          <div id="summary-tools">—</div>
+        </div>
+      </div>
+      <div class="panel mt-4">
+        <h3 class="text-xl font-semibold mb-2">Detected Features</h3>
+        <ul class="list" id="feature-list">
+          <li>Waiting for bridge data…</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <footer class="footer">
+    Auto-updating from /reports/ui/data/bridge.json • Refreshes every minute
+  </footer>
+
+  <script type="module" src="assets/ui.js"></script>
+  <script type="module" src="assets/bridge.js"></script>
+  <script type="module" src="assets/autodetect.js"></script>
+</body>
+</html>

@@ -6,6 +6,8 @@ const root = process.cwd();
 const dashRoot = path.resolve(root, 'reports', 'dashboard');
 const dashIndex = path.join(dashRoot, 'index.html');
 const dataDir = path.join(dashRoot, 'data');
+const uiRoot = path.resolve(root, 'reports', 'ui');
+const uiDataDir = path.join(uiRoot, 'data');
 
 async function readJson(relPath) {
   try {
@@ -32,6 +34,36 @@ async function listDir(relPath) {
   if (!(await fs.pathExists(target))) return [];
   const entries = await fs.readdir(target);
   return entries;
+}
+
+async function listFiles(relPath, filter = () => true) {
+  const target = path.resolve(root, relPath);
+  if (!(await fs.pathExists(target))) return [];
+  const entries = await fs.readdir(target);
+  const files = [];
+  for (const name of entries) {
+    const full = path.join(target, name);
+    const stat = await fs.stat(full);
+    if (stat.isFile() && filter(name, full)) {
+      files.push({ name, fullPath: full, relPath: path.join(relPath, name) });
+    }
+  }
+  return files;
+}
+
+async function collectMarkdownMeta(relPath) {
+  const files = await listFiles(relPath, (name) => name.endsWith('.md'));
+  const meta = [];
+  for (const file of files) {
+    const content = await fs.readFile(file.fullPath, 'utf8');
+    const headingMatch = content.match(/^#\s+(.+)$/m);
+    meta.push({
+      name: file.name,
+      title: headingMatch ? headingMatch[1].trim() : file.name.replace(/[-_]/g, ' ').replace('.md', ''),
+      relPath: file.relPath.replace(/\\/g, '/'),
+    });
+  }
+  return meta;
 }
 
 async function collectDirectives() {
@@ -164,6 +196,52 @@ function deriveDocCoverage(stats) {
   return Math.min(100, Math.round((stats.count / total) * 100));
 }
 
+async function collectBridgeData({ now, customRequests, taskLog, systemLog }) {
+  const pkg = (await readJson('package.json')) || {};
+  const scripts = Object.entries(pkg.scripts || {}).map(([name, command]) => ({
+    name,
+    command,
+  }));
+  const toolFiles = await listFiles('tools', (name) => /\.(c?m)?js$/.test(name));
+  const tools = toolFiles.map((file) => ({
+    name: file.name.replace(/\.(c?m)?js$/, ''),
+    path: `../../${file.relPath.replace(/\\/g, '/')}`,
+  }));
+  const configFiles = await listFiles('configs', (name) => /\.(json|js)$/.test(name));
+  const configs = configFiles.map((file) => ({
+    name: file.name,
+    path: `../../${file.relPath.replace(/\\/g, '/')}`,
+  }));
+  const docsMeta = await collectMarkdownMeta('docs');
+  const schema = (await readJson('configs/salla-schema.json')) || {};
+  const schemaFields = Object.keys(schema?.properties || schema?.fields || schema || {});
+  const settings = (await readJson('configs/settings.json')) || {};
+  const docIndex = docsMeta.map((meta) => ({
+    name: meta.title,
+    path: `../../${meta.relPath}`,
+  }));
+  const features = [
+    `${scripts.length} npm scripts`,
+    `${tools.length} tooling modules`,
+    `${configs.length} config files`,
+    `${schemaFields.length} schema fields`,
+    `${docIndex.length} docs`,
+  ];
+  return {
+    generatedAt: now,
+    scripts,
+    tools,
+    configs,
+    docs: docIndex,
+    schemaFields,
+    settingsKeys: Object.keys(settings),
+    customRequests,
+    taskLog,
+    systemLog,
+    features,
+  };
+}
+
 async function main() {
   if (!(await fs.pathExists(dashIndex))) {
     console.log('Dashboard not found — skipping update.');
@@ -216,6 +294,20 @@ async function main() {
 
   await fs.ensureDir(dataDir);
   await fs.writeJson(path.join(dataDir, 'observatory.json'), payload, { spaces: 2 });
+
+  // Bridge data for interactive UI
+  await fs.ensureDir(uiDataDir);
+  const bridgeData = await collectBridgeData({ now, customRequests, taskLog, systemLog });
+  await fs.writeJson(path.join(uiDataDir, 'bridge.json'), bridgeData, { spaces: 2 });
+  await fs.writeJson(
+    path.join(uiRoot, 'version.json'),
+    {
+      ui_version: 'auto',
+      last_sync: now,
+      features: bridgeData.features,
+    },
+    { spaces: 2 },
+  );
 
   const logsDir = path.resolve(root, 'logs');
   await fs.ensureDir(logsDir);
