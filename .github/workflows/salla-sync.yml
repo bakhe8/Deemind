@@ -2,7 +2,7 @@ name: Salla Sync
 on:
   schedule:
     - cron: "0 2 * * *"  # daily
-  workflow_dispatch:
+  workflow_dispatch: {}
 
 jobs:
   sync:

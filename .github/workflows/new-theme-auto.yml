@@ -4,7 +4,7 @@ on:
     branches: [ main ]
     paths:
       - 'input/**'
-  workflow_dispatch:
+  workflow_dispatch: {}
 
 jobs:
   new-theme:

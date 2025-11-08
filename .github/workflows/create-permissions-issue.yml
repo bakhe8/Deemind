@@ -1,6 +1,6 @@
 name: Create Permissions & Secrets Issue
 on:
-  workflow_dispatch:
+  workflow_dispatch: {}
 
 jobs:
   open-issue:

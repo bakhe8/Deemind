@@ -1,6 +1,6 @@
 name: PR Comment Summarizer
 on:
-  workflow_dispatch:
+  workflow_dispatch: {}
     inputs:
       pr_number:
         description: PR number to summarize

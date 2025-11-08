@@ -2,7 +2,7 @@ name: Codex Deep Evaluation (Deemind Tools)
 on:
   schedule:
     - cron: "0 3 * * *" # daily at 03:00 UTC
-  workflow_dispatch:
+  workflow_dispatch: {}
 
 jobs:
   evaluate:

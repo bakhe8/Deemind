@@ -1,6 +1,7 @@
 name: Actions Digest
 
 on:
+  workflow_dispatch: {}
   workflow_run:
     workflows: ["Deemind CI", "Codex Deep Evaluation", "Deemind Codex Agent", "Actions Digest"]
     types: [completed]

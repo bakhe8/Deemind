@@ -2,7 +2,7 @@ name: Roadmap → Issues Sync
 on:
   push:
     paths: ["docs/deemind_checklist.md"]
-  workflow_dispatch:
+  workflow_dispatch: {}
 
 jobs:
   sync:
