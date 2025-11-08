@@ -346,6 +346,14 @@
 - Secrets: OPENAI_API_KEY, GITHUB_TOKEN
 - Jobs:
 
+## codex-agent-dispatch.yml
+
+- File: .github/workflows/codex-agent-dispatch.yml
+- Triggers: n/a
+- Artifacts: no
+- Secrets: OPENAI_API_KEY, GITHUB_TOKEN
+- Jobs:
+
 ## CodeQL
 
 - File: .github/workflows/codeql.yml
