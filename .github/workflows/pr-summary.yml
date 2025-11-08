@@ -1,6 +1,6 @@
 name: PR Summary (placeholder)
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
   pull_request:
     types: [opened, synchronize]
 jobs:
@@ -15,4 +15,5 @@ jobs:
           header: summary
           message: |
             Automated summary placeholder. Integrate OpenAI later to auto-summarize changes and suggest changelog entries.
+
 

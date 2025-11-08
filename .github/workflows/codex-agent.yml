@@ -1,6 +1,6 @@
 name: Codex Maintenance (Deemind Tools)
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
   schedule:
     - cron: "0 */6 * * *"
   workflow_run:
@@ -42,3 +42,4 @@ jobs:
           else
             echo "No codex-trivial PRs to auto-merge."
           fi
+

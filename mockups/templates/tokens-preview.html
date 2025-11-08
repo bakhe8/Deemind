@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Token Preview</title>
+  <link rel="stylesheet" href="../_base/tokens.css" />
+  <link rel="stylesheet" href="../_base/typography.css" />
+  <style>
+    body { padding: 2rem; background: var(--color-surface); }
+    .swatches { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 1rem; }
+    .swatch { padding: 1rem; border-radius: var(--radius-md); color: #fff; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1 class="heading-lg">Token Palette</h1>
+  <div class="swatches">
+    <div class="swatch" style="background: var(--color-primary);">Primary</div>
+    <div class="swatch" style="background: var(--color-accent);">Accent</div>
+    <div class="swatch" style="background: var(--color-muted); color: var(--color-text);">Muted</div>
+    <div class="swatch" style="background: #11224e;">Text</div>
+  </div>
+  <section style="margin-top:2rem;">
+    <h2 class="heading-md">Typography</h2>
+    <p class="heading-lg">Heading Large</p>
+    <p class="heading-md">Heading Medium</p>
+    <p class="heading-sm">Heading Small</p>
+    <p class="text-muted">Body / Muted</p>
+  </section>
+</body>
+</html>

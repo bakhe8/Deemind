@@ -1,6 +1,6 @@
 name: AI Docs (stub)
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
   pull_request:
     types: [opened, synchronize]
 jobs:
@@ -17,3 +17,4 @@ jobs:
         with:
           name: pr-docs-draft
           path: docs/pr-summary.md
+

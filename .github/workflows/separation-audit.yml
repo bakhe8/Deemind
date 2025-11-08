@@ -2,7 +2,7 @@ name: Separation Audit (Deemind Tools)
 on:
   schedule:
     - cron: '0 6 * * 1' # weekly Mondays 06:00 UTC
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 jobs:
   audit:
@@ -17,4 +17,5 @@ jobs:
         with:
           name: separation-audit
           path: reports/harmony/separation-audit.md
+
 

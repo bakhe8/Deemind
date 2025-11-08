@@ -2,7 +2,7 @@ name: Weekly Status
 on:
   schedule:
     - cron: '0 7 * * 1'
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 jobs:
   status:
@@ -21,4 +21,5 @@ jobs:
         with:
           commit_message: "docs: update weekly status"
           branch: ${{ github.ref_name }}
+
 

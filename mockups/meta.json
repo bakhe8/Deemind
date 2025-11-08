@@ -1,0 +1,19 @@
+{
+  "name": "Deemind Visual System",
+  "version": "1.0.0",
+  "palette": {
+    "primary": "#0046FF",
+    "accent": "#35b9a6",
+    "surface": "#f5f7fb",
+    "muted": "#11224e"
+  },
+  "fonts": {
+    "heading": "Inter, 'Segoe UI', system-ui",
+    "body": "Inter, system-ui, -apple-system, BlinkMacSystemFont"
+  },
+  "radius": "12px",
+  "shadows": {
+    "sm": "0 2px 8px rgba(0,0,0,0.08)",
+    "lg": "0 12px 40px rgba(0,0,0,0.15)"
+  }
+}

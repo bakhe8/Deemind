@@ -1,6 +1,6 @@
 name: Create Permissions & Secrets Issue
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 jobs:
   open-issue:
@@ -20,3 +20,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: node tools/create-permissions-secrets-issue.js
+

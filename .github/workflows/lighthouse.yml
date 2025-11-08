@@ -1,6 +1,6 @@
 name: Lighthouse CI
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
   schedule:
     - cron: "0 4 * * 1"
 
@@ -24,4 +24,5 @@ jobs:
         with:
           name: lighthouse-${{ github.run_id }}
           path: ./.lighthouseci
+
 

@@ -1,6 +1,6 @@
 name: Package Theme on Release
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
   release:
     types: [published]
 
@@ -27,4 +27,5 @@ jobs:
           files: artifacts/demo-theme-${{ github.ref_name }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 

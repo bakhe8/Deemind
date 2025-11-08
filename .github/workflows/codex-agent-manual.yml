@@ -1,7 +1,7 @@
 name: Codex Agent Manual Trigger
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 jobs:
   codex:
@@ -36,3 +36,4 @@ jobs:
           else
             echo "No codex-trivial PRs to auto-merge."
           fi
+

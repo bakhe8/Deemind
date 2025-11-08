@@ -4,7 +4,7 @@ on:
     branches: [ main ]
     paths:
       - 'reports/release-*.md'
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 jobs:
   release:
@@ -23,4 +23,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: node tools/publish-release-from-notes.js
+
 

@@ -4,7 +4,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 jobs:
   hygiene:
@@ -71,3 +71,4 @@ jobs:
           path: |
             reports
             docs/modules.md
+

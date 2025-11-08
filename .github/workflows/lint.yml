@@ -1,6 +1,6 @@
 name: Lint
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
   pull_request:
     push:
       branches: [ main ]
@@ -14,3 +14,4 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: npm run lint
+

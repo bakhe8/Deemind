@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="../_base/tokens.css" />
+  <link rel="stylesheet" href="../_base/typography.css" />
+  <link rel="stylesheet" href="../_base/grid.css" />
+  <style>
+    body { padding:2rem; background: var(--color-surface); }
+    .grid { display:grid; gap:1.5rem; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); }
+    .product {
+      background:#fff;
+      border-radius:var(--radius-md);
+      padding:1rem;
+      box-shadow:var(--shadow-soft);
+    }
+    img { width:100%; border-radius:var(--radius-sm); margin-bottom:1rem; }
+    .price { color: var(--color-primary); font-weight:700; }
+    button { width:100%; margin-top:0.75rem; }
+  </style>
+</head>
+<body>
+  <section class="grid">
+    <article class="product">
+      <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f" alt="Product" />
+      <h3>Adaptive Backpack</h3>
+      <p class="price">$129</p>
+      <button class="button-primary">Add to cart</button>
+    </article>
+    <article class="product">
+      <img src="https://images.unsplash.com/photo-1514996937319-344454492b37" alt="Product" />
+      <h3>Everyday Essentials</h3>
+      <p class="price">$89</p>
+      <button class="button-primary button-ghost">Quick view</button>
+    </article>
+  </section>
+</body>
+</html>

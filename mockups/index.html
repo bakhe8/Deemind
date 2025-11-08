@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deemind Mockup System</title>
+  <link rel="stylesheet" href="_base/tokens.css" />
+  <link rel="stylesheet" href="_base/grid.css" />
+  <link rel="stylesheet" href="_base/typography.css" />
+  <style>
+    body { padding: 2rem; }
+    a.card-link { display: block; text-decoration: none; }
+    .card-base { transition: transform .2s ease; }
+    .card-base:hover { transform: translateY(-4px); }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="util-pill">Mockup System</span>
+    <h1 class="heading-lg">Deemind Visual Sandbox</h1>
+    <p class="text-muted">Use these primitives when crafting theme mock-ups. Run <code>npm run mockup:serve</code> to preview.</p>
+  </header>
+
+  <section class="section-grid grid-3" style="margin-top:2rem;">
+    <a class="card-link" href="components/navbar.html" target="_blank">
+      <article class="card-base">
+        <p class="util-pill">Component</p>
+        <h2 class="heading-md">Navbar</h2>
+        <p class="text-muted">Brand, menu, and CTA layout with sticky behavior.</p>
+      </article>
+    </a>
+    <a class="card-link" href="components/hero.html" target="_blank">
+      <article class="card-base">
+        <p class="util-pill">Component</p>
+        <h2 class="heading-md">Hero</h2>
+        <p class="text-muted">Responsive hero layout with image and CTA pair.</p>
+      </article>
+    </a>
+    <a class="card-link" href="templates/tokens-preview.html" target="_blank">
+      <article class="card-base">
+        <p class="util-pill">Preview</p>
+        <h2 class="heading-md">Token Palette</h2>
+        <p class="text-muted">Visualizes colors, typography, and elevation tokens.</p>
+      </article>
+    </a>
+  </section>
+</body>
+</html>

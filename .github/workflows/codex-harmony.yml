@@ -6,7 +6,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 jobs:
   harmony-check:
@@ -52,3 +52,4 @@ jobs:
             reports/salla-demo-diff.raed.md
             reports/salla-demo-diff.luna.md
             reports/salla-demo-diff.mono.md
+

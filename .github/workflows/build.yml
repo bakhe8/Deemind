@@ -1,6 +1,6 @@
 name: CI (Deemind Core)
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
   push:
     branches: [ main ]
   pull_request:
@@ -124,3 +124,4 @@ jobs:
         with:
           name: telemetry
           path: logs/telemetry.json
+

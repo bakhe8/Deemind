@@ -1,7 +1,7 @@
 name: Actions Digest
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
   workflow_run:
     workflows: ["Deemind CI", "Codex Deep Evaluation", "Deemind Codex Agent", "Actions Digest"]
     types: [completed]
@@ -64,4 +64,5 @@ jobs:
               await github.rest.issues.createComment({ owner, repo, issue_number: pr.number, body: md });
               core.info(`Commented digest on PR #${pr.number}`);
             }
+
 

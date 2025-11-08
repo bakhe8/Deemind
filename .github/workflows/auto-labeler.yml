@@ -1,6 +1,6 @@
 name: Auto Label Issues
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
   issues:
     types: [opened, edited]
 permissions:
@@ -16,4 +16,5 @@ jobs:
           sync-labels: false
           include-title: true
           include-body: true
+
 

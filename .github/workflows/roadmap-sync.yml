@@ -2,7 +2,7 @@ name: Roadmap → Issues Sync
 on:
   push:
     paths: ["docs/deemind_checklist.md"]
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 jobs:
   sync:
@@ -25,3 +25,4 @@ jobs:
           PROJECT_OWNER: EvaniaDeemind
           PROJECT_OWNER_TYPE: USER
           PROJECT_TITLE: Deemind Roadmap
+

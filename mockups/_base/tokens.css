@@ -1,0 +1,36 @@
+:root {
+  --color-primary: #0046ff;
+  --color-primary-contrast: #ffffff;
+  --color-accent: #35b9a6;
+  --color-surface: #f5f7fb;
+  --color-muted: #dbe3f5;
+  --color-text: #11224e;
+  --color-success: #1abc9c;
+  --color-warning: #f2c94c;
+  --color-danger: #ff5a5f;
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 24px;
+  --shadow-soft: 0 8px 26px rgba(17,34,78,0.08);
+  --shadow-strong: 0 20px 60px rgba(17,34,78,0.15);
+  --font-heading: 'Inter', 'Segoe UI', system-ui;
+  --font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont;
+}
+
+.util-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(0,70,255,0.1);
+  color: var(--color-primary);
+  font-size: 0.8rem;
+}
+
+.token-chip {
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.5rem;
+  border: 1px solid rgba(17,34,78,0.1);
+  font-size: 0.75rem;
+}

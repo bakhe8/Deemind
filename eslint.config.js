@@ -27,6 +27,25 @@ export default [
     rules: {
       "no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
       "no-console": "off",
+      "no-empty": ["error", { allowEmptyCatch: true }],
+      "no-useless-escape": "off",
+    },
+  },
+  {
+    files: ["reports/**/*.js"],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+      },
+    },
+  },
+  {
+    files: ["tests/**/*.spec.js", "tests/**/*.test.js"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.jest,
+      },
     },
   },
 ];
