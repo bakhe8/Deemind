@@ -31,6 +31,16 @@ npm run dev
 
 Use the dashboard to trigger builds, stream logs, review reports, and download outputs entirely on your machine.
 
+### Desktop Bundle (Phase 5 option)
+
+To launch both the service and dashboard inside a single Electron window:
+
+```
+npm run desktop:start
+```
+
+This command builds the dashboard (if needed), starts the local API, and opens a desktop window pointing at the offline UI.
+
 Quick VS Code Setup
 
 - Open the folder in VS Code

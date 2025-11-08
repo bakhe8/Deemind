@@ -22,6 +22,14 @@ npm run dev   # http://localhost:5758
 - Use Validate / Doctor / Build Demo buttons as needed
 - Logs stream live; Reports/Outputs panels list generated files
 
+## Desktop (Combined) Mode
+
+```powershell
+npm run desktop:start
+```
+
+This builds the dashboard if necessary, starts the local service, and opens an Electron window pointing at the offline UI.
+
 ## Manual CLI Commands (if needed)
 
 - Full autopilot: `npm run codex:autopilot`

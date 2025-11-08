@@ -65,7 +65,8 @@
     "codex:lighthouse": "gh workflow run lighthouse.yml --ref main",
     "dashboard": "node tools/dashboard-open.js",
     "codex:autopilot": "node tools/codex-autopilot.js",
-    "service:start": "tsx service/server.ts"
+    "service:start": "tsx service/server.ts",
+    "desktop:start": "electron electron-main.mjs"
   },
   "dependencies": {
     "ajv": "^8.12.0",
@@ -91,6 +92,7 @@
     "@semantic-release/npm": "^12.0.1",
     "autoprefixer": "^10.4.20",
     "depcheck": "^1.4.7",
+    "electron": "^39.1.1",
     "eslint": "^9.39.1",
     "express": "^5.1.0",
     "fs-extra": "^11.3.2",
