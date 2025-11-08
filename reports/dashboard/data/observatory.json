@@ -1,0 +1,145 @@
+{
+  "generatedAt": "2025-11-08T05:52:30.505Z",
+  "harmonyAverage": 92,
+  "docsCoverage": 95,
+  "docStats": {
+    "count": 21,
+    "directives": 8,
+    "reports": 23,
+    "missing": [
+      "docs/CI_CD.md"
+    ],
+    "directiveEntries": [
+      {
+        "name": "000-factory-full-plan.md",
+        "title": "000 factory full plan",
+        "summary": "🏗️ Overview",
+        "path": "../../codex-directives/000-factory-full-plan.md"
+      },
+      {
+        "name": "004-mockup-expansion-plan.md",
+        "title": "004 mockup expansion plan",
+        "summary": "🧩 Goal",
+        "path": "../../codex-directives/004-mockup-expansion-plan.md"
+      },
+      {
+        "name": "005-permission-policy.md",
+        "title": "🧩 Codex Permission Policy — Full Access Granted",
+        "summary": "---",
+        "path": "../../codex-directives/005-permission-policy.md"
+      },
+      {
+        "name": "006-autonomous-execution.md",
+        "title": "🧠 Codex Directive: Autonomous Execution Mode (Deemind)",
+        "summary": "Codex, you are now authorized to **run, complete, and finalize every pending or planned task** related to the **Deemind Project** — including all phases, workflows, refactors, and i",
+        "path": "../../codex-directives/006-autonomous-execution.md"
+      },
+      {
+        "name": "006-collaboration-mode.md",
+        "title": "🤝 Codex x Deemind — Controlled Collaboration Mode",
+        "summary": "---",
+        "path": "../../codex-directives/006-collaboration-mode.md"
+      },
+      {
+        "name": "007-interactive-bridge.md",
+        "title": "🧠 Codex Directive — Build Self-Updating Interactive Instruction Bridge (Deemind Command Pages)",
+        "summary": "These pages form a **permanent control bridge** between the human operator and Deemind itself — dynamically synced from Deemind’s configuration, schema, and CI reports.",
+        "path": "../../codex-directives/007-interactive-bridge.md"
+      },
+      {
+        "name": "007-task-taxonomy.md",
+        "title": "🧭 Codex Task Taxonomy — Controlled Collaboration Mode",
+        "summary": "Codex must only execute tasks listed here.",
+        "path": "../../codex-directives/007-task-taxonomy.md"
+      },
+      {
+        "name": "009-build-visual-dashboard.md",
+        "title": "🧠 Codex Directive — Build the Local Visual Dashboard (Deemind Observatory)",
+        "summary": "The dashboard must run **locally** without an external server, openable via `index.html` in a browser.",
+        "path": "../../codex-directives/009-build-visual-dashboard.md"
+      }
+    ]
+  },
+  "themes": [
+    {
+      "name": "demo",
+      "score": 97,
+      "notes": "Stable, all checks passed",
+      "preview": "../visual/demo/latest.png",
+      "buildReport": "../build-demo.md",
+      "validateReport": "../validate-demo.md",
+      "visualDir": "../visual/demo/",
+      "themeJson": "../../output/demo/theme.json"
+    },
+    {
+      "name": "gimni",
+      "score": 94,
+      "notes": "Stable, all checks passed",
+      "preview": "../visual/gimni/latest.png",
+      "buildReport": "../build-gimni.md",
+      "validateReport": "../validate-gimni.md",
+      "visualDir": "../visual/gimni/",
+      "themeJson": "../../output/gimni/theme.json"
+    },
+    {
+      "name": "modern",
+      "score": 91,
+      "notes": "Stable, all checks passed",
+      "preview": "../visual/modern/latest.png",
+      "buildReport": "../build-modern.md",
+      "validateReport": "../validate-modern.md",
+      "visualDir": "../visual/modern/",
+      "themeJson": "../../output/modern/theme.json"
+    },
+    {
+      "name": "salla-new-theme",
+      "score": 88,
+      "notes": "Requires review",
+      "preview": "../visual/salla-new-theme/latest.png",
+      "buildReport": "../build-salla-new-theme.md",
+      "validateReport": "../validate-salla-new-theme.md",
+      "visualDir": "../visual/salla-new-theme/",
+      "themeJson": "../../output/salla-new-theme/theme.json"
+    },
+    {
+      "name": "animal",
+      "score": 90,
+      "notes": "Requires review",
+      "preview": "../visual/animal/latest.png",
+      "buildReport": "../build-animal.md",
+      "validateReport": "../validate-animal.md",
+      "visualDir": "../visual/animal/",
+      "themeJson": "../../output/animal/theme.json"
+    }
+  ],
+  "schemaDrift": [
+    {
+      "title": "gimni harmony",
+      "detail": "Score 94 below 95 — review assets",
+      "level": "medium"
+    },
+    {
+      "title": "modern harmony",
+      "detail": "Score 91 below 95 — review assets",
+      "level": "medium"
+    },
+    {
+      "title": "salla-new-theme harmony",
+      "detail": "Score 88 below 95 — review assets",
+      "level": "medium"
+    },
+    {
+      "title": "animal harmony",
+      "detail": "Score 90 below 95 — review assets",
+      "level": "medium"
+    }
+  ],
+  "customRequests": [],
+  "taskLog": [],
+  "lighthouse": [],
+  "visualReports": [],
+  "systemLog": "",
+  "ciSummary": "Awaiting run",
+  "healthScore": 92.3,
+  "uiVersion": "1.0.0"
+}
