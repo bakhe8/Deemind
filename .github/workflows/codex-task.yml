@@ -1,6 +1,6 @@
 name: Codex Controlled Task
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
     inputs:
       task:
         description: "Command for Codex to run"
