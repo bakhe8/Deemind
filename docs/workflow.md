@@ -11,12 +11,14 @@ This is the current, stabilized workflow for Deemind. It reflects the upgraded p
 
 1. Create a branch: `feature/<task>`
 2. Build locally: `npm run deemind:build <theme> -- --sanitize --i18n --autofix`
+   - Preview auto-launches (configurable via `configs/deemind.config.json`) and serves `/output/<theme>/`.
 3. Validate & fix: `npm run deemind:doctor` (validate → fix → revalidate)
-4. Tests:
+4. Optional preview rerun: `npm run deemind:preview <theme>` to spin up the live server without a full rebuild.
+5. Tests:
    - Snapshots: `npm run test:snapshots`
    - Flaky detector: `npm run test:flaky`
-5. Commit; pre-commit hook runs lint-staged and validator.
-6. Push and open PR; CI runs full suite and posts summaries.
+6. Commit; pre-commit hook runs lint-staged and validator.
+7. Push and open PR; CI runs full suite and posts summaries.
 
 ## CI Overview
 

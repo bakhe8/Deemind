@@ -23,10 +23,11 @@ Deemind now exposes a local API and dashboard so everything runs offline without
 # Terminal 1 – API service (http://localhost:5757)
 npm run service:start
 
-# Terminal 2 – Dashboard UI (http://localhost:5758)
+# Terminal 2 – Dashboard UI (http://localhost:5758 dev / 5759 preview)
 cd dashboard
 npm install
 npm run dev
+# or let the desktop launcher rebuild + serve preview on 5759
 ```
 
 Use the dashboard to trigger builds, stream logs, review reports, and download outputs entirely on your machine.
@@ -41,7 +42,17 @@ npm run desktop:start
 
 This command builds the dashboard (if needed), starts the local API, and opens a desktop window pointing at the offline UI.
 
-Quick VS Code Setup
+### Previewing Themes
+
+- `npm run deemind:preview demo` starts a twig/html preview server for `/output/demo` (port 3000).
+- Modes: `--baseline-mode fill|enrich|force` choose how aggressively to apply Raed fallback.
+  - `fill`: only copy missing files.
+  - `enrich`: copy missing + supplement thin files with baseline sections (default).
+  - `force`: overwrite existing files with the Raed version.
+- Preview routes: `/` → `index`, `/pages` → list, `/page/<slug>?lang=ar`.
+- Configure defaults (preview port, auto-open, etc.) in `configs/deemind.config.json`.
+
+### Quick VS Code Setup
 
 - Open the folder in VS Code
 - Ensure Node v20.10.0 (`nvm use`)
@@ -120,6 +131,7 @@ Command Description
 npm run deemind:build demo Parse, map, adapt, validate, and output theme
 npm run deemind:validate Run extended QA validator only
 npm run deemind:test Execute test fixtures for regression checking
+npm run deemind:preview demo Serve /output/demo in the preview server (http://localhost:3000)
 
 🧠 7️⃣ What’s Next
 

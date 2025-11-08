@@ -1,4 +1,4 @@
-/* eslint-disable no-useless-escape */
+ 
 /**
  * @domain DeemindCore
  * Purpose: Adapt parsed+mapped HTML into Salla-compliant Twig theme structure.
@@ -111,6 +111,13 @@ export async function adaptToSalla(parsed, outputPath, { lockUnchanged = false, 
     const content = `{% extends "layout/default.twig" %}\n{% block content %}\n${pageHtml}\n{% endblock %}\n`;
     await fs.writeFile(outFile, content, 'utf8');
     written.push(relTwig);
+
+    // Write HTML stub for preview server
+    const htmlOut = path.join(pagesDir, p.rel.replace(/\\/g, '/'));
+    ensureInside(outputPath, htmlOut);
+    await fs.ensureDir(path.dirname(htmlOut));
+    const htmlDoc = `<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="utf-8"/>\n  <title>${path.basename(relTwig, '.twig')}</title>\n</head>\n<body>\n${p.html || pageHtml}\n</body>\n</html>\n`;
+    await fs.writeFile(htmlOut, htmlDoc, 'utf8');
      
     for (const m of content.matchAll(/\{\%\s*include\s*\"(partials\/[^\"]+)\"\s*\%\}/g)) {
       baselineRewrites.push({ page: `pages/${relTwig}`, include: m[1] });

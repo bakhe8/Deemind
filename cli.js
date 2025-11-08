@@ -22,8 +22,18 @@ import { validateExtended } from "./tools/validator-extended.js";
 import { prunePartials } from "./tools/partials-prune.js";
 import { DEFAULT_THEME_META } from "./configs/constants.js";
 import { loadBaselineSet, computeComponentUsage } from "./tools/baseline-compare.js";
+import { ensureBaselineCompleteness } from "./tools/ensure-baseline-theme.js";
+import { preparePreview } from "./tools/preview-prep.js";
+import { runPreviewServer } from "./tools/preview-server.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const CONFIG_PATH = path.join(__dirname, "configs", "deemind.config.json");
+const PREVIEW_DEFAULTS = {
+  enabled: true,
+  autoOpen: true,
+  port: 3000,
+  multiTheme: false,
+};
 
 /**
  * Orchestrates the full Deemind pipeline.
@@ -50,8 +60,10 @@ async function run() {
     process.exit(1);
   }
 
-  const inputPath = path.join(__dirname, "input", themeName);
-  const outputPath = path.join(__dirname, "output", themeName);
+  const inputRoot = path.join(__dirname, "input");
+  const outputRoot = path.join(__dirname, "output");
+  const inputPath = path.join(inputRoot, themeName);
+  const outputPath = path.join(outputRoot, themeName);
 
   if (!fs.existsSync(inputPath)) {
     console.error(chalk.red(`❌ Input folder not found: ${inputPath}`));
@@ -74,7 +86,21 @@ async function run() {
   const sanitize = args.includes('--sanitize');
   const autofix = args.includes('--autofix');
   const baselineFlag = args.find(a => a.startsWith('--baseline='));
-  const baseline = baselineFlag ? baselineFlag.split('=')[1] : undefined;
+  const baselineOverride = baselineFlag ? baselineFlag.split('=')[1] : undefined;
+  const diffMode = args.includes('--diff');
+  const autoApprove = args.includes('--auto');
+  const baselineModeFlag = args.find(a => a.startsWith('--baseline-mode='));
+  const baselineMode = baselineModeFlag ? baselineModeFlag.split('=')[1] : undefined;
+
+  let runtimeConfig = {};
+  try {
+    if (await fs.pathExists(CONFIG_PATH)) {
+      runtimeConfig = await fs.readJson(CONFIG_PATH);
+    }
+  } catch (err) {
+    console.warn(chalk.yellow(`⚠️ Could not read ${CONFIG_PATH}: ${err.message}`));
+  }
+  const previewConfig = { ...PREVIEW_DEFAULTS, ...(runtimeConfig.preview || {}) };
 
   try {
     const t0 = Date.now();
@@ -93,8 +119,46 @@ async function run() {
     const lockDefault = process.env.CI && !lockUnchanged ? true : lockUnchanged;
     console.log(chalk.yellow("🪄 Adapting to Salla theme format..."));
     const tAdapt0 = Date.now();
-    const adaptRes = await adaptToSalla(mapped, outputPath, { lockUnchanged: lockDefault, partialize, baseline });
+    const adaptRes = await adaptToSalla(mapped, outputPath, { lockUnchanged: lockDefault, partialize, baseline: baselineOverride });
     const tAdapt1 = Date.now();
+
+    console.log(chalk.yellow("🧱 Ensuring baseline completeness..."));
+    const baselineRes = await ensureBaselineCompleteness(outputPath, {
+      baselineName: baselineOverride,
+      manifestPath: path.join(outputPath, 'reports', 'baseline-summary.json'),
+      themeName,
+      diff: diffMode,
+      autoApprove,
+      inputPath,
+      mode: baselineMode,
+    });
+    if (!baselineRes.baselinePresent) {
+      console.log(chalk.gray('   → Baseline repo missing; skipped fallback.'));
+    } else if (baselineRes.logEntry?.added?.length) {
+      const stats = Object.entries(baselineRes.stats)
+        .map(([k, v]) => `${k}:${v}`)
+        .join(', ');
+      const stageBits = [
+        baselineRes.logEntry?.added?.length ? `+${baselineRes.logEntry.added.length} added` : null,
+        baselineRes.logEntry?.enriched?.length ? `≈${baselineRes.logEntry.enriched.length} enriched` : null,
+        baselineRes.logEntry?.forced?.length ? `!${baselineRes.logEntry.forced.length} forced` : null,
+      ]
+        .filter(Boolean)
+        .join(', ');
+      console.log(
+        chalk.gray(
+          `   → ${stageBits || 'Baseline fill'} from ${baselineRes.baselineName}${stats ? ` (${stats})` : ''}.`,
+        ),
+      );
+      if (baselineRes.logPath) {
+        console.log(chalk.gray(`   → Baseline log: ${path.relative(process.cwd(), baselineRes.logPath)}`));
+      }
+      if (baselineRes.diffPath && diffMode) {
+        console.log(chalk.gray(`   → Baseline diff: ${path.relative(process.cwd(), baselineRes.diffPath)}`));
+      }
+    } else {
+      console.log(chalk.gray('   → Already baseline-complete.'));
+    }
 
     // Post-process CSS assets for deterministic url(...) rewrites
     // Declare timing vars once; assign inside try to avoid redeclaration lint
@@ -265,6 +329,23 @@ async function run() {
       ].join('\n');
       try { await fs.appendFile(process.env.GITHUB_STEP_SUMMARY, `\n${summary}\n`); } catch (e) { void e; }
     }
+    const previewMeta = await preparePreview(themeName, {
+      outputPath: outputRoot,
+      port: previewConfig.port || PREVIEW_DEFAULTS.port,
+    });
+    if (previewConfig.enabled) {
+      if (previewMeta.status === 'ready') {
+        const previewResult = await runPreviewServer(themeName, previewConfig);
+        if (previewResult?.url) {
+          console.log(chalk.green(`🟢 Preview server ready → ${previewResult.url}`));
+        }
+      } else {
+        console.log(chalk.yellow('⚠️ Preview skipped: no pages were generated.'));
+      }
+    }
+
+    await appendBaselineMetrics(themeName, baselineRes, extReport);
+
     console.log(chalk.greenBright(`\n✅ Deemind build complete in ${elapsed}s`));
     console.log(chalk.gray(`Output → ${outputPath}`));
 
@@ -289,4 +370,23 @@ async function hashInputDir(dir) {
     } catch (err) { void err; }
   }
   return h.digest('hex');
+}
+async function appendBaselineMetrics(themeName, baselineInfo, extReport) {
+  const metricsDir = path.resolve("reports");
+  await fs.ensureDir(metricsDir);
+  const metricsPath = path.join(metricsDir, "baseline-metrics.md");
+  if (!(await fs.pathExists(metricsPath))) {
+    await fs.writeFile(
+      metricsPath,
+      "| Theme | Added | Skipped | Duration | Errors | Warnings |\n| --- | --- | --- | --- | --- | --- |\n",
+      "utf8"
+    );
+  }
+  const added = baselineInfo?.logEntry?.added?.length ?? 0;
+  const skipped = baselineInfo?.logEntry?.skipped?.length ?? 0;
+  const duration = baselineInfo?.logEntry?.duration ?? "-";
+  const errors = extReport?.errors?.length ?? 0;
+  const warnings = extReport?.warnings?.length ?? 0;
+  const row = `| ${themeName} | ${added} | ${skipped} | ${duration} | ${errors} | ${warnings} |\n`;
+  await fs.appendFile(metricsPath, row, "utf8");
 }

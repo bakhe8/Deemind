@@ -1,0 +1,12 @@
+﻿{
+  "baseline": ".baselines/theme-raed/src",
+  "defaultAdapter": "salla",
+  "inputPath": "input/",
+  "outputPath": "output/",
+  "preview": {
+    "enabled": true,
+    "autoOpen": true,
+    "port": 3000,
+    "multiTheme": false
+  }
+}
