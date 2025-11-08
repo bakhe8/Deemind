@@ -2,6 +2,7 @@ name: Codex Maintenance (Deemind Tools)
 on:
   schedule:
     - cron: "0 */6 * * *"
+  # Manual dispatch for Codex tasks
   workflow_dispatch:
   workflow_run:
     workflows: ["Deemind Codex Agent"]
