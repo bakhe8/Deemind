@@ -330,17 +330,17 @@
     • Generate repository documentation
     • Commit docs (if changed)
 
-## codex-agent.yml
+## codex-agent-v2.yml
 
-- File: .github/workflows/codex-agent.yml
+- File: .github/workflows/codex-agent-v2.yml
 - Triggers: n/a
 - Artifacts: no
 - Secrets: OPENAI_API_KEY, GITHUB_TOKEN
 - Jobs:
 
-## codex-agent-manual.yml
+## codex-agent-manual-v2.yml
 
-- File: .github/workflows/codex-agent-manual.yml
+- File: .github/workflows/codex-agent-manual-v2.yml
 - Triggers: n/a
 - Artifacts: no
 - Secrets: OPENAI_API_KEY, GITHUB_TOKEN

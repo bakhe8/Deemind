@@ -128,6 +128,7 @@ You can now rename your local folder to deemind, run the CLI as-is, and you’ll
 - [salla-reference.md](docs/salla-reference.md)
 - [salla-sdk.md](docs/salla-sdk.md)
 - [salla-web-components.md](docs/salla-web-components.md)
+- [status.md](docs/status.md)
 - [validation.md](docs/validation.md)
 - [workflow.md](docs/workflow.md)
 - [workflows.md](docs/workflows.md)
