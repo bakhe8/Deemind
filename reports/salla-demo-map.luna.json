@@ -1,0 +1,20 @@
+{
+  "baseline": {
+    "name": "luna",
+    "counts": {
+      "layout": 0,
+      "pages": 0,
+      "partials": 0,
+      "assets": 0
+    }
+  },
+  "output": {
+    "name": "demo",
+    "counts": {
+      "layout": 1,
+      "pages": 1,
+      "partials": 0,
+      "assets": 5
+    }
+  }
+}

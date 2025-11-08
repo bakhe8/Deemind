@@ -11,11 +11,52 @@
       "input": "input/fixtures/gimni",
       "expected": "output/snapshots_expected/gimni",
       "buildCommand": "npm run deemind:build gimni"
+    },
+    {
+      "name": "animal",
+      "input": "input/fixtures/animal",
+      "expected": "output/snapshots_expected/animal",
+      "buildCommand": "npm run deemind:build animal"
+    },
+    {
+      "name": "needsboxes",
+      "input": "input/fixtures/needsboxes",
+      "expected": "output/snapshots_expected/needsboxes",
+      "buildCommand": "npm run deemind:build needsboxes"
+    },
+    {
+      "name": "salla-luna-lite",
+      "input": "input/fixtures/salla-luna-lite",
+      "expected": "output/snapshots_expected/salla-luna-lite",
+      "buildCommand": "npm run deemind:build salla-luna-lite"
+    },
+    {
+      "name": "salla-mono-lite",
+      "input": "input/fixtures/salla-mono-lite",
+      "expected": "output/snapshots_expected/salla-mono-lite",
+      "buildCommand": "npm run deemind:build salla-mono-lite"
+    },
+    {
+      "name": "salla-raed-lite",
+      "input": "input/fixtures/salla-raed-lite",
+      "expected": "output/snapshots_expected/salla-raed-lite",
+      "buildCommand": "npm run deemind:build salla-raed-lite"
     }
   ],
   "compare": {
-    "includeExtensions": [".twig", ".html", ".json", ".css", ".js"],
-    "ignorePaths": ["**/.DS_Store", "**/*.map", "**/theme.json", "theme.json"],
+    "includeExtensions": [
+      ".twig",
+      ".html",
+      ".json",
+      ".css",
+      ".js"
+    ],
+    "ignorePaths": [
+      "**/.DS_Store",
+      "**/*.map",
+      "**/theme.json",
+      "theme.json"
+    ],
     "ignoreJsonKeys": [
       "timestamp",
       "buildDate",

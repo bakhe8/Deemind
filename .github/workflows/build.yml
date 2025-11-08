@@ -4,7 +4,7 @@ on:
     branches: [ main ]
   pull_request:
 
-jobs:
+  jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
@@ -28,8 +28,32 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
       - name: Conflict Markers Check
         run: node tools/check-conflicts.js
+      - name: Enforce Core/Tools domain boundary
+        run: node tools/check-domain-boundary.js
       - run: npm ci
       - run: npm run lint
+      - name: Build all themes in parallel
+        shell: bash
+        run: |
+          set -e
+          THEMES=$(ls input | xargs)
+          pids=()
+          for t in $THEMES; do
+            echo "Building $t..."
+            ( npm run deemind:build $t -- --sanitize --i18n --autofix ) &
+            pids+=("$!")
+          done
+          for p in "${pids[@]}"; do wait "$p"; done
+      - name: Validate theme.json against Salla schema
+        run: node tools/validate-theme-schema.js --all
+      - name: Madge cycle gate
+        shell: bash
+        run: |
+          set -e
+          OUT=$(npx --yes madge --circular --extensions js . --json || true)
+          if [ -n "$OUT" ] && [ "$OUT" != "[]" ]; then
+            echo "Cycles detected: $OUT"; exit 1;
+          fi
       - name: Static analysis (cycles, unused deps)
         run: |
           npm i -D madge depcheck

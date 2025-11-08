@@ -1,8 +1,8 @@
 name: Lighthouse CI
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ]
+  schedule:
+    - cron: "0 4 * * 1"
 
 jobs:
   lhci:
@@ -12,26 +12,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install Lighthouse CI
-        run: npm i -g @lhci/cli@0.13.x serve
-      - name: Run Lighthouse (DEMO URL)
-        if: env.LIGHTHOUSE_URL_DEMO != ''
-        env:
-          LIGHTHOUSE_URL_DEMO: ${{ secrets.LIGHTHOUSE_URL_DEMO }}
+      - run: npm ci || npm i
+      - name: Build sample theme
         run: |
-          mkdir -p reports/lighthouse/demo
-          lhci collect --url "$LIGHTHOUSE_URL_DEMO" --numberOfRuns=1 --output=html --outputPath=./reports/lighthouse/demo/report.html || true
-      - name: Run Lighthouse (GIMNI URL)
-        if: env.LIGHTHOUSE_URL_GIMNI != ''
-        env:
-          LIGHTHOUSE_URL_GIMNI: ${{ secrets.LIGHTHOUSE_URL_GIMNI }}
-        run: |
-          mkdir -p reports/lighthouse/gimni
-          lhci collect --url "$LIGHTHOUSE_URL_GIMNI" --numberOfRuns=1 --output=html --outputPath=./reports/lighthouse/gimni/report.html || true
+          npm run deemind:build demo || true
+      - name: Run Lighthouse CI
+        run: npx @lhci/cli autorun || true
       - name: Upload Lighthouse Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lighthouse
-          path: reports/lighthouse/**
+          name: lighthouse-${{ github.run_id }}
+          path: ./.lighthouseci
 

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الإطار الكامل لمشروع تويلا</title>
+    <!-- Chosen Palette: Toyla Branding Palette (Sage Green, Sand Beige, Muted Coral, Cream White) -->
+    <!-- Application Structure Plan: A comprehensive, tabbed single-page application designed to consolidate all provided project files into one cohesive dashboard. The structure is thematic: 1) Framework (the 'why'), 2) The Product (the 'what'), 3) Characters (the 'who'), 4) Story Scenes (the 'where'), 5) Dialogue Cards (the 'how'), and 6) Strategy (the 'next'). This architecture synthesizes scattered information into a logical, explorable user journey, making it the definitive guide for all stakeholders. -->
+    <!-- Visualization & Content Choices: 1. Framework: Doughnut chart (Chart.js) for EQ/IQ focus. 2. Product: Interactive flipping card for the box specs. 3. Characters: Interactive modal-based catalog for detailed specs. 4. Scenes: A paginated book-like interface for exploring backgrounds. 5. Cards: A categorized, clickable gallery with modals for card details. 6. Strategy: A clear timeline and icon-based lists. All methods confirm NO SVG/Mermaid and serve to make the dense, consolidated information interactive and digestible. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8DB596;
+            --secondary: #E5A96F;
+            --accent: #F07F69;
+            --light: #FEFCF3;
+            --dark: #4A4A4A;
+            --cognition: #4A6C98;
+            --challenge: #6B4E3B;
+        }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        .nav-link.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        .section-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .section-content.active {
+            display: block;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+            z-index: 50; display: none; align-items: center; justify-content: center;
+        }
+        .modal-content {
+            width: 90%; max-width: 600px; z-index: 60;
+            max-height: 90vh; overflow-y: auto;
+        }
+        .prod-card { perspective: 1000px; }
+        .prod-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
+        .prod-card.flipped .prod-card-inner { transform: rotateY(180deg); }
+        .prod-card-front, .prod-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 0.75rem; }
+        .prod-card-back { transform: rotateY(180deg); }
+
+        .book-container { width: 100%; max-width: 800px; height: 500px; max-height: 80vh; perspective: 1500px; }
+        .page { background-size: cover; background-position: center; }
+        .pagination-dot.active { background-color: var(--accent); width: 20px; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold" style="color: var(--primary);">
+                🧸 الإطار الكامل لمشروع "تويلا"
+            </h1>
+            <p class="text-lg md:text-xl mt-2 text-gray-600">الدليل المرجعي الشامل: من الفكرة إلى مواصفات الإنتاج</p>
+        </header>
+
+        <nav class="flex flex-wrap justify-center border-b mb-8 sticky top-0 bg-white/80 backdrop-blur-sm z-20">
+            <div class="flex flex-wrap justify-center space-x-2 sm:space-x-4">
+                <button class="nav-link active py-3 px-2 sm:px-3 text-xs sm:text-base font-bold" data-target="framework">🎠 الإطار العام</button>
+                <button class="nav-link py-3 px-2 sm:px-3 text-xs sm:text-base font-bold" data-target="product">📦 المنتج الأول</button>
+                <button class="nav-link py-3 px-2 sm:px-3 text-xs sm:text-base font-bold" data-target="characters">👥 دليل الشخصيات</button>
+                <button class="nav-link py-3 px-2 sm:px-3 text-xs sm:text-base font-bold" data-target="scenes">🗺️ مسرح القصة</button>
+                <button class="nav-link py-3 px-2 sm:px-3 text-xs sm:text-base font-bold" data-target="cards">🃏 بطاقات الحوار</button>
+                <button class="nav-link py-3 px-2 sm:px-3 text-xs sm:text-base font-bold" data-target="strategy">🚀 الاستراتيجية</button>
+            </div>
+        </nav>
+
+        <main>
+            <!-- Section 1: Framework -->
+            <section id="framework" class="section-content active">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold mb-2" style="color: var(--dark);">الفكرة الجوهرية والفلسفة التربوية</h2>
+                    <p class="max-w-3xl mx-auto text-gray-600">هذا القسم يوضح "لماذا" تم إنشاء تويلا، مستعرضًا رسالتها وقيمها الأساسية التي ترتكز على تنمية الذكاء العاطفي من خلال اللعب التفاعلي.</p>
+                </div>
+                <div class="grid lg:grid-cols-2 gap-8 items-center">
+                     <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-lg shadow-sm border-r-4" style="border-color: var(--primary);">
+                            <h3 class="font-bold text-xl mb-2">الفكرة الجوهرية</h3>
+                            <p class="text-gray-700">مشروع فني وتربوي يسعى ليكون "أول صديقة خيالية عربية" تساعد الأطفال على فهم مشاعرهم وبناء علاقة صحية مع الخيال والتعبير عن الذات.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-sm border-r-4" style="border-color: var(--secondary);">
+                            <h3 class="font-bold text-xl mb-2">الفلسفة التربوية</h3>
+                            <p class="text-gray-700">التعلم التخيلي (Imaginative Learning) حيث أن الخيال هو لغة الطفل الأولى. التركيز على بناء الذكاء العاطفي (EQ) عبر اللعب التفاعلي وليس فقط الذكاء المعرفي (IQ).</p>
+                        </div>
+                         <div class="bg-white p-6 rounded-lg shadow-sm border-r-4" style="border-color: var(--accent);">
+                            <h3 class="font-bold text-xl mb-2">الهدف الاستراتيجي</h3>
+                            <p class="text-gray-700">أن نكون الوجهة الأولى للهدايا الفنية التي تُترك كإرث عاطفي وجمالي بين الأم وطفلها.</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="chart-container">
+                            <canvas id="eqIqChart"></canvas>
+                        </div>
+                         <p class="text-center text-sm text-gray-500 mt-2">التركيز التربوي للمنتج</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Product -->
+            <section id="product" class="section-content">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold mb-2" style="color: var(--dark);">المنتج الأول: أسرار واحة النخيل</h2>
+                    <p class="max-w-3xl mx-auto text-gray-600">استعراض شامل لمكونات المنتج الرائد "أسرار واحة النخيل"، المصمم ليكون تجربة لعب متكاملة ومحفزة للخيال. انقر على الصندوق لعرض محتوياته.</p>
+                </div>
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div class="prod-card h-80 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                        <div class="prod-card-inner">
+                            <div class="prod-card-front bg-white p-6 flex flex-col items-center justify-center shadow-lg border-4" style="border-color: var(--secondary);">
+                                <h3 class="text-4xl font-bold" style="color: var(--primary);">Toyla</h3>
+                                <p class="text-lg font-bold mt-2 text-center" style="color:var(--dark);">رحلة السرد والتفكير من قلب الصحراء</p>
+                                <div class="text-6xl mt-4" style="color: var(--accent);">🐪👶</div>
+                                <p class="text-sm mt-4 text-gray-500">مناسب لعمر 4 سنوات فأكثر</p>
+                            </div>
+                            <div class="prod-card-back bg-gray-800 text-white p-6 flex flex-col justify-center shadow-lg">
+                                 <h4 class="font-bold text-xl border-b pb-2 mb-3">محتويات الصندوق:</h4>
+                                <ul class="space-y-2 text-sm">
+                                    <li class="flex items-center"><span class="ml-2 bg-blue-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">1</span> كتاب الخلفيات (12 مشهدًا).</li>
+                                    <li class="flex items-center"><span class="ml-2 bg-green-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">10</span> شخصيات تفاعلية (ورق مقوى سميك).</li>
+                                    <li class="flex items-center"><span class="ml-2 bg-yellow-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">30</span> بطاقة حوار (5 فئات).</li>
+                                    <li class="flex items-center"><span class="ml-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">1</span> قلم مسح جاف.</li>
+                                </ul>
+                                <h4 class="font-bold text-lg border-b pb-1 mt-4 mb-2">جودة المنتج:</h4>
+                                <ul class="list-disc pr-4 text-xs">
+                                    <li>مصنوع من كرتون صلب متين.</li>
+                                    <li>طلاء مطفي لحماية الألوان.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <h3 class="text-2xl font-bold mb-4">مكونات تجربة متكاملة</h3>
+                        <div class="bg-white p-4 rounded-lg shadow-sm flex items-start space-x-3 space-x-reverse">
+                            <i class="fas fa-book-open text-2xl mt-1" style="color: var(--primary);"></i>
+                            <div>
+                                <h4 class="font-bold">كتاب الخلفيات</h4>
+                                <p class="text-sm text-gray-600">مسرح القصة الذي يضم 12 مشهداً من البيئة المحلية.</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm flex items-start space-x-3 space-x-reverse">
+                            <i class="fas fa-users text-2xl mt-1" style="color: var(--accent);"></i>
+                            <div>
+                                <h4 class="font-bold">الشخصيات التفاعلية</h4>
+                                <p class="text-sm text-gray-600">أبطال القصة من ورق مقوى سميك ومتين للعب المتكرر.</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm flex items-start space-x-3 space-x-reverse">
+                             <i class="fas fa-comment-dots text-2xl mt-1" style="color: var(--secondary);"></i>
+                            <div>
+                                <h4 class="font-bold">بطاقات الحوار والتعبير</h4>
+                                <p class="text-sm text-gray-600">30 بطاقة مقسمة إلى 5 فئات لتوجيه القصة وتنمية المهارات.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section 3: Characters -->
+            <section id="characters" class="section-content">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold mb-2" style="color: var(--dark);">دليل شخصيات أبطال الرمال</h2>
+                    <p class="max-w-3xl mx-auto text-gray-600">تعرف على أبطال القصة، مواصفاتهم الفنية، أدوارهم السردية، وكيفية تطبيق الهوية البصرية عليهم. انقر على أي شخصية لعرض تفاصيلها.</p>
+                </div>
+                <div id="character-catalog" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"></div>
+            </section>
+
+            <!-- Section 4: Scenes -->
+            <section id="scenes" class="section-content">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold mb-2" style="color: var(--dark);">مسرح القصة: كتاب الخلفيات</h2>
+                    <p class="max-w-3xl mx-auto text-gray-600">استعرض المشاهد الـ 12 المصممة لتكون مسرحاً لأحداث قصص "تويلا". كل مشهد يقدم بيئة مختلفة وإمكانيات سردية جديدة.</p>
+                </div>
+                <div class="book-container relative mx-auto rounded-lg overflow-hidden flex items-center justify-center">
+                    <div id="page-display" class="page w-full h-full relative rounded-lg border-4 p-6" style="border-color: var(--secondary);">
+                        <h3 id="scene-title" class="text-2xl font-bold mb-2 text-white bg-black/50 p-2 rounded"></h3>
+                        <p id="scene-description" class="text-sm text-white bg-black/50 p-2 rounded max-w-md"></p>
+                    </div>
+                    <button id="prev-page" class="absolute right-2 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 p-3 rounded-full shadow-lg hover:bg-white transition-colors"><i class="fas fa-chevron-right"></i></button>
+                    <button id="next-page" class="absolute left-2 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 p-3 rounded-full shadow-lg hover:bg-white transition-colors"><i class="fas fa-chevron-left"></i></button>
+                </div>
+                <div id="pagination-dots" class="flex justify-center space-x-2 mt-6"></div>
+            </section>
+            
+            <!-- Section 5: Cards -->
+            <section id="cards" class="section-content">
+                 <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold mb-2" style="color: var(--dark);">بطاقات الحوار والتعبير (30 بطاقة)</h2>
+                    <p class="max-w-3xl mx-auto text-gray-600">أداة توجيه القصة نحو خمسة محاور نمائية أساسية: المشاعر، السلوك، المهارات الاجتماعية، التفكير، والتحديات. انقر على أي بطاقة لمعرفة المزيد.</p>
+                </div>
+                <div id="card-groups" class="space-y-8"></div>
+            </section>
+
+            <!-- Section 6: Strategy -->
+             <section id="strategy" class="section-content">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold mb-2" style="color: var(--dark);">الاستراتيجية وخطة التطوير</h2>
+                    <p class="max-w-3xl mx-auto text-gray-600">نظرة على استراتيجية إطلاق المنتج، خطط التطور المستقبلية، وقنوات التسويق المقترحة لضمان وصول "تويلا" إلى الجمهور المستهدف بفعالية.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <h3 class="text-xl font-bold mb-4 text-center">🚀 استراتيجية الإطلاق</h3>
+                         <div class="space-y-4">
+                            <div class="flex items-start"><i class="fas fa-video mt-1 ml-3 text-lg" style="color: var(--primary);"></i><div><h4 class="font-bold">المحتوى التسويقي الهادف</h4><p class="text-sm text-gray-600">إنشاء فيديوهات قصيرة تظهر أطفالاً يبدعون قصصهم، مع التركيز على تطور الخيال لديهم.</p></div></div>
+                            <div class="flex items-start"><i class="fas fa-gift mt-1 ml-3 text-lg" style="color: var(--accent);"></i><div><h4 class="font-bold">التعبئة كهدايا فريدة</h4><p class="text-sm text-gray-600">عرض المجموعة كـ"هدية للذاكرة والذكاء" تختلف عن الهدايا التقليدية.</p></div></div>
+                             <div class="flex items-start"><i class="fas fa-users mt-1 ml-3 text-lg" style="color: var(--secondary);"></i><div><h4 class="font-bold">الشراكات المؤثرة</h4><p class="text-sm text-gray-600">التعاون مع مدونات الأمهات والتربية الإيجابية لعمل مراجعات تركز على القيمة التعليمية.</p></div></div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <h3 class="text-xl font-bold mb-4 text-center">📈 خطة التطور المستقبلية</h3>
+                         <div class="space-y-4">
+                            <div class="flex items-start"><i class="fas fa-book-open mt-1 ml-3 text-lg" style="color: var(--primary);"></i><div><h4 class="font-bold">المحتوى التربوي</h4><p class="text-sm text-gray-600">تطوير سلسلة "تويلي تتحدث عن المشاعر" وقصص مصورة جديدة.</p></div></div>
+                            <div class="flex items-start"><i class="fab fa-instagram mt-1 ml-3 text-lg" style="color: var(--accent);"></i><div><h4 class="font-bold">الوسائط الرقمية</h4><p class="text-sm text-gray-600">رسوم متحركة قصيرة على Instagram و TikTok وتطبيق مصاحب.</p></div></div>
+                            <div class="flex items-start"><i class="fas fa-handshake mt-1 ml-3 text-lg" style="color: var(--secondary);"></i><div><h4 class="font-bold">الشراكات والمنتجات</h4><p class="text-sm text-gray-600">شراكات مع مدارس ومراكز تربوية، وإطلاق دفاتر أنشطة وألعاب جديدة.</p></div></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal for details -->
+    <div id="details-modal" class="modal-overlay" onclick="hideDetailsModal()">
+        <div class="modal-content bg-white p-6 md:p-8 relative rounded-xl border-4" style="border-color: var(--accent);" onclick="event.stopPropagation()">
+            <button onclick="hideDetailsModal()" class="absolute top-3 left-3 text-3xl font-bold p-1 leading-none rounded-full" style="color: var(--dark);">&times;</button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Data consolidation
+            const characters = [
+                {name:"الجدة نورا", role:"رمز الحكمة والخبرة.", size:"10 سم", color:"الأخضر المريمي", accent:"الأبيض الكريمي", icon:"👵", category: "human"},
+                {name:"الطفل راشد", role:"البطل، رمز الحركة والاستكشاف.", size:"8 سم", color:"البيج الرملي", accent:"المرجاني المطفي", icon:"👶", category: "human"},
+                {name:"الجمل صابر", role:"رمز الصبر والقوة والتحمل.", size:"12 سم", color:"البيج الرملي", accent:"الأخضر المريمي", icon:"🐪", category: "animal"},
+                {name:"المها العربي", role:"رمز الجمال والتكيف.", size:"9 سم", color:"الأبيض الكريمي", accent:"اللون الداكن", icon:"🦌", category: "animal"},
+                {name:"ثعلب الفنك", role:"رمز المكر والذكاء.", size:"6 سم", color:"الأبيض الكريمي", accent:"المرجاني المطفي", icon:"🦊", category: "animal"},
+                {name:"الصقر", role:"رمز الحرية والرؤية الواضحة.", size:"7 سم", color:"البني الهادئ", accent:"الأبيض الكريمي", icon:"🦅", category: "animal"},
+                {name:"اليربوع", role:"رمز المفاجأة والحذر.", size:"4 سم", color:"الرمادي/البني", accent:"لا يوجد", icon:"🐁", category: "animal"},
+                {name:"النخلة", role:"رمز الرزق والحياة.", size:"12 سم", color:"الأخضر المريمي", accent:"البيج الرملي", icon:"🌴", category: "element"},
+                {name:"خيمة الترحال", role:"رمز الأمان والمأوى.", size:"9 سم", color:"البيج الرملي", accent:"اللون الداكن", icon:"⛺", category: "element"},
+                {name:"بئر الماء", role:"رمز المورد والهدف.", size:"6 سم", color:"الرمادي البارد", accent:"الأزرق الفاتح", icon:"💧", category: "element"},
+            ];
+
+            const scenes = [
+                { id: 1, title: "واحة النخيل الهادئة", desc: "بركة ماء صغيرة وأشجار نخيل. مشهد مثالي لمغامرات التجمع والتعارف.", bg: 'https://placehold.co/800x500/8DB596/FEFCF3?text=واحة+النخيل' },
+                { id: 2, title: "الكثبان الرملية (غروب)", desc: "تلال رملية متموجة مع ظل طويل. المشهد يدعم قصص السفر والتحدي.", bg: 'https://placehold.co/800x500/E5A96F/4A4A4A?text=الكثبان+الرملية' },
+                { id: 3, title: "الوادي الصخري/المخيم", desc: "تضاريس صخرية مع خلفية لمخيم بسيط. مكان للاستراحة وتبادل الحكايات.", bg: 'https://placehold.co/800x500/b8aea5/FEFCF3?text=الوادي+الصخري' },
+                { id: 4, title: "سوق القرية القديم", desc: "مشهد اجتماعي بأقواس ومتاجر صغيرة. يدعم قصص الحوار والتفاوض.", bg: 'https://placehold.co/800x500/F07F69/FEFCF3?text=سوق+القرية' },
+                { id: 5, title: "سماء الليل والنجوم", desc: "خلفية سماء مظلمة مع نجوم ساطعة. يشجع على الأفكار المجردة والأحلام.", bg: 'https://placehold.co/800x500/1a1a2e/FEFCF3?text=سماء+الليل' },
+                { id: 6, title: "مزرعة النخيل (حصاد)", desc: "مشهد عملي يركز على الحصاد والري. يدعم قصص المهارات الحياتية والمسؤولية.", bg: 'https://placehold.co/800x500/a8cfa8/4A4A4A?text=المزرعة' },
+            ];
+            
+            const cardData = [
+                { category: "المشاعر الأساسية", color: "var(--accent)", cards: ["سعيد 😊", "خائف 😨", "متفاجئ 😮", "متحمس ✨", "غاضب 😠"], tip: "اجعل الطفل يختار مشاعر الشخصية ثم يقلد تعبير الوجه." },
+                { category: "الاستجابات السلوكية", color: "var(--secondary)", cards: ["يبحث 🔎", "يختبئ 🙈", "يتسلق 🧗", "يقترب 🚶", "يستريح 🧘"], tip: "اطلب من الطفل اختيار فعل واحد لكل شخصية في المشهد التالي." },
+                { category: "المهارات الاجتماعية", color: "var(--primary)", cards: ["يتعاون 🤝", "يشارك 🤲", "يصغي 👂", "يعتذر 🙏", "يساعد 🙋‍♂️"], tip: "ركز على بطاقة واحدة. اسأل: كيف يمكن للشخصية أن تُظهر هذه المهارة؟" },
+                { category: "أسئلة التفكير", color: "var(--cognition)", cards: ["ماذا بعد؟ 🤔", "تذكر 🧠", "خطط 🗺️", "لماذا؟ ❓", "ماذا لو؟ ✨"], tip: "استخدمها للتدخل في القصة وتوجيهها نحو مهارات المنطق العليا." },
+                { category: "التحديات البيئية", color: "var(--challenge)", cards: ["عاصفة رملية 🌪️", "ضياع الأثر 👣", "نقص المياه 🚱", "الليل 🌑", "مفترس 🦅"], tip: "تُستخدم لتقديم عقبات خارجية، مما يجبر الشخصيات على استخدام بطاقات أخرى." },
+            ];
+
+            // Navigation Logic
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.section-content');
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    const targetId = link.dataset.target;
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+                    link.classList.add('active');
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                        if (section.id === targetId) setTimeout(() => section.classList.add('active'), 150);
+                    });
+                });
+            });
+
+            // Chart Logic
+            const ctx = document.getElementById('eqIqChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['الذكاء العاطفي (EQ)', 'الذكاء المعرفي (IQ)'],
+                        datasets: [{
+                            data: [75, 25],
+                            backgroundColor: ['rgba(141, 181, 150, 0.9)', 'rgba(229, 169, 111, 0.8)'],
+                            borderColor: ['#8DB596', '#E5A96F'],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    font: {
+                                        family: "'Tajawal', sans-serif"
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                rtl: true,
+                                bodyFont: { family: "'Tajawal', sans-serif" },
+                                titleFont: { family: "'Tajawal', sans-serif" }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Character Catalog Logic
+            const characterCatalog = document.getElementById('character-catalog');
+            if(characterCatalog){
+                characters.forEach(char => {
+                    const charCard = document.createElement('div');
+                    charCard.className = 'bg-white p-3 rounded-lg shadow-md hover:shadow-xl hover:scale-105 transition-transform cursor-pointer text-center';
+                    charCard.innerHTML = `<div class="text-5xl mb-2">${char.icon}</div><h4 class="font-bold">${char.name}</h4>`;
+                    charCard.onclick = () => showCharacterDetails(char);
+                    characterCatalog.appendChild(charCard);
+                });
+            }
+
+            // Scene Viewer Logic
+            let currentSceneIndex = 0;
+            const pageDisplay = document.getElementById('page-display');
+            const sceneTitle = document.getElementById('scene-title');
+            const sceneDescription = document.getElementById('scene-description');
+            const prevButton = document.getElementById('prev-page');
+            const nextButton = document.getElementById('next-page');
+            const paginationDotsContainer = document.getElementById('pagination-dots');
+
+            function updateSceneDisplay() {
+                const scene = scenes[currentSceneIndex];
+                pageDisplay.style.backgroundImage = `url('${scene.bg}')`;
+                sceneTitle.textContent = scene.title;
+                sceneDescription.textContent = scene.desc;
+                document.querySelectorAll('.pagination-dot').forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentSceneIndex);
+                });
+            }
+
+            if(pageDisplay) {
+                scenes.forEach((_, index) => {
+                    const dot = document.createElement('button');
+                    dot.className = 'pagination-dot w-3 h-3 rounded-full mx-1 bg-gray-300 transition-all';
+                    dot.onclick = () => { currentSceneIndex = index; updateSceneDisplay(); };
+                    paginationDotsContainer.appendChild(dot);
+                });
+                prevButton.onclick = () => { currentSceneIndex = (currentSceneIndex - 1 + scenes.length) % scenes.length; updateSceneDisplay(); };
+                nextButton.onclick = () => { currentSceneIndex = (currentSceneIndex + 1) % scenes.length; updateSceneDisplay(); };
+                updateSceneDisplay();
+            }
+
+            // Dialogue Cards Logic
+            const cardGroupsContainer = document.getElementById('card-groups');
+            if(cardGroupsContainer) {
+                cardData.forEach(group => {
+                    const groupEl = document.createElement('div');
+                    groupEl.innerHTML = `
+                        <h3 class="text-2xl font-bold mb-4 pr-3" style="border-right: 5px solid ${group.color}; color: ${group.color};">${group.category}</h3>
+                        <div class="flex flex-wrap justify-center gap-3">
+                            ${group.cards.map(card => `<div class="card-example w-32 h-20 rounded-lg shadow-md flex items-center justify-center p-2 text-center font-semibold text-white cursor-pointer hover:scale-105 transition-transform" style="background-color: ${group.color};" onclick="showCardDetails('${card}', '${group.tip}')">${card}</div>`).join('')}
+                        </div>
+                    `;
+                    cardGroupsContainer.appendChild(groupEl);
+                });
+            }
+        });
+
+        // Modal Functions
+        const modal = document.getElementById('details-modal');
+        const modalBody = document.getElementById('modal-body');
+        
+        function showCharacterDetails(char) {
+            modalBody.innerHTML = `
+                <h3 class="text-3xl font-bold mb-4" style="color: var(--accent);">${char.name} ${char.icon}</h3>
+                <div class="space-y-4">
+                    <div><strong class="font-bold text-lg text-gray-800">الدور السردي:</strong><p class="text-gray-600">${char.role}</p></div>
+                    <div><strong class="font-bold text-lg text-gray-800">المقياس:</strong><p class="text-gray-600">${char.size}</p></div>
+                    <div><strong class="font-bold text-lg text-gray-800">اللون الأساسي:</strong><p class="text-gray-600">${char.color}</p></div>
+                    <div><strong class="font-bold text-lg text-gray-800">لمسة التركيز:</strong><p class="text-gray-600">${char.accent}</p></div>
+                </div>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        function showCardDetails(cardName, tip) {
+             modalBody.innerHTML = `
+                <h3 class="text-3xl font-bold mb-4" style="color: var(--accent);">${cardName}</h3>
+                <div><strong class="font-bold text-lg text-gray-800">نصيحة الاستخدام:</strong><p class="text-gray-600">${tip}</p></div>
+                 <div class="mt-4"><strong class="font-bold text-lg text-gray-800">المواصفات:</strong><p class="text-gray-600">ورق مقوى 300 جرام/م2، حجم 7x10 سم، كسوة مطفية.</p></div>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        function hideDetailsModal() {
+            modal.style.display = 'none';
+        }
+
+    </script>
+
+</body>
+</html>
+

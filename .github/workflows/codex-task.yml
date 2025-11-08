@@ -1,0 +1,25 @@
+name: Codex Controlled Task
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: "Command for Codex to run"
+        required: true
+        type: string
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci || npm i
+      - name: Run Codex Task
+        run: |
+          echo "Executing Codex task: ${{ github.event.inputs.task }}"
+          npm run ${{ github.event.inputs.task }}
+      - name: Generate Theme Screenshots
+        run: node tools/screenshot-pages.js || true
+      - name: Refresh Harmony Summary
+        run: npm run codex:update-harmony || true

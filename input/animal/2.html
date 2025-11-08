@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خطة تطوير ملصقات القصص العربية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Trust Palette (Sage, Coral, Sand) -->
+    <!-- Application Structure Plan: The application is designed as an interactive strategic roadmap. It starts with a high-level vision comparing the "Current State" to the "Target State" to establish context immediately. The core of the app is divided into two main interactive sections: "Product Improvement" and "Building Digital Trust". The "Digital Trust" section, being the priority, uses an interactive card system where clicking a "Problem" reveals the "Solution," making the dense table from the report engaging and digestible. This structure guides the user through the strategic narrative—from problem to solution—far more effectively than a static document. -->
+    <!-- Visualization & Content Choices: Report Info: Problem/Solution Table -> Goal: Demonstrate path to resolution -> Viz: Interactive HTML cards -> Interaction: On-click JS to reveal solution -> Justification: Transforms a static, dense table into an engaging, step-by-step exploration of solutions, enhancing comprehension and retention. | Report Info: Product improvement points -> Goal: Inform & Organize -> Viz: Styled cards with Unicode icons -> Interaction: Hover effects -> Justification: A visually appealing and easily scannable format for key recommendations. No quantitative data was present, so no charts were needed. All choices avoid SVG/Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #FDFBF5;
+        }
+        .smooth-transition {
+            transition: all 0.3s ease-in-out;
+        }
+        .solution-card {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        .solution-card.active {
+            max-height: 500px; 
+            padding-top: 1.5rem;
+            padding-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body class="bg-[#FDFBF5] text-gray-800 antialiased">
+
+    <header class="bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-800">خطة تطوير المنتج</h1>
+            <div class="hidden md:flex space-x-8 space-x-reverse">
+                <a href="#vision" class="text-gray-600 hover:text-[#F07F69] smooth-transition font-semibold">الرؤية</a>
+                <a href="#product" class="text-gray-600 hover:text-[#F07F69] smooth-transition font-semibold">تحسين المنتج</a>
+                <a href="#trust" class="text-gray-600 hover:text-[#F07F69] smooth-transition font-semibold">بناء الثقة</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-6 md:p-12">
+
+        
+        <section class="text-center py-16">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4">من نموذج أولي إلى علامة تجارية موثوقة</h2>
+            <p class="text-lg max-w-3xl mx-auto text-gray-600 mt-4">
+                خارطة طريق استراتيجية لتحويل منتج "ملصقات القصص العربية" من فكرة أولية إلى علامة تجارية ناجحة وموثوقة لدى الآباء والأمهات في العالم العربي.
+            </p>
+        </section>
+
+        
+        <section id="vision" class="py-16">
+            <h2 class="text-3xl font-bold text-center mb-12">الرؤية: مقارنة بين الوضع الحالي والمستهدف</h2>
+            <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-2xl shadow-lg border-t-8 border-red-300">
+                    <h3 class="text-2xl font-bold mb-4 text-center text-red-800">الوضع الحالي: نموذج أولي عالي المخاطر</h3>
+                    <ul class="space-y-3 text-gray-700">
+                        <li class="flex items-start"><span class="text-2xl mr-3 text-red-400">⚠️</span><span>غياب الشفافية والمصداقية.</span></li>
+                        <li class="flex items-start"><span class="text-2xl mr-3 text-red-400">❓</span><span>لا يوجد دليل جودة أو مراجعات.</span></li>
+                        <li class="flex items-start"><span class="text-2xl mr-3 text-red-400">🔒</span><span>شكوك أمنية حول الدفع.</span></li>
+                        <li class="flex items-start"><span class="text-2xl mr-3 text-red-400">📦</span><span>قيمة المنتج المادي غير واضحة.</span></li>
+                    </ul>
+                </div>
+                <div class="bg-white p-8 rounded-2xl shadow-lg border-t-8 border-green-300">
+                    <h3 class="text-2xl font-bold mb-4 text-center text-green-800">الوضع المستهدف: علامة تجارية موثوقة</h3>
+                     <ul class="space-y-3 text-gray-700">
+                        <li class="flex items-start"><span class="text-2xl mr-3 text-green-500">✅</span><span>شفافية كاملة ومعلومات اتصال واضحة.</span></li>
+                        <li class="flex items-start"><span class="text-2xl mr-3 text-green-500">⭐</span><span>دليل اجتماعي قوي (مراجعات وشهادات).</span></li>
+                        <li class="flex items-start"><span class="text-2xl mr-3 text-green-500">🛡️</span><span>تجربة دفع آمنة وموثوقة.</span></li>
+                        <li class="flex items-start"><span class="text-2xl mr-3 text-green-500">💖</span><span>منتج ذو قيمة تعليمية وفنية عالية.</span></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        
+        <section id="product" class="py-16 bg-white rounded-2xl shadow-lg">
+            <h2 class="text-3xl font-bold text-center mb-4">أولاً: تحسين وتطوير المنتج المادي</h2>
+            <p class="text-center text-gray-600 max-w-3xl mx-auto mb-12">لضمان تميز الملصقات عن المنافسين وزيادة قيمتها التعليمية، يجب التركيز على المحاور التالية.</p>
+            <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-8 text-center">
+                <div class="bg-amber-50 p-8 rounded-xl smooth-transition hover:shadow-xl hover:-translate-y-2">
+                    <div class="text-5xl mb-4">📚</div>
+                    <h3 class="text-xl font-bold mb-2">ربط الملصقات بقصص</h3>
+                    <p class="text-gray-600">تحويل الشخصيات من عامة إلى أبطال في قصص معروفة أو جديدة، مع إرفاق قصة رقمية مجانية عبر QR Code.</p>
+                </div>
+                <div class="bg-sky-50 p-8 rounded-xl smooth-transition hover:shadow-xl hover:-translate-y-2">
+                    <div class="text-5xl mb-4">✨</div>
+                    <h3 class="text-xl font-bold mb-2">تعزيز القيمة التفاعلية</h3>
+                    <p class="text-gray-600">إضافة عناصر تعلمية (اسم الحيوان، الحرف الأول) أو استخدام تقنية الواقع المعزز (AR) لإصدار صوت الحيوان.</p>
+                </div>
+                <div class="bg-rose-50 p-8 rounded-xl smooth-transition hover:shadow-xl hover:-translate-y-2">
+                    <div class="text-5xl mb-4">🛡️</div>
+                    <h3 class="text-xl font-bold mb-2">التركيز على الجودة والأمان</h3>
+                    <p class="text-gray-600">التأكيد على أن المواد **غير سامة (Non-Toxic)** ومتينة وقابلة لإعادة الاستخدام الفائقة دون ترك أي أثر.</p>
+                </div>
+            </div>
+        </section>
+
+        
+        <section id="trust" class="py-16">
+            <h2 class="text-3xl font-bold text-center mb-4">ثانياً: بناء الثقة والمصداقية الرقمية (الأولوية القصوى)</h2>
+            <p class="text-center text-gray-600 max-w-3xl mx-auto mb-12">الموقع الحالي يعاني من نقص حاد في المصداقية. هذه هي خطة العمل الفورية لمعالجة المشاكل وبناء ثقة المستخدمين. انقر على كل مشكلة لرؤية الحل المقترح.</p>
+            <div id="trust-container" class="max-w-4xl mx-auto space-y-4">
+                
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white text-center py-6 mt-12 border-t">
+        <p class="text-gray-600">&copy; 2025 خطة تطوير ملصقات القصص العربية</p>
+    </footer>
+
+    <script>
+        const trustData = [
+            {
+                problem: "غياب الشفافية",
+                solution: "إنشاء صفحات **'عنّا'** (Who We Are)، **'اتصل بنا'** (Contact Us)، و **'سياسة الخصوصية'** (Privacy Policy).",
+                goal: "إثبات أن وراء المشروع كياناً حقيقياً وإظهار المسؤولية."
+            },
+            {
+                problem: "لا يوجد دليل على الجودة",
+                solution: "عرض صور وفيديوهات عالية الجودة للمنتج *وهو قيد الاستخدام*. إظهار كيفية تفاعل الأطفال مع الملصقات وإثبات جودتها ومتانتها. يجب تضمين صور للمنتج في عبوته.",
+                goal: "إثبات جودة المنتج ومتانته بشكل عملي."
+            },
+            {
+                problem: "انعدام الثقة",
+                solution: "تخصيص قسم كامل لـ **'شهادات العملاء والمراجعات'**.",
+                goal: "بناء دليل اجتماعي (Social Proof). يمكن البدء بمراجعات من مدونين أو أولياء أمور تجريبيين."
+            },
+            {
+                problem: "الشكوك الأمنية",
+                solution: "عرض أيقونات بوابات الدفع الموثوقة (مثل مدى، فيزا) وتأكيد استخدام **تشفير SSL/HTTPS**.",
+                goal: "طمأنة المستخدم بأن بياناته المالية آمنة."
+            },
+            {
+                problem: "جمود المحتوى",
+                solution: "إضافة مدونة قصيرة عن فوائد القراءة باللغة العربية، أفكار لاستخدام الملصقات، أو قصص جديدة يتم نشرها شهرياً.",
+                goal: "تحويل الموقع إلى مصدر معلومات مفيد، وليس مجرد كتالوج مبيعات."
+            }
+        ];
+
+        const trustContainer = document.getElementById('trust-container');
+
+        trustData.forEach((item, index) => {
+            const problemId = `problem-${index}`;
+            const solutionId = `solution-${index}`;
+
+            const itemHtml = `
+                <div class="rounded-lg shadow-md overflow-hidden">
+                    <div id="${problemId}" class="problem-card bg-white p-6 cursor-pointer flex justify-between items-center smooth-transition hover:bg-gray-50">
+                        <h3 class="text-xl font-bold text-gray-800">${item.problem}</h3>
+                        <span class="text-2xl transform transition-transform duration-300">▼</span>
+                    </div>
+                    <div id="${solutionId}" class="solution-card bg-green-50 border-t border-green-200">
+                         <div class="px-6">
+                            <h4 class="text-lg font-bold text-green-800">الحل المقترح:</h4>
+                            <p class="text-green-900 mt-2">${item.solution.replace(/\*\*/g, '<strong>')}</p>
+                             <p class="text-sm text-gray-600 mt-4 pt-4 border-t border-green-100"><strong>الهدف:</strong> ${item.goal}</p>
+                         </div>
+                    </div>
+                </div>
+            `;
+            trustContainer.innerHTML += itemHtml;
+        });
+
+        document.querySelectorAll('.problem-card').forEach((card, index) => {
+            card.addEventListener('click', () => {
+                const solution = document.getElementById(`solution-${index}`);
+                const arrow = card.querySelector('span');
+                
+                const isActive = solution.classList.contains('active');
+
+                
+                document.querySelectorAll('.solution-card.active').forEach(activeSolution => {
+                    if (activeSolution !== solution) {
+                        activeSolution.classList.remove('active');
+                        const problemCard = activeSolution.previousElementSibling;
+                        problemCard.querySelector('span').style.transform = 'rotate(0deg)';
+                        problemCard.classList.remove('bg-green-50');
+                    }
+                });
+
+                
+                solution.classList.toggle('active');
+                if (solution.classList.contains('active')) {
+                    arrow.style.transform = 'rotate(180deg)';
+                    card.classList.add('bg-green-50');
+                } else {
+                    arrow.style.transform = 'rotate(0deg)';
+                    card.classList.remove('bg-green-50');
+                }
+            });
+        });
+        
+        
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetElement = document.querySelector(this.getAttribute('href'));
+                if (targetElement) {
+                     targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

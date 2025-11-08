@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محاكاة تصميم الصندوق القوي (Toyla)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8DB596;   /* الأخضر المريمي */
+            --secondary: #E5A96F; /* البيج الرملي */
+            --accent: #F07F69;    /* المرجاني المطفي */
+            --light: #FEFCF3;     /* الأبيض الكريمي */
+            --dark: #4A4A4A;      /* النص الأساسي */
+        }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+        }
+        .box-container {
+            width: 300px;
+            height: 250px;
+            perspective: 1000px;
+            transition: transform 1s;
+        }
+        .box-face {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 4px solid var(--primary);
+            box-sizing: border-box;
+            transition: transform 0.8s;
+        }
+        .front-face {
+            background-color: var(--secondary); /* البيج الرملي */
+            transform: rotateY(0deg);
+            flex-direction: column;
+            padding: 20px;
+        }
+        .back-face {
+            background-color: var(--light); /* أبيض كريمي */
+            transform: rotateY(180deg);
+            padding: 20px;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .toy-logo {
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 900;
+            font-size: 3.5rem;
+            color: var(--primary);
+            text-shadow: 2px 2px 0 var(--dark);
+        }
+        .slogan {
+            color: var(--dark);
+            font-size: 1.1rem;
+            margin-top: -10px;
+        }
+        .content-item {
+            @apply flex items-center mb-2 text-sm;
+        }
+        .content-icon {
+            @apply ml-2 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold;
+        }
+        .flip-btn {
+            background-color: var(--accent);
+            color: var(--light);
+            transition: background-color 0.3s;
+        }
+        .flip-btn:hover {
+            background-color: #d16b5a;
+        }
+        .flipped {
+            transform: rotateY(180deg);
+        }
+        /* Mobile adjustment for smaller width */
+        @media (max-width: 600px) {
+            .box-container {
+                width: 90vw;
+                height: 75vw;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased flex flex-col items-center py-12 min-h-screen">
+
+    <header class="text-center mb-10 max-w-4xl mx-auto">
+        <h1 class="text-4xl font-bold mb-2" style="color: var(--accent);">🎁 تصميم التغليف النهائي والمواصفات</h1>
+        <p class="text-lg text-gray-600">اضغط على الصندوق لتقليب الواجهة ومعاينة المحتويات والمواصفات الخلفية.</p>
+    </header>
+
+    <div id="toy-box" class="box-container relative" onclick="flipBox()">
+        
+        <!-- الواجهة الأمامية (الغطاء) -->
+        <div class="box-face front-face">
+            <span class="toy-logo">Toyla</span>
+            <p class="slogan font-bold mt-4 text-center">رحلة السرد والتفكير من قلب الصحراء</p>
+            <div class="text-center mt-6">
+                 <!-- رسم بسيط لراشد أو الجمل -->
+                <span style="font-size: 4rem; color: var(--accent);">🐪👶</span>
+            </div>
+            <p class="text-xs mt-4" style="color: var(--dark);">مناسب لعمر 4 سنوات فأكثر</p>
+        </div>
+
+        <!-- الواجهة الخلفية (المحتويات والمواصفات) -->
+        <div class="box-face back-face">
+            <h2 class="text-2xl font-bold mb-4" style="color: var(--primary); border-bottom: 3px solid var(--accent);">محتويات صندوق Toyla</h2>
+            
+            <div class="w-full">
+                <!-- قائمة المحتويات -->
+                <div class="content-item">
+                    <span class="content-icon bg-red-400" style="background-color: var(--accent);">1</span>
+                    <span class="font-bold">كتاب الخلفيات</span> (12 مشهدًا قابلاً للمسح).
+                </div>
+                <div class="content-item">
+                    <span class="content-icon bg-yellow-400" style="background-color: var(--secondary);">20</span>
+                    <span class="font-bold">شخصية تفاعلية</span> (بما في ذلك الجمل، الجدة، الطفل).
+                </div>
+                <div class="content-item">
+                    <span class="content-icon bg-green-400" style="background-color: var(--primary);">30</span>
+                    <span class="font-bold">بطاقة حوار</span> (5 فئات لتعزيز المشاعر والمنطق).
+                </div>
+                <div class="content-item">
+                    <span class="content-icon bg-gray-400" style="background-color: var(--dark); color: var(--light);">1</span>
+                    <span class="font-bold">قلم مسح</span> (Dry-Erase Marker).
+                </div>
+            </div>
+
+            <h3 class="text-lg font-bold mt-4 mb-2" style="color: var(--accent); border-bottom: 2px solid var(--secondary);">جودة المنتج:</h3>
+            <ul class="text-xs pr-4 list-disc text-gray-700">
+                <li>مصنوع من كرتون صلب متين 7 سم (للتخزين طويل الأمد).</li>
+                <li>طلاء مطفي لحماية الألوان وعناصر اللعب.</li>
+                <li>تنظيم داخلي مخصص لمنع فقدان الأجزاء.</li>
+            </ul>
+        </div>
+    </div>
+
+    <button onclick="flipBox()" class="flip-btn py-2 px-6 rounded-full font-bold mt-10 shadow-lg hover:shadow-xl">تقليب الصندوق لعرض المواصفات</button>
+
+    <script>
+        function flipBox() {
+            const box = document.getElementById('toy-box');
+            box.classList.toggle('flipped');
+        }
+    </script>
+</body>
+</html>

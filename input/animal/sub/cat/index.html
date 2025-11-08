@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎠 Toyla Conceptual Framework — v2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Noto+Sans+Arabic:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8DB596;   /* الأخضر المريمي */
+            --secondary: #E5A96F; /* البيج الرملي */
+            --accent: #F07F69;    /* المرجاني المطفي */
+            --light: #FEFCF3;     /* الأبيض الكريمي */
+            --dark: #4A4A4A;      /* النص الأساسي */
+        }
+        
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+        }
+        
+        .font-headline {
+            font-family: 'Tajawal', sans-serif;
+        }
+        
+        .font-body {
+            font-family: 'Noto Sans Arabic', sans-serif;
+        }
+        
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary) 0%, #7aa085 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-item {
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+        
+        .color-swatch {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .color-swatch:hover {
+            transform: scale(1.05);
+        }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+        }
+        
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        
+        .stage-card {
+            border-left: 4px solid var(--primary);
+        }
+        
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e5e7eb;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            transition: width 0.5s ease;
+        }
+        
+        .timeline {
+            position: relative;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            right: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: var(--primary);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            right: 14px;
+            top: 10px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            z-index: 1;
+        }
+        
+        .character-card {
+            transition: all 0.3s ease;
+        }
+        
+        .character-card:hover {
+            transform: translateY(-10px);
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="flex h-screen overflow-hidden">
+        <!-- الشريط الجانبي -->
+        <div class="sidebar w-64 text-white flex flex-col">
+            <div class="p-6 text-center border-b border-white/20">
+                <h1 class="text-2xl font-bold font-headline">🎠 تويلي</h1>
+                <p class="text-sm opacity-80 mt-1">الإطار المفاهيمي والإبداعي — v2</p>
+            </div>
+            
+            <nav class="flex-1 p-4">
+                <ul class="space-y-2">
+                    <li class="nav-item active" data-target="introduction">
+                        <a href="#" class="flex items-center p-3">
+                            <i class="fas fa-home ml-3"></i>
+                            <span>مقدمة المشروع</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-target="core-idea">
+                        <a href="#" class="flex items-center p-3">
+                            <i class="fas fa-lightbulb ml-3"></i>
+                            <span>الفكرة الجوهرية</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-target="philosophy">
+                        <a href="#" class="flex items-center p-3">
+                            <i class="fas fa-book ml-3"></i>
+                            <span>الفلسفة التربوية</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-target="concept-identity">
+                        <a href="#" class="flex items-center p-3">
+                            <i class="fas fa-globe ml-3"></i>
+                            <span>الهوية المفاهيمية</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-target="visual-identity">
+                        <a href="#" class="flex items-center p-3">
+                            <i class="fas fa-palette ml-3"></i>
+                            <span>الهوية البصرية</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-target="products">
+                        <a href="#" class="flex items-center p-3">
+                            <i class="fas fa-cube ml-3"></i>
+                            <span>المنتجات الأساسية</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-target="experience">
+                        <a href="#" class="flex items-center p-3">
+                            <i class="fas fa-child ml-3"></i>
+                            <span>تجربة الطفل</span>
+                        </a>
+                    </li>
+<li class="nav-item" data-target="oasis-product">
+    <a href="#" class="flex items-center p-3">
+        <i class="fas fa-palette ml-3"></i>
+        <span>أسرار واحة النخيل</span>
+    </a>
+</li>
+<li class="nav-item" data-target="oasis-product">
+    <a href="#" class="flex items-center p-3">
+        <i class="fas fa-palette ml-3"></i>
+        <span>رحلة النخلة السحرية</span>
+    </a>
+</li>
+                    <li class="nav-item" data-target="development">
+                        <a href="#" class="flex items-center p-3">
+                            <i class="fas fa-road ml-3"></i>
+                            <span>خطة التطوير</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-target="strategy">
+                        <a href="#" class="flex items-center p-3">
+                            <i class="fas fa-chart-line ml-3"></i>
+                            <span>الاستراتيجية</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="p-4 border-t border-white/20 text-center text-sm opacity-80">
+                <p>الإطار المفاهيمي والإبداعي &copy; 2025</p>
+            </div>
+        </div>
+        
+        <!-- المحتوى الرئيسي -->
+        <div class="flex-1 overflow-y-auto bg-gray-50">
+            <!-- قسم مقدمة المشروع -->
+            <section id="introduction" class="content-section active p-6 md:p-8">
+                <div class="max-w-6xl mx-auto">
+                    <div class="text-center mb-12">
+                        <h1 class="text-4xl font-bold mb-4 text-gray-800">🎠 Toyla Conceptual Framework — v2</h1>
+                        <p class="text-xl text-gray-600 max-w-3xl mx-auto">الدليل المفاهيمي والإبداعي المعتمد لمشروع Toyla — تويلي</p>
+                    </div>
+                    
+                    <div class="card p-8 mb-8">
+                        <h2 class="text-3xl font-bold mb-6 text-center">🧸 مقدمة المشروع</h2>
+                        <div class="grid md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <p class="text-gray-700 text-lg mb-4">
+                                    <strong>Toyla — تويلي</strong> هو مشروع فني وتربوي يدمج الخيال، اللعب، والمشاعر الإيجابية في عالم بصري دافئ مخصص للأطفال.
+                                </p>
+                                <p class="text-gray-700 text-lg">
+                                    تسعى "تويلي" لتكون أول صديقة خيالية عربية تساعد الأطفال على فهم مشاعرهم، وبناء علاقة صحية مع الخيال والتعبير عن الذات.
+                                </p>
+                            </div>
+                            <div class="bg-[var(--primary)]/10 p-6 rounded-xl text-center">
+                                <h3 class="text-xl font-bold mb-4">💬 الشعار المفاهيمي</h3>
+                                <p class="text-2xl font-bold" style="color: var(--primary);">"اللعب بالخيال، والتعلّم بالمشاعر."</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <div class="card p-6 text-center">
+                            <div class="text-5xl mb-4 text-[var(--primary)]">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3">الفكرة الأساسية</h3>
+                            <p class="text-gray-600">بناء الذكاء العاطفي (EQ) من خلال اللعب التفاعلي، وليس فقط الذكاء المعرفي (IQ)</p>
+                        </div>
+                        
+                        <div class="card p-6 text-center">
+                            <div class="text-5xl mb-4 text-[var(--accent)]">
+                                <i class="fas fa-bullseye"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3">الهدف الاستراتيجي</h3>
+                            <p class="text-gray-600">أن نكون الوجهة الأولى للهدايا الفنية التي تُترك كإرث عاطفي جميل بين الأم وطفلها</p>
+                        </div>
+                        
+                        <div class="card p-6 text-center">
+                            <div class="text-5xl mb-4 text-[var(--secondary)]">
+                                <i class="fas fa-rocket"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3">مراحل التطوير</h3>
+                            <p class="text-gray-600">خطة من ثلاث مراحل للانتقال من الفكرة إلى منتج حقيقي في السوق</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- قسم الفكرة الجوهرية -->
+            <section id="core-idea" class="content-section p-6 md:p-8">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="text-3xl font-bold mb-8 text-center">🌈 الفكرة الجوهرية</h2>
+                    
+                    <div class="card p-8 mb-8">
+                        <h3 class="text-2xl font-bold mb-6 text-center">💡 المفهوم الأساسي</h3>
+                        <div class="grid md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <p class="text-gray-700 text-lg mb-4">
+                                    <strong>"تويلي" ليست مجرد شخصية أو مجموعة استيكرات، بل هي عالم رمزي صغير يتعلّم فيه الأطفال كيف يفهمون أنفسهم ومشاعرهم من خلال التفاعل والخيال.</strong>
+                                </p>
+                                <p class="text-gray-700 text-lg">
+                                    نحن نؤمن أن الخيال هو لغة الطفل الأولى، ومن خلاله يفهم العالم من حوله ويبني علاقته مع مشاعره.
+                                </p>
+                            </div>
+                            <div class="bg-[var(--accent)]/10 p-6 rounded-xl">
+                                <h4 class="text-xl font-bold mb-4 text-center">🎯 الهدف العام</h4>
+                                <p class="text-lg text-center">زرع الإيجابية والوعي العاطفي في الأطفال عبر أدوات مرئية وتفاعلية بسيطة (استيكرات، بطاقات، قصص، محتوى رقمي).</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-8">
+                        <h3 class="text-2xl font-bold mb-6 text-center">💞 الجوهر العاطفي</h3>
+                        <div class="bg-[var(--secondary)]/10 p-6 rounded-xl text-center">
+                            <p class="text-xl italic">
+                                "تويلي ليست لعبة ولا مجرد صورة،<br>
+                                بل صديقة خيالية تحمل في قلبها قصصًا صغيرة،<br>
+                                تساعد الأطفال أن يحبّوا أنفسهم والعالم من حولهم،<br>
+                                بابتسامة صغيرة وألوان هادئة." 🌷
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- قسم الفلسفة التربوية -->
+            <section id="philosophy" class="content-section p-6 md:p-8">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="text-3xl font-bold mb-8 text-center">🪄 الفلسفة التربوية — (Imaginative Learning)</h2>
+                    
+                    <div class="card p-8 mb-8">
+                        <h3 class="text-2xl font-bold mb-6 text-center">"الخيال هو لغة الطفل الأولى، ومن خلاله يفهم العالم."</h3>
+                        
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="bg-amber-50 p-6 rounded-xl text-center">
+                                <div class="text-4xl mb-4">🌟</div>
+                                <h4 class="text-xl font-bold mb-3">اللعب هو وسيلة للتعلّم</h4>
+                                <p class="text-gray-600">الطفل يكتشف ذاته أثناء اللعب وليس عبر التلقين.</p>
+                            </div>
+                            
+                            <div class="bg-pink-50 p-6 rounded-xl text-center">
+                                <div class="text-4xl mb-4">💖</div>
+                                <h4 class="text-xl font-bold mb-3">المشاعر جزء من النمو</h4>
+                                <p class="text-gray-600">تعليم الأطفال التعبير عن مشاعرهم بطرق آمنة.</p>
+                            </div>
+                            
+                            <div class="bg-blue-50 p-6 rounded-xl text-center">
+                                <div class="text-4xl mb-4">🌈</div>
+                                <h4 class="text-xl font-bold mb-3">الخيال يبني الثقة</h4>
+                                <p class="text-gray-600">كل تفاعل خيالي يوسّع عالم الطفل الداخلي.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-8">
+                        <h3 class="text-2xl font-bold mb-6 text-center">قيمنا الأساسية</h3>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="text-center p-4">
+                                <div class="text-4xl mb-4 text-[var(--primary)]">
+                                    <i class="fas fa-heart"></i>
+                                </div>
+                                <h4 class="text-xl font-bold mb-2">التواصل العاطفي</h4>
+                                <p class="text-gray-600">نسعى لتعزيز الروابط العاطفية بين الأطفال وأسرهم من خلال أدوات تفاعلية مبتكرة</p>
+                            </div>
+                            
+                            <div class="text-center p-4">
+                                <div class="text-4xl mb-4 text-[var(--accent)]">
+                                    <i class="fas fa-palette"></i>
+                                </div>
+                                <h4 class="text-xl font-bold mb-2">الجمالية والفن</h4>
+                                <p class="text-gray-600">نقدم تصاميم فنية راقية تنمي الذوق الجمالي لدى الطفل وتناسب الذوق الرفيع للأم</p>
+                            </div>
+                            
+                            <div class="text-center p-4">
+                                <div class="text-4xl mb-4 text-[var(--secondary)]">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <h4 class="text-xl font-bold mb-2">التعلم بالترفيه</h4>
+                                <p class="text-gray-600">ندمج القيم التعليمية مع المتعة لخلق تجربة تعلم استثنائية بعيداً عن الأساليب التقليدية</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- قسم الهوية المفاهيمية -->
+            <section id="concept-identity" class="content-section p-6 md:p-8">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="text-3xl font-bold mb-8 text-center">🎭 الهوية المفاهيمية (The Toyla World)</h2>
+                    
+                    <div class="card p-8 mb-8">
+                        <h3 class="text-2xl font-bold mb-6 text-center">🎡 عالم تويلي</h3>
+                        <p class="text-center text-gray-600 max-w-3xl mx-auto mb-8">عالم لطيف ومليء بالألوان الهادئة، تسكنه شخصيات تعبّر عن مشاعر مختلفة وتعيش مغامرات صغيرة تعكس مواقف يومية للطفل.</p>
+                        
+                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="character-card bg-white p-6 rounded-xl shadow-md text-center">
+                                <div class="text-5xl mb-4">🧸</div>
+                                <h4 class="text-xl font-bold mb-2">تويلي</h4>
+                                <p class="text-gray-600">الشخصية المحورية، تمثّل اللطف والفضول</p>
+                            </div>
+                            
+                            <div class="character-card bg-white p-6 rounded-xl shadow-md text-center">
+                                <div class="text-5xl mb-4">☁️</div>
+                                <h4 class="text-xl font-bold mb-2">نونو</h4>
+                                <p class="text-gray-600">الغيمة الطيبة، تعبّر عن الهدوء والتأمل</p>
+                            </div>
+                            
+                            <div class="character-card bg-white p-6 rounded-xl shadow-md text-center">
+                                <div class="text-5xl mb-4">🌞</div>
+                                <h4 class="text-xl font-bold mb-2">بومي</h4>
+                                <p class="text-gray-600">الشمس الصغيرة، ترمز للشجاعة والبهجة</p>
+                            </div>
+                            
+                            <div class="character-card bg-white p-6 rounded-xl shadow-md text-center">
+                                <div class="text-5xl mb-4">🌷</div>
+                                <h4 class="text-xl font-bold mb-2">لولي</h4>
+                                <p class="text-gray-600">الزهرة الوردية، تمثّل المحبة والمشاركة</p>
+                            </div>
+                            
+                            <div class="character-card bg-white p-6 rounded-xl shadow-md text-center">
+                                <div class="text-5xl mb-4">🌙</div>
+                                <h4 class="text-xl font-bold mb-2">ميمي</h4>
+                                <p class="text-gray-600">القمر الحالم، يرمز للخيال والأمان</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-8">
+                        <h3 class="text-2xl font-bold mb-6 text-center">🧩 منظومة القيم (Value System)</h3>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="p-4 font-bold">القيمة</th>
+                                        <th class="p-4 font-bold">التعبير البصري</th>
+                                        <th class="p-4 font-bold">السلوك داخل القصص أو المنتجات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b">
+                                        <td class="p-4 font-bold">💖 اللطف</td>
+                                        <td class="p-4">ألوان وردية دافئة، ابتسامات صغيرة</td>
+                                        <td class="p-4">مساعدة الأصدقاء</td>
+                                    </tr>
+                                    <tr class="border-b">
+                                        <td class="p-4 font-bold">🌟 الفضول</td>
+                                        <td class="p-4">رموز النجوم والعدسات الصغيرة</td>
+                                        <td class="p-4">طرح الأسئلة واستكشاف الجديد</td>
+                                    </tr>
+                                    <tr class="border-b">
+                                        <td class="p-4 font-bold">🌈 المشاركة</td>
+                                        <td class="p-4">شخصيتان تتعاونان</td>
+                                        <td class="p-4">العمل الجماعي</td>
+                                    </tr>
+                                    <tr class="border-b">
+                                        <td class="p-4 font-bold">☁️ الهدوء</td>
+                                        <td class="p-4">خلفيات سماوية ناعمة</td>
+                                        <td class="p-4">التنفس والتأمل</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-4 font-bold">🔆 الشجاعة</td>
+                                        <td class="p-4">شمس أو ضوء ساطع</td>
+                                        <td class="p-4">مواجهة المواقف بخطوات صغيرة</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- قسم الهوية البصرية -->
+            <section id="visual-identity" class="content-section p-6 md:p-8">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="text-3xl font-bold mb-8 text-center">🎨 الهوية البصرية</h2>
+                    
+                    <div class="card p-8 mb-8">
+                        <h3 class="text-2xl font-bold mb-6 text-center">لوحة الألوان</h3>
+                        <p class="text-center text-gray-600 max-w-3xl mx-auto mb-8">تم اختيار لوحة ألوان هادئة ودافئة لتعكس الجودة والرقي الفني. انقر على أي لون لرؤية استخدامه المقترح عملياً.</p>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
+                            <div class="color-swatch text-center" data-color="#F5E5C9" data-use="background">
+                                <div class="w-full h-32 rounded-lg shadow-md mb-3" style="background-color: #F5E5C9;"></div>
+                                <h4 class="font-bold">البيج الرملي</h4>
+                                <p class="text-sm text-gray-500">#F5E5C9</p>
+                            </div>
+                            
+                            <div class="color-swatch text-center" data-color="#FEFCF3" data-use="card-background">
+                                <div class="w-full h-32 rounded-lg shadow-md mb-3 border" style="background-color: #FEFCF3;"></div>
+                                <h4 class="font-bold">الأبيض الكريمي</h4>
+                                <p class="text-sm text-gray-500">#FEFCF3</p>
+                            </div>
+                            
+                            <div class="color-swatch text-center" data-color="#8DB596" data-use="accent">
+                                <div class="w-full h-32 rounded-lg shadow-md mb-3" style="background-color: #8DB596;"></div>
+                                <h4 class="font-bold">الأخضر المريمي</h4>
+                                <p class="text-sm text-gray-500">#8DB596</p>
+                            </div>
+                            
+                            <div class="color-swatch text-center" data-color="#E5A96F" data-use="text">
+                                <div class="w-full h-32 rounded-lg shadow-md mb-3" style="background-color: #E5A96F;"></div>
+                                <h4 class="font-bold">الوردي الخجول</h4>
+                                <p class="text-sm text-gray-500">#E5A96F</p>
+                            </div>
+                            
+                            <div class="color-swatch text-center" data-color="#F07F69" data-use="cta">
+                                <div class="w-full h-32 rounded-lg shadow-md mb-3" style="background-color: #F07F69;"></div>
+                                <h4 class="font-bold">المرجاني المطفي</h4>
+                                <p class="text-sm text-gray-500">#F07F69</p>
+                            </div>
+                            
+                            <div class="color-swatch text-center" data-color="#4A4A4A" data-use="default-text">
+                                <div class="w-full h-32 rounded-lg shadow-md mb-3" style="background-color: #4A4A4A;"></div>
+                                <h4 class="font-bold">النص الأساسي</h4>
+                                <p class="text-sm text-gray-500">#4A4A4A</p>
+                            </div>
+                        </div>
+                        
+                        <div id="demo-area" class="p-8 rounded-2xl transition-all duration-300" style="background-color: #F5E5C9;">
+                            <div id="demo-card" class="bg-[#FEFCF3] rounded-xl shadow-xl p-6 transition-all duration-300">
+                                <h3 id="demo-title" class="text-2xl font-bold mb-2 transition-all duration-300" style="color: #4A4A4A;">بطاقة منتج تويلي</h3>
+                                <p id="demo-text" class="text-gray-600 mb-6 transition-all duration-300" style="color: #4A4A4A;">هذا النص يعرض كيف تبدو الخطوط والألوان معًا لتعكس هوية العلامة التجارية الدافئة والفنية.</p>
+                                <button id="demo-button" class="w-full py-3 px-4 rounded-lg font-bold text-white transition-all duration-300" style="background-color: #F07F69;">شراء الآن</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="card p-6">
+                            <h3 class="text-xl font-bold mb-4">الخطوط والطباعة</h3>
+                            
+                            <div class="space-y-6">
+                                <div>
+                                    <h4 class="font-bold mb-2 border-b pb-2">عناوين رئيسية وشعار (Tajawal)</h4>
+                                    <p class="font-headline text-3xl font-bold mb-2">جودة وفن في كل هدية</p>
+                                    <p class="text-sm text-gray-500">يعكس الاحترافية والجودة. جريء وثابت.</p>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-bold mb-2 border-b pb-2">نصوص وصفية وقصص (Noto Sans Arabic)</h4>
+                                    <p class="font-body text-lg mb-2">صُممت هذه اللعبة لتكون بداية لمحادثات دافئة ولحظات لا تُنسى بينكِ وبين طفلكِ.</p>
+                                    <p class="text-sm text-gray-500">يضمن سهولة القراءة ويعطي شعوراً بالدفء والود.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card p-6">
+                            <h3 class="text-xl font-bold mb-4">النمط الجمالي للمنتج والشخصيات</h3>
+                            <p class="text-gray-600 mb-4">النمط المختار هو <strong>الحد الأدنى باللمسة الفنية</strong>، للارتقاء بالمنتج من مجرد "لعبة" إلى "قطعة فنية".</p>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <div class="bg-[var(--primary)]/20 p-2 rounded-full ml-3 mt-1">
+                                        <i class="fas fa-paint-brush text-[var(--primary)]"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold">الشخصيات (الملصقات)</h4>
+                                        <p class="text-sm text-gray-600">خطوط بسيطة ونظيفة مع لمسة ألوان مائية تجعلها تبدو كأنها مرسومة باليد.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <div class="bg-[var(--accent)]/20 p-2 rounded-full ml-3 mt-1">
+                                        <i class="fas fa-smile text-[var(--accent)]"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold">تعبيرات واضحة</h4>
+                                        <p class="text-sm text-gray-600">تركيز على تعابير الوجه (فرح، حزن، غضب) لدعم تنمية الذكاء العاطفي.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <div class="bg-[var(--secondary)]/20 p-2 rounded-full ml-3 mt-1">
+                                        <i class="fas fa-box-open text-[var(--secondary)]"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold">التغليف والديكور</h4>
+                                        <p class="text-sm text-gray-600">تصميمات نظيفة معتمدة على البيج الرملي والأخضر المريمي مع نقوش طبيعية بسيطة.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- قسم المنتجات الأساسية -->
+            <section id="products" class="content-section p-6 md:p-8">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="text-3xl font-bold mb-8 text-center">📦 المنتجات الأساسية</h2>
+                    
+                    <div class="card p-8 mb-8">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="p-4 font-bold">المرحلة</th>
+                                        <th class="p-4 font-bold">المنتج</th>
+                                        <th class="p-4 font-bold">الهدف</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b">
+                                        <td class="p-4 font-bold">🧷 المرحلة الأولى</td>
+                                        <td class="p-4">Toyla Stickers Guide.pdf</td>
+                                        <td class="p-4">توحيد النمط الفني واختبار الجمهور.</td>
+                                    </tr>
+                                    <tr class="border-b">
+                                        <td class="p-4 font-bold">📚 المرحلة الثانية</td>
+                                        <td class="p-4">بطاقات مشاعر (Story Cards)</td>
+                                        <td class="p-4">تعليم التعبير عن المشاعر اليومية.</td>
+                                    </tr>
+                                    <tr class="border-b">
+                                        <td class="p-4 font-bold">📖 المرحلة الثالثة</td>
+                                        <td class="p-4">قصص تويلي المصوّرة القصيرة</td>
+                                        <td class="p-4">تقديم قيم تويلي في شكل قصص مصغّرة.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-4 font-bold">🌐 المرحلة الرابعة</td>
+                                        <td class="p-4">منصّة رقمية/حسابات اجتماعية</td>
+                                        <td class="p-4">نشر محتوى تعليمي خفيف ومقاطع مرسومة.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-8">
+                        <h3 class="text-2xl font-bold mb-6 text-center">المهارات النامية لدى الطفل</h3>
+                        <div class="flex flex-wrap gap-3 justify-center">
+                            <span class="bg-green-100 text-green-800 text-sm font-semibold px-3 py-2 rounded-lg flex items-center">
+                                <i class="fas fa-comment ml-2"></i> الذكاء اللغوي
+                            </span>
+                            <span class="bg-pink-100 text-pink-800 text-sm font-semibold px-3 py-2 rounded-lg flex items-center">
+                                <i class="fas fa-heart ml-2"></i> الذكاء العاطفي
+                            </span>
+                            <span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-2 rounded-lg flex items-center">
+                                <i class="fas fa-users ml-2"></i> الذكاء الاجتماعي
+                            </span>
+                            <span class="bg-yellow-100 text-yellow-800 text-sm font-semibold px-3 py-2 rounded-lg flex items-center">
+                                <i class="fas fa-hand-paper ml-2"></i> المهارات الحركية
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- قسم تجربة الطفل -->
+            <section id="experience" class="content-section p-6 md:p-8">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="text-3xl font-bold mb-8 text-center">🧠 تجربة الطفل (Emotional UX Journey)</h2>
+                    
+                    <div class="card p-8 mb-8">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="p-4 font-bold">المرحلة</th>
+                                        <th class="p-4 font-bold">التجربة</th>
+                                        <th class="p-4 font-bold">الأثر العاطفي</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b">
+                                        <td class="p-4 font-bold">👀 الاكتشاف</td>
+                                        <td class="p-4">يرى تويلي لأول مرة</td>
+                                        <td class="p-4">فضول – إعجاب</td>
+                                    </tr>
+                                    <tr class="border-b">
+                                        <td class="p-4 font-bold">🤲 التفاعل</td>
+                                        <td class="p-4">يلعب بالاستيكرات أو البطاقات</td>
+                                        <td class="p-4">فرح – ارتباط</td>
+                                    </tr>
+                                    <tr class="border-b">
+                                        <td class="p-4 font-bold">💭 الفهم</td>
+                                        <td class="p-4">يتعرّف على مشاعره من خلال القصة</td>
+                                        <td class="p-4">وعي ذاتي بسيط</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-4 font-bold">💌 المشاركة</td>
+                                        <td class="p-4">يشاركها مع الأم أو الأصدقاء</td>
+                                        <td class="p-4">فخر – تواصل عاطفي</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-8">
+                        <h3 class="text-2xl font-bold mb-6 text-center">🎯 المبدأ الأساسي</h3>
+                        <div class="bg-[var(--primary)]/10 p-6 rounded-xl text-center">
+                            <p class="text-xl font-bold">كل تفاعل مع تويلي يجب أن يترك أثرًا وجدانيًا.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- قسم منتج أسرار واحة النخيل -->
+<section id="oasis-product" class="content-section p-6 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-4 text-gray-800">🌴 أسرار واحة النخيل</h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">أول منتج تفاعلي من تويلي - رحلة عاطفية في قلب الصحراء العربية</p>
+        </div>
+
+        <!-- الهوية والتصميم العام -->
+        <div class="card p-8 mb-8">
+            <h2 class="text-3xl font-bold mb-6 text-center">🌅 الهوية والتصميم العام للمنتج</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <div class="bg-amber-50 p-6 rounded-xl">
+                    <h3 class="text-xl font-bold mb-4 text-center">المعلومات الأساسية</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="font-bold">اسم المجموعة:</span>
+                            <span class="text-[var(--primary)]">أسرار واحة النخيل</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="font-bold">البيئة الثيمية:</span>
+                            <span>الصحراء والواحة الخضراء</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="font-bold">المهارة المستهدفة:</span>
+                            <span>التكيف مع التحديات والتعاطف</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="font-bold">الفئة العمرية:</span>
+                            <span>3-7 سنوات</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-bold">المكانة السوقية:</span>
+                            <span class="text-[var(--accent)]">طقم هدية فاخرة</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-green-50 p-6 rounded-xl">
+                    <h3 class="text-xl font-bold mb-4 text-center">القيمة التعليمية</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-start">
+                            <i class="fas fa-heart text-[var(--primary)] ml-2 mt-1"></i>
+                            <span>تنمية الذكاء العاطفي (EQ)</span>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-brain text-[var(--primary)] ml-2 mt-1"></i>
+                            <span>تعزيز مهارات حل المشكلات</span>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-users text-[var(--primary)] ml-2 mt-1"></i>
+                            <span>تنمية التعاطف والتعاون</span>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-lightbulb text-[var(--primary)] ml-2 mt-1"></i>
+                            <span>تحفيز الخيال والإبداع</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-[var(--primary)]/10 p-6 rounded-xl text-center">
+                <h4 class="text-xl font-bold mb-3">الشعار التسويقي</h4>
+                <p class="text-lg italic">"اكتشفي خيال طفلك وساعديه على فهم مشاعره. أسرار واحة النخيل: القصة التي يكتبها طفلك بنفسه."</p>
+            </div>
+        </div>
+
+        <!-- المكونات التفصيلية -->
+        <div class="card p-8 mb-8">
+            <h2 class="text-3xl font-bold mb-6 text-center">📦 المكونات التفصيلية للمجموعة</h2>
+            <p class="text-center text-gray-600 mb-8">تم تصميم كل مكون ليعمل بشكل تآزري مع باقي المكونات لضمان تجربة لعب مفتوحة ومحفزة للخيال</p>
+            
+            <div class="space-y-8">
+                <!-- الكتاب القاعدي -->
+                <div class="bg-white p-6 rounded-xl border-2 border-amber-200">
+                    <div class="flex items-start mb-4">
+                        <div class="bg-amber-100 p-3 rounded-full ml-4">
+                            <i class="fas fa-book text-amber-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold">1. الكتاب القاعدي (مسرح القصة)</h3>
+                            <p class="text-gray-600">القلب النابض للتجربة التفاعلية</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-bold mb-3 text-[var(--primary)]">المواصفات:</h4>
+                            <ul class="list-disc pr-5 space-y-2 text-gray-600">
+                                <li>كتاب ورقي سميك بمقاس A4 أفقي</li>
+                                <li>10-12 صفحة ذات رسومات خلفية عالية الجودة</li>
+                                <li>أسطح مصقولة (Laminated) للمتانة وسهولة التنظيف</li>
+                                <li>يتضمن "دليل البصيرة الأسرية" للأم والأب</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-3 text-[var(--primary)]">الخلفيات:</h4>
+                            <div class="grid grid-cols-2 gap-2">
+                                <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2 py-1 rounded text-center">كثبان رملية واسعة</span>
+                                <span class="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded text-center">واحة نخيل خضراء</span>
+                                <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded text-center">سماء الليل والنجوم</span>
+                                <span class="bg-orange-100 text-orange-800 text-xs font-semibold px-2 py-1 rounded text-center">خيمة بدوية بسيطة</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- الشخصيات التفاعلية -->
+                <div class="bg-white p-6 rounded-xl border-2 border-green-200">
+                    <div class="flex items-start mb-4">
+                        <div class="bg-green-100 p-3 rounded-full ml-4">
+                            <i class="fas fa-users text-green-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold">2. الشخصيات التفاعلية</h3>
+                            <p class="text-gray-600">أبطال القصة الذين ينبضون بالحياة</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-bold mb-3 text-[var(--primary)]">الشخصيات الأساسية:</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center">
+                                    <span class="text-2xl ml-3">👦</span>
+                                    <div>
+                                        <strong>"سالم"</strong>
+                                        <p class="text-sm text-gray-600">طفل عربي محلي يرتدي زياً تقليدياً</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-2xl ml-3">🐫</span>
+                                    <div>
+                                        <strong>"الجمل الودود"</strong>
+                                        <p class="text-sm text-gray-600">حيوان أساسي في بيئة الصحراء</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-2xl ml-3">🦊</span>
+                                    <div>
+                                        <strong>"الثعلب الفضولي"</strong>
+                                        <p class="text-sm text-gray-600">يمثل التحدي ويحتاج للمساعدة</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-2xl ml-3">👧</span>
+                                    <div>
+                                        <strong>"نجمة"</strong>
+                                        <p class="text-sm text-gray-600">فتاة باحثة عن المغامرة</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-3 text-[var(--primary)]">التصميم والتقنية:</h4>
+                            <ul class="list-disc pr-5 space-y-2 text-gray-600">
+                                <li>طباعة رقمية عالية الجودة على فوم دعائي متين</li>
+                                <li>ألوان زاهية ومتينة مقاومة للبلى</li>
+                                <li>تقنية لصق خفيف قابلة لإعادة الاستخدام</li>
+                                <li>سهلة التثبيت والإزالة دون إتلاف الأسطح</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- بطاقات المشاعر والأفعال -->
+                <div class="bg-white p-6 rounded-xl border-2 border-blue-200">
+                    <div class="flex items-start mb-4">
+                        <div class="bg-blue-100 p-3 rounded-full ml-4">
+                            <i class="fas fa-cards text-blue-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold">3. بطاقات المشاعر والأفعال</h3>
+                            <p class="text-gray-600">أدوات تنمية الذكاء العاطفي (EQ)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-bold mb-3 text-[var(--primary)]">بطاقات المشاعر (6 بطاقات):</h4>
+                            <div class="grid grid-cols-2 gap-2 mb-4">
+                                <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-1 rounded text-center">😊 الفرح</span>
+                                <span class="bg-purple-100 text-purple-800 text-xs font-semibold px-2 py-1 rounded text-center">😨 الخوف</span>
+                                <span class="bg-pink-100 text-pink-800 text-xs font-semibold px-2 py-1 rounded text-center">💖 التعاطف</span>
+                                <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2 py-1 rounded text-center">😴 التعب</span>
+                                <span class="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded text-center">🔍 الاكتشاف</span>
+                                <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded text-center">😢 الحزن</span>
+                            </div>
+                            
+                            <h4 class="font-bold mb-3 text-[var(--primary)]">بطاقات الأفعال (6 بطاقات):</h4>
+                            <div class="grid grid-cols-2 gap-2">
+                                <span class="bg-orange-100 text-orange-800 text-xs font-semibold px-2 py-1 rounded text-center">🔎 البحث</span>
+                                <span class="bg-teal-100 text-teal-800 text-xs font-semibold px-2 py-1 rounded text-center">🤝 المساعدة</span>
+                                <span class="bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded text-center">🏃 الهروب</span>
+                                <span class="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2 py-1 rounded text-center">👥 التعاون</span>
+                                <span class="bg-lime-100 text-lime-800 text-xs font-semibold px-2 py-1 rounded text-center">🍎 الأكل/الشرب</span>
+                                <span class="bg-cyan-100 text-cyan-800 text-xs font-semibold px-2 py-1 rounded text-center">🧭 الاهتداء</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-3 text-[var(--primary)]">طريقة الاستخدام:</h4>
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-700 mb-3">يطلب من الطفل أثناء إنشاء قصته أن:</p>
+                                <ol class="list-decimal pr-5 space-y-2 text-sm text-gray-600">
+                                    <li>يضع بطاقة مشاعر بجانب الشخصية التي يختارها</li>
+                                    <li>يضع بطاقة الأفعال في مسار القصة</li>
+                                    <li>يربط بين المشاعر والأفعال في السرد</li>
+                                    <li>يتعلم التعبير عن المشاعر بشكل بناء</li>
+                                </ol>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-3">هذا الأسلوب ينمي الحصيلة اللغوية والقدرة على الربط بين الأحداث والمشاعر.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- التغليف والهدايا -->
+                <div class="bg-white p-6 rounded-xl border-2 border-purple-200">
+                    <div class="flex items-start mb-4">
+                        <div class="bg-purple-100 p-3 rounded-full ml-4">
+                            <i class="fas fa-gift text-purple-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold">4. التغليف وتقديم الهدية</h3>
+                            <p class="text-gray-600">لمسة فاخرة تليق بقيمة المنتج</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-bold mb-3 text-[var(--primary)]">صندوق التجميع:</h4>
+                            <ul class="list-disc pr-5 space-y-2 text-gray-600">
+                                <li>صندوق متين ومصقول يحمل شعار تويلي</li>
+                                <li>تصميم فني يعكس هوية المنتج الصحراوية</li>
+                                <li>مواد صديقة للبيئة وعالية الجودة</li>
+                                <li>تنفيذ محلي بالتعاون مع مطابع سعودية</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-3 text-[var(--primary)]">الهدية الإضافية (اختياري):</h4>
+                            <div class="bg-purple-50 p-4 rounded-lg">
+                                <div class="flex items-center mb-2">
+                                    <span class="text-2xl ml-2">🏺</span>
+                                    <strong class="mr-2">تحفة فنية خزفية مصغرة</strong>
+                                </div>
+                                <ul class="list-disc pr-5 text-sm text-gray-600 space-y-1">
+                                    <li>كوب (Mug) أو تمثال صغير (Figurine)</li>
+                                    <li>تحمل رمزاً من رموز الصحراء (نخلة/جمل)</li>
+                                    <li>تصنيع يدوي بالتعاون مع ورش فنية في الرياض</li>
+                                    <li>تضيف قيمة فاخرة وتبرر التسعير المرتفع</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- استراتيجية التسويق -->
+        <div class="card p-8 mb-8">
+            <h2 class="text-3xl font-bold mb-6 text-center">🎯 استراتيجية التسويق الأولية</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white p-6 rounded-xl">
+                    <h3 class="text-xl font-bold mb-4 text-center">المحتوى الموجه للأمهات</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <i class="fas fa-video text-[var(--primary)] ml-2 mt-1"></i>
+                            <div>
+                                <h4 class="font-bold">فيديوهات تعليمية (Tutorials)</h4>
+                                <p class="text-sm text-gray-600">توضيح كيفية استخدام بطاقات المشاعر لتعزيز الذكاء العاطفي</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-child text-[var(--accent)] ml-2 mt-1"></i>
+                            <div>
+                                <h4 class="font-bold">عروض عملية</h4>
+                                <p class="text-sm text-gray-600">إظهار كيفية استخدام المجسمات لتطوير مهارات الفهم والاستنتاج</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-star text-[var(--secondary)] ml-2 mt-1"></i>
+                            <div>
+                                <h4 class="font-bold">شهادات حقيقية</h4>
+                                <p class="text-sm text-gray-600">عرض تجارب أمهات وأطفال استخدموا المنتج</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl">
+                    <h3 class="text-xl font-bold mb-4 text-center">بناء المصداقية</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 ml-2 mt-1"></i>
+                            <div>
+                                <h4 class="font-bold">الجودة المحلية</h4>
+                                <p class="text-sm text-gray-600">التأكيد على أن المكونات مصنوعة محلياً بجودة عالية</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-graduation-cap text-blue-500 ml-2 mt-1"></i>
+                            <div>
+                                <h4 class="font-bold">فوائد موثقة تربوياً</h4>
+                                <p class="text-sm text-gray-600">التركيز على فوائد تعزيز النضج النفسي والاجتماعي</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-brain text-purple-500 ml-2 mt-1"></i>
+                            <div>
+                                <h4 class="font-bold">تنمية شاملة</h4>
+                                <p class="text-sm text-gray-600">إبراز دور المنتج في تنمية الخيال والإبداع</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-[var(--accent)]/10 p-6 rounded-xl">
+                <h4 class="text-xl font-bold mb-3 text-center">قنوات التسويق المقترحة</h4>
+                <div class="grid md:grid-cols-4 gap-4 text-center">
+                    <div class="bg-white p-3 rounded-lg">
+                        <i class="fab fa-instagram text-pink-500 text-2xl mb-2"></i>
+                        <p class="font-bold">Instagram</p>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg">
+                        <i class="fab fa-tiktok text-black text-2xl mb-2"></i>
+                        <p class="font-bold">TikTok</p>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg">
+                        <i class="fab fa-youtube text-red-500 text-2xl mb-2"></i>
+                        <p class="font-bold">YouTube</p>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg">
+                        <i class="fas fa-store text-[var(--primary)] text-2xl mb-2"></i>
+                        <p class="font-bold">متاجر التجزئة</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- الفوائد التربوية -->
+        <div class="card p-8">
+            <h2 class="text-3xl font-bold mb-6 text-center">🧠 الفوائد التربوية والتنموية</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4 text-center">المهارات المعرفية</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center p-3 bg-blue-50 rounded-lg">
+                            <i class="fas fa-language text-blue-500 ml-2"></i>
+                            <span>تنمية الحصيلة اللغوية والتعبير</span>
+                        </div>
+                        <div class="flex items-center p-3 bg-green-50 rounded-lg">
+                            <i class="fas fa-puzzle-piece text-green-500 ml-2"></i>
+                            <span>تعزيز مهارات حل المشكلات</span>
+                        </div>
+                        <div class="flex items-center p-3 bg-purple-50 rounded-lg">
+                            <i class="fas fa-lightbulb text-purple-500 ml-2"></i>
+                            <span>تحفيز التفكير الإبداعي والابتكار</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-bold mb-4 text-center">المهارات العاطفية والاجتماعية</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center p-3 bg-pink-50 rounded-lg">
+                            <i class="fas fa-heart text-pink-500 ml-2"></i>
+                            <span>تنمية الذكاء العاطفي (EQ)</span>
+                        </div>
+                        <div class="flex items-center p-3 bg-orange-50 rounded-lg">
+                            <i class="fas fa-hands-helping text-orange-500 ml-2"></i>
+                            <span>تعزيز التعاطف والتعاون</span>
+                        </div>
+                        <div class="flex items-center p-3 bg-teal-50 rounded-lg">
+                            <i class="fas fa-user-friends text-teal-500 ml-2"></i>
+                            <span>تحسين المهارات الاجتماعية</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 bg-gradient-to-r from-amber-100 to-green-100 p-6 rounded-xl text-center">
+                <h4 class="text-xl font-bold mb-3">القيمة المضافة الفريدة</h4>
+                <p class="text-lg">"أسرار واحة النخيل" لا يقدم فقط متعة اللعب، بل يبني أساساً قوياً للنمو العاطفي والمعرفي الذي سيستفيد منه الطفل طوال حياته.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- قسم منتج رحلة النخلة السحرية -->
+<section id="oasis-product" class="content-section p-6 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- الهيرو -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-4 text-gray-800">🌴 رحلة النخلة السحرية – أسرار واحة النخيل</h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">تجربة تفاعلية ساحرة تدمج الخيال مع التعليم العاطفي في قلب الواحة العربية</p>
+        </div>
+
+        <!-- الفكرة الأساسية -->
+        <div class="card p-8 mb-8">
+            <h2 class="text-3xl font-bold mb-6 text-center">💡 الفكرة الأساسية</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <p class="text-gray-700 text-lg mb-6">
+                        منتج تفاعلي مبتكر يدمج الخيال مع التعليم العاطفي، حيث يكتشف الطفل عالم واحة النخيل الساحر ويتعلم قيمًا إنسانية عميقة من خلال مغامرات شيقة.
+                    </p>
+                    
+                    <div class="bg-gradient-to-r from-green-50 to-amber-50 p-6 rounded-xl">
+                        <h4 class="text-xl font-bold mb-4 text-center">القيم الأساسية التي يقدمها المنتج:</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-handshake text-green-600 ml-2"></i>
+                                <span>الصداقة والتعاون</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-shield-alt text-blue-600 ml-2"></i>
+                                <span>الشجاعة وحل المشكلات</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-leaf text-emerald-600 ml-2"></i>
+                                <span>الحفاظ على البيئة</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-heart text-pink-600 ml-2"></i>
+                                <span>الرعاية والاهتمام</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-[var(--primary)]/10 p-6 rounded-xl text-center">
+                    <h3 class="text-2xl font-bold mb-4">🎯 الأهداف التربوية</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <i class="fas fa-brain text-[var(--primary)] ml-2 mt-1"></i>
+                            <span>تطوير الوعي العاطفي والذكاء العاطفي (EQ)</span>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-lightbulb text-[var(--primary)] ml-2 mt-1"></i>
+                            <span>تعزيز الخيال والإبداع لدى الأطفال</span>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-comments text-[var(--primary)] ml-2 mt-1"></i>
+                            <span>تحسين مهارات التواصل والتعبير</span>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-puzzle-piece text-[var(--primary)] ml-2 mt-1"></i>
+                            <span>تنمية مهارات حل المشكلات</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- مكونات المنتج -->
+        <div class="card p-8 mb-8">
+            <h2 class="text-3xl font-bold mb-6 text-center">📦 مكونات المنتج التفاعلي</h2>
+            <p class="text-center text-gray-600 mb-8">مجموعة متكاملة من المكونات التفاعلية المصممة لتقديم تجربة تعليمية شاملة وممتعة</p>
+            
+            <div class="space-y-8">
+                <!-- الكتاب المصور التفاعلي -->
+                <div class="bg-white p-6 rounded-xl border-2 border-green-200">
+                    <div class="flex items-start mb-4">
+                        <div class="bg-green-100 p-3 rounded-full ml-4">
+                            <i class="fas fa-book-open text-green-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold">أ. الكتاب المصور التفاعلي</h3>
+                            <p class="text-gray-600">قلب التجربة التعليمية - قصص مصورة تفاعلية</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-bold mb-3 text-[var(--primary)]">المحتوى القصصي:</h4>
+                            <ul class="list-disc pr-5 space-y-2 text-gray-600">
+                                <li>قصص قصيرة مصورة عن نخلة سحرية وشخصيات الواحة</li>
+                                <li>شخصيات متنوعة: حيوانات، طيور، أطفال، كائنات سحرية</li>
+                                <li>مغامرات يومية تعكس مواقف حياتية واقعية</li>
+                                <li>حوارات بسيطة تناسب الفئة العمرية 3-7 سنوات</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-3 text-[var(--primary)]">التفاعلات المبتكرة:</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center p-3 bg-blue-50 rounded-lg">
+                                    <span class="text-xl ml-2">🔄</span>
+                                    <div>
+                                        <strong>نقاط اختيار المسار</strong>
+                                        <p class="text-sm text-gray-600">(Decision Points) - يختار الطفل اتجاه القصة</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center p-3 bg-purple-50 rounded-lg">
+                                    <span class="text-xl ml-2">🧩</span>
+                                    <div>
+                                        <strong>ألغاز صغيرة</strong>
+                                        <p class="text-sm text-gray-600">مرتبطة بالقيم والمبادئ التعليمية</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center p-3 bg-orange-50 rounded-lg">
+                                    <span class="text-xl ml-2">🎨</span>
+                                    <div>
+                                        <strong>أنشطة تلوين وتطابق</strong>
+                                        <p class="text-sm text-gray-600">تفعيل المشاركة الإبداعية</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- بطاقات المشاعر والشخصيات -->
+                <div class="bg-white p-6 rounded-xl border-2 border-pink-200">
+                    <div class="flex items-start mb-4">
+                        <div class="bg-pink-100 p-3 rounded-full ml-4">
+                            <i class="fas fa-cards text-pink-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold">ب. بطاقات المشاعر والشخصيات</h3>
+                            <p class="text-gray-600">أدوات التعبير العاطفي والتعرف على المشاعر</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-bold mb-3 text-[var(--primary)]">مجموعة المشاعر (12 بطاقة):</h4>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="bg-yellow-100 p-3 rounded-lg text-center">
+                                    <span class="text-2xl">😊</span>
+                                    <p class="text-sm font-bold">الفرح</p>
+                                </div>
+                                <div class="bg-purple-100 p-3 rounded-lg text-center">
+                                    <span class="text-2xl">😨</span>
+                                    <p class="text-sm font-bold">الخوف</p>
+                                </div>
+                                <div class="bg-blue-100 p-3 rounded-lg text-center">
+                                    <span class="text-2xl">🤔</span>
+                                    <p class="text-sm font-bold">الفضول</p>
+                                </div>
+                                <div class="bg-red-100 p-3 rounded-lg text-center">
+                                    <span class="text-2xl">❤️</span>
+                                    <p class="text-sm font-bold">الحب</p>
+                                </div>
+                                <div class="bg-gray-100 p-3 rounded-lg text-center">
+                                    <span class="text-2xl">😢</span>
+                                    <p class="text-sm font-bold">الحزن</p>
+                                </div>
+                                <div class="bg-green-100 p-3 rounded-lg text-center">
+                                    <span class="text-2xl">🤗</span>
+                                    <p class="text-sm font-bold">التعاطف</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-3 text-[var(--primary)]">طريقة الاستخدام:</h4>
+                            <div class="bg-pink-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-700 mb-3">يساعد الطفل على:</p>
+                                <ul class="list-disc pr-5 space-y-2 text-sm text-gray-600">
+                                    <li>التعبير عن مشاعره الخاصة</li>
+                                    <li>ربط المشاعر بمواقف الشخصيات</li>
+                                    <li>فهم مشاعر الآخرين</li>
+                                    <li>تطوير الذكاء العاطفي (EQ)</li>
+                                </ul>
+                            </div>
+                            <div class="mt-4 bg-white p-3 rounded-lg border">
+                                <p class="text-sm text-gray-600">"عندما تشعر الشخصية بالخوف، ماذا يمكن أن تفعل؟" - أسئلة تحفيزية</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- الملصقات والقطع التفاعلية -->
+                <div class="bg-white p-6 rounded-xl border-2 border-amber-200">
+                    <div class="flex items-start mb-4">
+                        <div class="bg-amber-100 p-3 rounded-full ml-4">
+                            <i class="fas fa-sticky-note text-amber-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold">ج. الملصقات والقطع التفاعلية</h3>
+                            <p class="text-gray-600">عالم إبداعي من التزيين والتشكيل</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-bold mb-3 text-[var(--primary)]">المجموعة الإبداعية:</h4>
+                            <ul class="list-disc pr-5 space-y-2 text-gray-600">
+                                <li>50+ ملصق تفاعلي بأشكال وأحجام مختلفة</li>
+                                <li>قطع قابلة لإعادة الاستخدام واللصق</li>
+                                <li>تصاميم مستوحاة من بيئة الواحة</li>
+                                <li>مواد آمنة وصديقة للأطفال</li>
+                            </ul>
+                            
+                            <h4 class="font-bold mb-3 mt-4 text-[var(--primary)]">أنماط التصميم:</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">نخيل وأشجار</span>
+                                <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded">حيوانات الواحة</span>
+                                <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-1 rounded">عناصر طبيعية</span>
+                                <span class="bg-purple-100 text-purple-800 text-xs font-semibold px-2 py-1 rounded">رموز سحرية</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-3 text-[var(--primary)]">الفوائد التربوية:</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-start">
+                                    <i class="fas fa-palette text-purple-500 ml-2 mt-1"></i>
+                                    <div>
+                                        <strong>تعزيز الإبداع البصري</strong>
+                                        <p class="text-sm text-gray-600">من خلال تزيين المشاهد وتكوين تركيبات جديدة</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <i class="fas fa-hands text-blue-500 ml-2 mt-1"></i>
+                                    <div>
+                                        <strong>تنمية المهارات الحركية</strong>
+                                        <p class="text-sm text-gray-600">تحسين التنسيق بين اليد والعين</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <i class="fas fa-vector-square text-green-500 ml-2 mt-1"></i>
+                                    <div>
+                                        <strong>تنمية الإدراك المكاني</strong>
+                                        <p class="text-sm text-gray-600">فهم العلاقات بين الأشكال والمساحات</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- القيمة التعليمية -->
+        <div class="card p-8 mb-8">
+            <h2 class="text-3xl font-bold mb-6 text-center">🎓 القيمة التعليمية الشاملة</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-xl border-l-4 border-blue-500">
+                        <h3 class="text-xl font-bold mb-3 flex items-center">
+                            <i class="fas fa-comments text-blue-500 ml-2"></i>
+                            التواصل العاطفي
+                        </h3>
+                        <p class="text-gray-600">تعزيز الروابط بين الطفل وأسرته أو أصدقائه من خلال الأنشطة التفاعلية المشتركة، وتطوير مهارات الاستماع والتعبير عن المشاعر.</p>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-xl border-l-4 border-purple-500">
+                        <h3 class="text-xl font-bold mb-3 flex items-center">
+                            <i class="fas fa-lightbulb text-purple-500 ml-2"></i>
+                            تنمية الخيال والإبداع
+                        </h3>
+                        <p class="text-gray-600">تمكين الطفل من خلق مشاهد وخيارات مختلفة داخل القصة، وتشجيعه على ابتكار نهايات بديلة وحلول إبداعية للتحديات.</p>
+                    </div>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-xl border-l-4 border-green-500">
+                        <h3 class="text-xl font-bold mb-3 flex items-center">
+                            <i class="fas fa-leaf text-green-500 ml-2"></i>
+                            التعلم البيئي
+                        </h3>
+                        <p class="text-gray-600">تعليم الطفل أهمية الحفاظ على الواحة والنخيل والكائنات الحية، وغرس قيم المسؤولية البيئية والاستدامة منذ الصغر.</p>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-xl border-l-4 border-pink-500">
+                        <h3 class="text-xl font-bold mb-3 flex items-center">
+                            <i class="fas fa-palette text-pink-500 ml-2"></i>
+                            الجمالية والفن
+                        </h3>
+                        <p class="text-gray-600">تنمية الذوق الفني من خلال ألوان وتصاميم راقية وجذابة، وتعريف الطفل بمفاهيم التناغم اللوني والتوازن البصري.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 bg-gradient-to-r from-blue-50 to-green-50 p-6 rounded-xl">
+                <h4 class="text-xl font-bold mb-4 text-center">📊 المهارات المكتسبة</h4>
+                <div class="grid md:grid-cols-4 gap-4 text-center">
+                    <div class="bg-white p-4 rounded-lg">
+                        <div class="text-2xl mb-2">💬</div>
+                        <p class="font-bold">المهارات اللغوية</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg">
+                        <div class="text-2xl mb-2">🧠</div>
+                        <p class="font-bold">التفكير النقدي</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg">
+                        <div class="text-2xl mb-2">❤️</div>
+                        <p class="font-bold">الذكاء العاطفي</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg">
+                        <div class="text-2xl mb-2">🎨</div>
+                        <p class="font-bold">الإبداع الفني</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- الشكل البصري -->
+        <div class="card p-8 mb-8">
+            <h2 class="text-3xl font-bold mb-6 text-center">🎨 الشكل البصري والهوية الفنية</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">لوحة الألوان المستوحاة من الطبيعة</h3>
+                    <div class="grid grid-cols-4 gap-4 mb-6">
+                        <div class="text-center">
+                            <div class="w-16 h-16 rounded-lg bg-green-600 mx-auto mb-2"></div>
+                            <p class="text-sm font-bold">أخضر النخيل</p>
+                            <p class="text-xs text-gray-600">#16a34a</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-16 h-16 rounded-lg bg-amber-400 mx-auto mb-2"></div>
+                            <p class="text-sm font-bold">أصفر الرمال</p>
+                            <p class="text-xs text-gray-600">#f59e0b</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-16 h-16 rounded-lg bg-orange-500 mx-auto mb-2"></div>
+                            <p class="text-sm font-bold">برتقالي الغروب</p>
+                            <p class="text-xs text-gray-600">#f97316</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-16 h-16 rounded-lg bg-pink-400 mx-auto mb-2"></div>
+                            <p class="text-sm font-bold">وردي الفاتح</p>
+                            <p class="text-xs text-gray-600">#f472b6</p>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold mb-4">الخطوط العربية</h3>
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="font-tajawal text-xl text-center">هذا نموذج لخط Tajawal</p>
+                            <p class="text-sm text-gray-600 text-center">خط عربي واضح وبسيط يناسب الأطفال</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-bold mb-4">الشخصيات الكرتونية</h3>
+                    <div class="bg-amber-50 p-6 rounded-xl">
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div class="text-center">
+                                <div class="text-4xl mb-2">🧑</div>
+                                <p class="font-bold">سالم</p>
+                                <p class="text-sm text-gray-600">الطفل المغامر</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-4xl mb-2">👧</div>
+                                <p class="font-bold">نورة</p>
+                                <p class="text-sm text-gray-600">الفتاة الذكية</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="text-center">
+                                <div class="text-3xl mb-1">🐫</div>
+                                <p class="text-xs">الجمل</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-3xl mb-1">🦊</div>
+                                <p class="text-xs">الثعلب</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-3xl mb-1">🐦</div>
+                                <p class="text-xs">العصفور</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h4 class="font-bold mb-3">مميزات التصميم:</h4>
+                        <ul class="list-disc pr-5 space-y-2 text-gray-600">
+                            <li>شخصيات كرتونية محببة وسهلة التمييز</li>
+                            <li>تتناسب مع عالم الواحة الطبيعي</li>
+                            <li>تعبيرات وجه واضحة تعبر عن المشاعر</li>
+                            <li>ألوان نابضة بالحياة وجذابة للأطفال</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- تجربة الطفل -->
+        <div class="card p-8">
+            <h2 class="text-3xl font-bold mb-6 text-center">🌟 رحلة الطفل العاطفية</h2>
+            
+            <div class="space-y-8">
+                <!-- المرحلة 1 -->
+                <div class="flex flex-col md:flex-row items-center gap-6">
+                    <div class="bg-blue-100 p-6 rounded-full text-blue-600 text-2xl w-20 h-20 flex items-center justify-center">
+                        1️⃣
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold mb-3">اللقاء الأول مع الواحة</h3>
+                        <p class="text-gray-600 mb-4">يبدأ الطفل رحلته باكتشاف الكتاب المليء بالألوان الزاهية والشخصيات الجذابة. الصفحات الأولى تقدم عالم الواحة الساحر بأسلوب مبسط وشيق.</p>
+                        <div class="bg-blue-50 p-3 rounded-lg">
+                            <p class="text-sm text-blue-700">"مرحباً! أنا النخلة السحرية، سأصاحبك في رحلة ممتعة عبر واحتنا الجميلة"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- المرحلة 2 -->
+                <div class="flex flex-col md:flex-row items-center gap-6">
+                    <div class="bg-green-100 p-6 rounded-full text-green-600 text-2xl w-20 h-20 flex items-center justify-center">
+                        2️⃣
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold mb-3">الانخراط في القصة</h3>
+                        <p class="text-gray-600 mb-4">يشارك الطفل بنشاط في توجيه أحداث القصة من خلال اختيار المسارات وحل الألغاز. كل قرار يتخذه الطفل يؤثر على تطور الأحداث.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">اختيار المسار</span>
+                            <span class="bg-purple-100 text-purple-800 text-sm font-semibold px-3 py-1 rounded-full">حل الألغاز</span>
+                            <span class="bg-orange-100 text-orange-800 text-sm font-semibold px-3 py-1 rounded-full">اتخاذ القرارات</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- المرحلة 3 -->
+                <div class="flex flex-col md:flex-row items-center gap-6">
+                    <div class="bg-pink-100 p-6 rounded-full text-pink-600 text-2xl w-20 h-20 flex items-center justify-center">
+                        3️⃣
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold mb-3">التعبير العاطفي</h3>
+                        <p class="text-gray-600 mb-4">يستخدم الطفل بطاقات المشاعر للتعبير عن مشاعره وربطها بمشاعر الشخصيات. هذه المرحلة crucial لتنمية الذكاء العاطفي.</p>
+                        <div class="bg-pink-50 p-4 rounded-lg">
+                            <p class="text-sm text-pink-700 font-bold mb-2">أسئلة تحفيزية:</p>
+                            <ul class="list-disc pr-5 text-sm text-pink-600 space-y-1">
+                                <li>"كيف تشعر الشخصية في هذا الموقف؟"</li>
+                                <li>"متى شعرت بنفس هذا الشعور؟"</li>
+                                <li>"ماذا يمكننا فعل لمساعدة الشخصية؟"</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- المرحلة 4 -->
+                <div class="flex flex-col md:flex-row items-center gap-6">
+                    <div class="bg-purple-100 p-6 rounded-full text-purple-600 text-2xl w-20 h-20 flex items-center justify-center">
+                        4️⃣
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold mb-3">المشاركة والإبداع</h3>
+                        <p class="text-gray-600 mb-4">ينتقل الطفل إلى مرحلة الإبداع العملي من خلال التلوين واللصق، ثم يشارك قصته وإبداعاته مع الأسرة أو الأصدقاء.</p>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">🎨</div>
+                                <p class="text-sm font-bold">التلوين</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">📖</div>
+                                <p class="text-sm font-bold">سرد القصة</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">👨‍👩‍👧‍👦</div>
+                                <p class="text-sm font-bold">المشاركة العائلية</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 bg-gradient-to-r from-purple-100 to-pink-100 p-6 rounded-xl text-center">
+                <h4 class="text-xl font-bold mb-3">النتيجة النهائية</h4>
+                <p class="text-lg">طفل أكثر وعياً بمشاعره، أكثر إبداعاً في تفكيره، وأكثر ثقة في تعبيره عن ذاته - مستعد لمواجهة تحديات الحياة بمرونة وإيجابية.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+            <!-- قسم خطة التطوير -->
+            <section id="development" class="content-section p-6 md:p-8">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="text-3xl font-bold mb-8 text-center">🚀 خطة التطور المستقبلي</h2>
+                    
+                    <div class="card p-8 mb-8">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="p-4 font-bold">المجال</th>
+                                        <th class="p-4 font-bold">التطوير المقترح</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b">
+                                        <td class="p-4 font-bold">📚 المحتوى التربوي</td>
+                                        <td class="p-4">تطوير سلسلة "تويلي تتحدث عن المشاعر"</td>
+                                    </tr>
+                                    <tr class="border-b">
+                                        <td class="p-4 font-bold">🎥 الوسائط الرقمية</td>
+                                        <td class="p-4">رسوم متحركة قصيرة على Instagram / TikTok</td>
+                                    </tr>
+                                    <tr class="border-b">
+                                        <td class="p-4 font-bold">🏫 التعاون</td>
+                                        <td class="p-4">شراكات مع مدارس ومراكز تربوية</td>
+                                    </tr>
+                                    <tr class="border-b">
+                                        <td class="p-4 font-bold">🧸 المنتجات المادية</td>
+                                        <td class="p-4">دفاتر أنشطة، كتب مصوّرة، ألعاب رمزية</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-4 font-bold">🧠 التوسع المفاهيمي</td>
+                                        <td class="p-4">بناء "Toyla Club" — مجتمع صغير للأمهات والأطفال</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-8">
+                        <h3 class="text-2xl font-bold mb-6 text-center">📘 دليل الثبات البصري (Visual Consistency Rules)</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="p-4 font-bold">العنصر</th>
+                                        <th class="p-4 font-bold">القاعدة</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b">
+                                        <td class="p-4 font-bold">الشعار</td>
+                                        <td class="p-4">يُستخدم على خلفية بيضاء أو باستيل فقط</td>
+                                    </tr>
+                                    <tr class="border-b">
+                                        <td class="p-4 font-bold">الألوان</td>
+                                        <td class="p-4">لا تُستخدم الألوان الصارخة أو المتضادة</td>
+                                    </tr>
+                                    <tr class="border-b">
+                                        <td class="p-4 font-bold">الخطوط</td>
+                                        <td class="p-4">Sans Rounded — ناعمة ومقروءة للأطفال</td>
+                                    </tr>
+                                    <tr class="border-b">
+                                        <td class="p-4 font-bold">الشخصيات</td>
+                                        <td class="p-4">يجب أن تحافظ على نفس التناسب البصري</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-4 font-bold">النصوص</td>
+                                        <td class="p-4">لغة بسيطة لا تتجاوز ٨ كلمات في السطر</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- قسم الاستراتيجية -->
+            <section id="strategy" class="content-section p-6 md:p-8">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="text-3xl font-bold mb-8 text-center">الاستراتيجية والتخطيط</h2>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mb-12">
+                        <div class="card p-6">
+                            <h3 class="text-xl font-bold mb-4">خطة التطور التدريجي</h3>
+                            
+                            <div class="timeline pl-8">
+                                <div class="timeline-item">
+                                    <div class="bg-white p-4 rounded-lg shadow-sm border">
+                                        <h4 class="font-bold mb-2">المرحلة 1: التنفيذ الفني الأولي</h4>
+                                        <ul class="list-disc pr-5 text-sm text-gray-600 space-y-1">
+                                            <li>طباعة عيّنات من الاستيكرات</li>
+                                            <li>اختبار جودة الورق والألوان المعتمدة</li>
+                                            <li>إنشاء أول نموذج واقعي ملموس للمنتج</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item">
+                                    <div class="bg-white p-4 rounded-lg shadow-sm border">
+                                        <h4 class="font-bold mb-2">المرحلة 2: اختبار الجمهور</h4>
+                                        <ul class="list-disc pr-5 text-sm text-gray-600 space-y-1">
+                                            <li>إجراء تجربة مع مجموعة صغيرة من الأمهات والأطفال</li>
+                                            <li>جمع الملاحظات العاطفية والانطباعات البصرية</li>
+                                            <li>تحليل النتائج لاختيار الشخصيات الأكثر جاذبية</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item">
+                                    <div class="bg-white p-4 rounded-lg shadow-sm border">
+                                        <h4 class="font-bold mb-2">المرحلة 3: إطلاق المنتج الأولي</h4>
+                                        <ul class="list-disc pr-5 text-sm text-gray-600 space-y-1">
+                                            <li>تجميع أكثر الشخصيات المحبوبة في حزمة أولى</li>
+                                            <li>إنتاج كمية محدودة لغرض الترويج التجريبي</li>
+                                            <li>إعداد صفحة عرض إلكترونية أو حساب تجريبي</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card p-6">
+                            <h3 class="text-xl font-bold mb-4">الاتجاه المستقبلي</h3>
+                            <p class="text-gray-600 mb-6">إطلاق بطاقات مشاعر، دفاتر نشاط، محتوى رقمي تعليمي على Instagram و TikTok، والتعاون مع المراكز التربوية.</p>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <h4 class="font-bold mb-2 flex items-center">
+                                        <i class="fas fa-chart-line text-[var(--primary)] ml-2"></i>
+                                        استراتيجية النمو
+                                    </h4>
+                                    <p class="text-sm text-gray-600">الانتقال من منتج واحد إلى منصة متكاملة للتعلم التفاعلي والترفيه العائلي</p>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-bold mb-2 flex items-center">
+                                        <i class="fas fa-expand-arrows-alt text-[var(--accent)] ml-2"></i>
+                                        فرص التوسع
+                                    </h4>
+                                    <p class="text-sm text-gray-600">التوسع في الأسواق العربية ثم العالمية، مع إصدارات بلغات متعددة</p>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-bold mb-2 flex items-center">
+                                        <i class="fas fa-handshake text-[var(--secondary)] ml-2"></i>
+                                        الشراكات الاستراتيجية
+                                    </h4>
+                                    <p class="text-sm text-gray-600">التعاون مع دور النشر والمؤسسات التعليمية ومدوني الأمومة والطفولة</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-8">
+                        <h3 class="text-2xl font-bold mb-6 text-center">استراتيجيتنا التسويقية الأولية</h3>
+                        
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="text-center p-6 bg-[var(--primary)]/10 rounded-xl">
+                                <div class="text-4xl mb-4 text-[var(--primary)]">
+                                    <i class="fas fa-eye"></i>
+                                </div>
+                                <h4 class="text-xl font-bold mb-3">المحتوى المرئي</h4>
+                                <p class="text-gray-600">عرض سيناريوهات لعب دافئة على Instagram و Pinterest لجذب الأم التي تهتم بالصورة والجودة العالية.</p>
+                            </div>
+                            
+                            <div class="text-center p-6 bg-[var(--accent)]/10 rounded-xl">
+                                <div class="text-4xl mb-4 text-[var(--accent)]">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <h4 class="text-xl font-bold mb-3">الشراكات المؤثرة</h4>
+                                <p class="text-gray-600">التعاون مع مدونات الأمهات والتربية الإيجابية لعمل مراجعات تركز على جودة المنتج وقيمته التعليمية.</p>
+                            </div>
+                            
+                            <div class="text-center p-6 bg-[var(--secondary)]/10 rounded-xl">
+                                <div class="text-4xl mb-4 text-[var(--secondary)]">
+                                    <i class="fas fa-plus-circle"></i>
+                                </div>
+                                <h4 class="text-xl font-bold mb-3">المنتج الإضافي</h4>
+                                <p class="text-gray-600">إطلاق طقم ديكور لغرفة الطفل بتصاميم موحدة وقابلة للتخصيص لتعزيز البيئة القصصية وتكرار الشراء.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // التنقل بين الأقسام
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // إزالة النشاط من جميع العناصر
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                
+                // إضافة النشاط للعنصر الحالي
+                this.classList.add('active');
+                
+                // إخفاء جميع الأقسام
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // إظهار القسم المطلوب
+                const targetId = this.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+        
+        // تفاعل الألوان
+        document.querySelectorAll('.color-swatch').forEach(swatch => {
+            swatch.addEventListener('click', function() {
+                const color = this.getAttribute('data-color');
+                const use = this.getAttribute('data-use');
+                const demoArea = document.getElementById('demo-area');
+                const demoCard = document.getElementById('demo-card');
+                const demoTitle = document.getElementById('demo-title');
+                const demoText = document.getElementById('demo-text');
+                const demoButton = document.getElementById('demo-button');
+                
+                switch (use) {
+                    case 'background':
+                        demoArea.style.backgroundColor = color;
+                        break;
+                    case 'card-background':
+                        demoCard.style.backgroundColor = color;
+                        break;
+                    case 'accent':
+                        demoCard.style.borderLeft = `6px solid ${color}`;
+                        break;
+                    case 'text':
+                        demoTitle.style.color = color;
+                        demoText.style.color = color;
+                        break;
+                    case 'cta':
+                        demoButton.style.backgroundColor = color;
+                        break;
+                    case 'default-text':
+                        demoTitle.style.color = color;
+                        demoText.style.color = color;
+                        break;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ملف مشروع تويلي (Toyla) التفاعلي</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Toyla's Warm & Artistic Palette (Pastels: Shy Pink, Sand Beige, Sage Green) -->
+    <!-- Application Structure Plan: The application is designed as an interactive pitch deck. It follows a narrative flow: from the high-level vision and core idea, it drills down into the visual identity, the initial product, the target audience (visualized with a persona and chart), and finally, a multi-stage roadmap. This thematic structure, combined with a sticky navigation bar, allows stakeholders to easily explore the business plan. The key interactions are the audience motivation chart and the expandable roadmap, which turn dense text into digestible, engaging insights. -->
+    <!-- Visualization & Content Choices: Report Info: Target Audience "Mothers" -> Goal: Emphasize their purchasing drivers -> Viz: Doughnut Chart (Chart.js/Canvas) -> Interaction: Animated load, tooltips -> Justification: The chart visually quantifies the mother's motivations (Educational Content, Aesthetics), making the persona analysis more impactful than text alone. | Report Info: 3-Stage Development Plan -> Goal: Organize and clarify the timeline -> Viz: Interactive HTML/CSS cards -> Interaction: On-click JS to expand and show details -> Justification: Transforms a static list into an engaging, step-by-step exploration of the project's evolution. All choices avoid SVG/Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #FEFCF3; /* Creamy White */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .smooth-transition {
+            transition: all 0.3s ease-in-out;
+        }
+        .stage-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        .stage-details.active {
+            max-height: 500px; 
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-[#FEFCF3] text-gray-800 antialiased">
+
+    <header class="bg-[#F5E5C9]/80 backdrop-blur-sm shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-3xl font-bold text-gray-800">تويلي (Toyla)</h1>
+            <div class="hidden md:flex space-x-8 space-x-reverse">
+                <a href="#vision" class="text-gray-700 hover:text-[#F07F69] smooth-transition font-semibold">الرؤية</a>
+                <a href="#product" class="text-gray-700 hover:text-[#F07F69] smooth-transition font-semibold">المنتج</a>
+                <a href="#audience" class="text-gray-700 hover:text-[#F07F69] smooth-transition font-semibold">الفئة المستهدفة</a>
+                <a href="#roadmap" class="text-gray-700 hover:text-[#F07F69] smooth-transition font-semibold">خطة التطور</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-6 md:p-12">
+
+        <!-- Hero Section -->
+        <section class="text-center py-20">
+            <h2 class="text-4xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#8DB596] to-[#E5A96F]">أول صديقة خيالية لطفلك</h2>
+            <p class="text-lg max-w-3xl mx-auto text-gray-600 mt-6">
+                 ملف تعريفي شامل لمشروع **تويلي (Toyla)**، العلامة التجارية التي تهدف إلى تنمية خيال الطفل وتشجيعه على التواصل العاطفي من خلال اللعب.
+            </p>
+        </section>
+
+        <!-- Vision & Mission Section -->
+        <section id="vision" class="py-16">
+            <h2 class="text-3xl font-bold text-center mb-12">رؤيتنا ورسالتنا</h2>
+            <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 text-center">
+                <div class="bg-white p-8 rounded-2xl shadow-lg border-b-8 border-[#E5A96F] smooth-transition hover:shadow-2xl hover:-translate-y-2">
+                    <div class="text-5xl mb-4">🌟</div>
+                    <h3 class="text-2xl font-bold mb-2">الرؤية</h3>
+                    <p class="text-gray-600">أن نصبح علامة تمثّل **"الطفولة الإيجابية"** في العالم العربي، حيث يُعبّر الطفل عن نفسه بحرية ويتعلم من خلال التفاعل والخيال.</p>
+                </div>
+                <div class="bg-white p-8 rounded-2xl shadow-lg border-b-8 border-[#8DB596] smooth-transition hover:shadow-2xl hover:-translate-y-2">
+                    <div class="text-5xl mb-4">💌</div>
+                    <h3 class="text-2xl font-bold mb-2">الرسالة</h3>
+                    <p class="text-gray-600">ابتكار شخصيات وأدوات تفاعلية (استيكرات، قصص، بطاقات مشاعر) تحفّز الفضول وتنشر القيم الإيجابية بين الأطفال وأسرهم.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Section -->
+        <section id="product" class="py-16 bg-white rounded-2xl shadow-lg">
+            <h2 class="text-3xl font-bold text-center mb-12">المنتج الأساسي والهوية البصرية</h2>
+            <p class="text-center text-gray-600 max-w-3xl mx-auto mb-12">جوهر "تويلي" يكمن في بساطته الفنية وقدرته على إطلاق العنان لخيال الطفل.</p>
+             <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 items-start">
+                <div class="bg-[#F5E5C9]/50 p-8 rounded-xl h-full flex flex-col">
+                    <h3 class="text-2xl font-bold mb-3">المنتج الأساسي (المرحلة الحالية)</h3>
+                    <p class="text-gray-700 mb-4 flex-grow">
+                        **دليل استيكرات تويلي الرسمي (PDF):** هو أول مخرج بصري ملموس للمشروع، يحتوي على تصاميم أولية تمثل الشخصيات والعناصر المرئية. الغرض منه هو توحيد النمط الفني واختبار تقبّل الجمهور.
+                    </p>
+                     <h4 class="font-bold mb-2">التطبيقات البصرية المخطط لها:</h4>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">استيكرات تفاعلية</span>
+                        <span class="bg-pink-100 text-pink-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">بطاقات مشاعر</span>
+                        <span class="bg-purple-100 text-purple-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">قصص رقمية</span>
+                    </div>
+                </div>
+                 <div class="bg-[#8DB596]/20 p-8 rounded-xl h-full flex flex-col">
+                    <h3 class="text-2xl font-bold mb-3">الهوية البصرية</h3>
+                     <p class="text-gray-700 mb-4 flex-grow">
+                        الطابع العام دافئ، عاطفي، وإيجابي. يعتمد على ألوان الباستيل الناعمة (وردي، بيج، أخضر)، ونمط فني بسيط ومسطّح بخطوط دائرية ناعمة.
+                    </p>
+                    <h4 class="font-bold mb-2">القيم المضافة للمشروع:</h4>
+                    <div class="flex flex-wrap gap-2">
+                         <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">تعليم بالترفيه</span>
+                         <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">منتج عربي عالمي</span>
+                         <span class="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">مرونة التوسع</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Target Audience Section -->
+        <section id="audience" class="py-16">
+            <h2 class="text-3xl font-bold text-center mb-12">الفئة المستهدفة</h2>
+            <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-center">
+                <div class="bg-white p-8 rounded-2xl shadow-lg">
+                    <h3 class="text-2xl font-bold mb-4 text-center">شخصية المشتري: الأم</h3>
+                    <p class="text-center text-gray-500 mb-6">تبحث عن محتوى تربوي ولطيف، وهي صانعة القرار الرئيسية.</p>
+                     <ul class="space-y-4">
+                        <li class="flex items-start"><span class="text-xl mr-3 text-[#F07F69]">👧</span> <strong>المستخدم الأساسي:</strong> الأطفال (3-9 سنوات) الذين يحبون القصص والألوان.</li>
+                        <li class="flex items-start"><span class="text-xl mr-3 text-[#F07F69]">👩‍🏫</span> <strong>الشريك المحتمل:</strong> المربون والمعلمات الذين يستخدمون أدوات اللعب الإيجابي.</li>
+                    </ul>
+                </div>
+                 <div>
+                    <h3 class="text-2xl font-bold mb-4 text-center">أهم دوافع الشراء لدى الأم</h3>
+                     <div class="chart-container">
+                        <canvas id="audienceChart"></canvas>
+                    </div>
+                 </div>
+            </div>
+        </section>
+
+        <!-- Roadmap Section -->
+        <section id="roadmap" class="py-16 bg-gray-800 text-white rounded-2xl shadow-lg">
+            <h2 class="text-3xl font-bold text-center mb-12">خطة التطور التدريجي والاتجاه المستقبلي</h2>
+            <p class="text-center text-gray-300 max-w-3xl mx-auto mb-12">خطة من ثلاث مراحل للانتقال من الفكرة إلى منتج حقيقي، مع رؤية واضحة للتوسع. انقر على كل مرحلة لرؤية تفاصيلها.</p>
+            <div class="max-w-4xl mx-auto space-y-4">
+                <div class="stage-container rounded-lg shadow-md overflow-hidden bg-gray-700">
+                    <div class="stage-header p-6 cursor-pointer flex justify-between items-center smooth-transition hover:bg-gray-600">
+                        <h3 class="text-xl font-bold text-white">المرحلة 1: التنفيذ الفني الأولي</h3>
+                        <span class="arrow text-2xl transform transition-transform duration-300">▼</span>
+                    </div>
+                    <div class="stage-details">
+                        <div class="p-6 border-t border-gray-600">
+                            <ul class="list-disc pr-6 space-y-2 text-gray-300">
+                                <li>طباعة عيّنات من الاستيكرات.</li>
+                                <li>اختبار جودة الورق والألوان المعتمدة.</li>
+                                <li>إنشاء أول نموذج واقعي ملموس للمنتج.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="stage-container rounded-lg shadow-md overflow-hidden bg-gray-700">
+                     <div class="stage-header p-6 cursor-pointer flex justify-between items-center smooth-transition hover:bg-gray-600">
+                        <h3 class="text-xl font-bold text-white">المرحلة 2: اختبار الجمهور</h3>
+                        <span class="arrow text-2xl transform transition-transform duration-300">▼</span>
+                    </div>
+                    <div class="stage-details">
+                        <div class="p-6 border-t border-gray-600">
+                             <ul class="list-disc pr-6 space-y-2 text-gray-300">
+                                <li>إجراء تجربة مع مجموعة صغيرة من الأمهات والأطفال.</li>
+                                <li>جمع الملاحظات العاطفية والانطباعات البصرية.</li>
+                                <li>تحليل النتائج لاختيار الشخصيات الأكثر جاذبية وشعبية.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="stage-container rounded-lg shadow-md overflow-hidden bg-gray-700">
+                     <div class="stage-header p-6 cursor-pointer flex justify-between items-center smooth-transition hover:bg-gray-600">
+                        <h3 class="text-xl font-bold text-white">المرحلة 3: إطلاق المنتج الأولي (Toyla Mini Set)</h3>
+                        <span class="arrow text-2xl transform transition-transform duration-300">▼</span>
+                    </div>
+                    <div class="stage-details">
+                        <div class="p-6 border-t border-gray-600">
+                             <ul class="list-disc pr-6 space-y-2 text-gray-300">
+                                <li>تجميع أكثر الشخصيات المحبوبة في حزمة أولى جاهزة للبيع.</li>
+                                <li>إنتاج كمية محدودة لغرض الترويج التجريبي.</li>
+                                <li>إعداد صفحة عرض إلكترونية أو حساب تجريبي على وسائل التواصل الاجتماعي.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <div class="text-center mt-12">
+                 <h3 class="text-2xl font-bold text-center mb-4">الاتجاه المستقبلي</h3>
+                 <p class="max-w-2xl mx-auto text-gray-300">إطلاق بطاقات مشاعر، دفاتر نشاط، محتوى رقمي تعليمي على Instagram و TikTok، والتعاون مع المراكز التربوية.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-[#F5E5C9] text-center py-6 mt-12 border-t border-gray-200">
+        <p class="text-gray-600">ملف مشروع تويلي (Toyla) &copy; 2025</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Chart.js doughnut chart for target audience
+            const ctx = document.getElementById('audienceChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['المحتوى التربوي الهادف', 'التصميم الفني واللطيف', 'الجودة والأمان', 'تحفيز الخيال والتفاعل'],
+                        datasets: [{
+                            label: 'دوافع الشراء',
+                            data: [40, 30, 20, 10],
+                            backgroundColor: [
+                                '#8DB596', // Sage Green
+                                '#E5A96F', // Shy Pink
+                                '#F07F69', // Muted Coral
+                                '#a7f3d0'  // Lighter Green
+                            ],
+                            borderColor: '#FEFCF3',
+                            borderWidth: 4,
+                            hoverOffset: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 20,
+                                    font: {
+                                        family: "'Tajawal', sans-serif",
+                                        size: 14,
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                bodyFont: {
+                                    family: "'Tajawal', sans-serif",
+                                },
+                                titleFont: {
+                                    family: "'Tajawal', sans-serif",
+                                },
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed !== null) {
+                                            label += context.parsed + '%';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '60%'
+                    }
+                });
+            }
+
+            // Roadmap accordion functionality
+            const stageHeaders = document.querySelectorAll('.stage-header');
+            stageHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const details = header.nextElementSibling;
+                    const arrow = header.querySelector('.arrow');
+                    const isActive = details.classList.contains('active');
+
+                    // Optional: close others when one opens
+                    document.querySelectorAll('.stage-details.active').forEach(activeDetail => {
+                        if (activeDetail !== details) {
+                            activeDetail.classList.remove('active');
+                            activeDetail.previousElementSibling.querySelector('.arrow').style.transform = 'rotate(0deg)';
+                        }
+                    });
+
+                    details.classList.toggle('active');
+                    arrow.style.transform = isActive ? 'rotate(0deg)' : 'rotate(180deg)';
+                });
+            });
+
+            // Smooth scrolling for navigation
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetElement = document.querySelector(this.getAttribute('href'));
+                    if (targetElement) {
+                         targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+

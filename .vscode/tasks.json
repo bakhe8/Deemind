@@ -25,5 +25,18 @@
       },
       "problemMatcher": []
     }
+    ,
+    {
+      "label": "Watch New Themes",
+      "type": "shell",
+      "command": "npm run deemind:watch",
+      "options": {
+        "shell": {
+          "executable": "bash",
+          "args": ["-lc"]
+        }
+      },
+      "problemMatcher": []
+    }
   ]
 }

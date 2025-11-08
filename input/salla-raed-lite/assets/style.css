@@ -1,0 +1,5 @@
+body{font-family:Inter,sans-serif}
+.hero{background:#eef}
+.product-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.product{border:1px solid #ddd;padding:8px}
+

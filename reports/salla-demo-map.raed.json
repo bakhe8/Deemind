@@ -1,0 +1,20 @@
+{
+  "baseline": {
+    "name": "raed",
+    "counts": {
+      "layout": 0,
+      "pages": 0,
+      "partials": 0,
+      "assets": 0
+    }
+  },
+  "output": {
+    "name": "animal",
+    "counts": {
+      "layout": 1,
+      "pages": 15,
+      "partials": 0,
+      "assets": 17
+    }
+  }
+}

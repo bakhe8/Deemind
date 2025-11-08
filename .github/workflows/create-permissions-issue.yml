@@ -1,0 +1,22 @@
+name: Create Permissions & Secrets Issue
+on:
+  workflow_dispatch:
+
+jobs:
+  open-issue:
+    if: ${{ false }} # disabled: full access granted, no permission issues should be opened
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci || npm i
+      - name: Open issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: node tools/create-permissions-secrets-issue.js

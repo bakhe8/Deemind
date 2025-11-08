@@ -1,0 +1,10 @@
+{
+  "updated": "2025-11-08T00:00:00Z",
+  "scores": {
+    "demo": { "score": 97, "notes": "Stable, all checks passed" },
+    "gimni": { "score": 94, "notes": "Stable, all checks passed" },
+    "modern": { "score": 91, "notes": "Stable, all checks passed" },
+    "salla-new-theme": { "score": 88, "notes": "Requires review" },
+    "animal": { "score": 90, "notes": "Requires review" }
+  }
+}

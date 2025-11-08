@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تصميم 30 بطاقة حوار وتعبير (5 مجموعات)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8DB596;   /* الأخضر المريمي */
+            --secondary: #E5A96F; /* البيج الرملي */
+            --accent: #F07F69;    /* المرجاني المطفي */
+            --cognition: #4A6C98; /* الأزرق المعرفي (جديد) */
+            --challenge: #6B4E3B; /* البني الداكن (جديد) */
+            --light: #FEFCF3;     /* الأبيض الكريمي */
+            --dark: #4A4A4A;      /* النص الأساسي */
+        }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+        }
+        .card-group-container {
+            @apply p-6 rounded-xl shadow-lg mb-8;
+        }
+        .card-example {
+            width: 140px;
+            height: 90px;
+            @apply rounded-lg shadow-md flex flex-col items-center justify-center m-2 transition-transform duration-300 hover:scale-105 cursor-pointer;
+            border: 2px solid var(--dark);
+        }
+        .card-title {
+            @apply text-xl font-bold;
+        }
+        .group-header {
+            border-right: 5px solid;
+            @apply pr-3 py-1 mb-4 font-bold text-2xl;
+        }
+        .card-tip {
+            @apply p-3 mt-4 rounded-md text-sm;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 50;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            width: 90%;
+            max-width: 550px;
+            z-index: 60;
+            border: 5px solid;
+        }
+    </style>
+</head>
+<body class="antialiased flex flex-col items-center py-12">
+
+    <header class="text-center mb-10 max-w-4xl mx-auto">
+        <h1 class="text-4xl font-bold mb-2" style="color: var(--primary);">📊 30 بطاقة حوار وتعبير (تصميم خماسي الفئات)</h1>
+        <p class="text-lg text-gray-600">لتوجيه القصة نحو خمسة محاور نمائية: المشاعر، السلوك، المهارات، التفكير، والتحدي.</p>
+    </header>
+
+    <div class="w-full max-w-6xl mx-auto p-4">
+
+        <!-- 1. المشاعر الأساسية (7 بطاقات) -->
+        <div class="card-group-container" style="background-color: #fcebeb;">
+            <h2 class="group-header" style="border-color: var(--accent); color: var(--accent);">1. المشاعر الأساسية (المرجاني - الذكاء العاطفي)</h2>
+            <div class="flex flex-wrap justify-center">
+                <div class="card-example" style="background-color: var(--accent); color: var(--light);" data-title="سعيد" data-tip="نصيحة: ضع البطاقة بجوار 'الطفل راشد' واسأل: ما الشيء المادي الذي جعله يشعر بـ 'السعادة' في هذا المشهد؟">سعيد 😊</div>
+                <div class="card-example" style="background-color: var(--accent); color: var(--light);" data-title="خائف" data-tip="نصيحة: استخدم البطاقة لتوجيه القصة نحو سبب الخوف وكيفية التعامل معه. اسأل: كيف يمكن للجدة أن تطمئن راشد؟">خائف 😨</div>
+                <div class="card-example" style="background-color: var(--accent); color: var(--light);" data-title="متفاجئ" data-tip="نصيحة: اختر بطاقة 'متفاجئ' عند ظهور 'اليربوع' أو 'بئر الماء'.">متفاجئ 😮</div>
+                 <div class="card-example" style="background-color: var(--accent); color: var(--light);" data-title="متحمس" data-tip="نصيحة: استخدمها لتمثيل مشاعر البدء والدافعية قبل رحلة جديدة.">متحمس ✨</div>
+                 <div class="card-example" style="background-color: var(--accent); color: var(--light);" data-title="غاضب" data-tip="نصيحة: اسأل: هل من الجيد أن يكون راشد 'غاضبًا'؟ وكيف يمكنه التعبير عن غضبه بهدوء؟">غاضب 😠</div>
+            </div>
+            <div class="card-tip" style="border-left: 4px solid var(--accent); background-color: #fdf2f2;">**الإرشادات:** اجعل الطفل يختار مشاعر الشخصية ثم يقلد تعبير الوجه.</div>
+        </div>
+
+        <!-- 2. الاستجابات السلوكية (7 بطاقات) -->
+        <div class="card-group-container" style="background-color: #f7ede3;">
+            <h2 class="group-header" style="border-color: var(--secondary); color: var(--secondary);">2. الاستجابات السلوكية (البيج الرملي - دفع السرد)</h2>
+            <div class="flex flex-wrap justify-center">
+                <div class="card-example" style="background-color: var(--secondary); color: var(--dark);" data-title="يبحث" data-tip="نصيحة: استخدمها لقصص الاكتشاف. اسأل: ماذا كان راشد يبحث عنه عندما وصل إلى الكثبان؟">يبحث 🔎</div>
+                <div class="card-example" style="background-color: var(--secondary); color: var(--dark);" data-title="يختبئ" data-tip="نصيحة: ضع البطاقة عندما يواجه راشد خطرًا لتعليم الحذر.">يختبئ 🙈</div>
+                <div class="card-example" style="background-color: var(--secondary); color: var(--dark);" data-title="يتسلق" data-tip="نصيحة: استخدمها في مشهد 'الوادي الصخري'. اسأل: ماذا رأى راشد عندما تسلق الصخرة؟">يتسلق 🧗</div>
+                <div class="card-example" style="background-color: var(--secondary); color: var(--dark);" data-title="يقترب" data-tip="نصيحة: استخدمها لزيادة التوتر في القصة عند الاقتراب من الخيمة/البئر.">يقترب 🚶</div>
+                 <div class="card-example" style="background-color: var(--secondary); color: var(--dark);" data-title="يستريح" data-tip="نصيحة: لتعليم قيمة الراحة وأخذ الأنفاس بعد مجهود طويل.">يستريح 🧘</div>
+            </div>
+            <div class="card-tip" style="border-left: 4px solid var(--secondary); background-color: #fcf8f0;">**الإرشادات:** اطلب من الطفل اختيار فعل واحد لكل شخصية في المشهد التالي، مما يدفع القصة للأمام.</div>
+        </div>
+
+        <!-- 3. المهارات الاجتماعية (6 بطاقات) -->
+        <div class="card-group-container" style="background-color: #e6f0e7;">
+            <h2 class="group-header" style="border-color: var(--primary); color: var(--primary);">3. المهارات الاجتماعية (الأخضر المريمي - الـ SEL)</h2>
+            <div class="flex flex-wrap justify-center">
+                <div class="card-example" style="background-color: var(--primary); color: var(--light);" data-title="يتعاون" data-tip="نصيحة: ادمج البطاقة في قصص 'بناء الخيمة' لتشجيع العمل الجماعي.">يتعاون 🤝</div>
+                <div class="card-example" style="background-color: var(--primary); color: var(--light);" data-title="يشارك" data-tip="نصيحة: استخدمها لتعليم الكرم عند استخدام بطاقة 'وعاء التمر'.">يشارك 🤲</div>
+                <div class="card-example" style="background-color: var(--primary); color: var(--light);" data-title="يصغي" data-tip="نصيحة: عند استخدام 'الجدة نورا'، ضع هذه البطاقة أمام الطفل لتعليم قيمة الإنصات.">يصغي 👂</div>
+                <div class="card-example" style="background-color: var(--primary); color: var(--light);" data-title="يعتذر" data-tip="نصيحة: استخدمها عند وقوع خطأ صغير في القصة.">يعتذر 🙏</div>
+                <div class="card-example" style="background-color: var(--primary); color: var(--light);" data-title="يساعد" data-tip="نصيحة: اسأل: هل تحتاج 'الجدة' إلى 'مساعدة' راشد في هذه المهمة؟">يساعد 🙋‍♂️</div>
+            </div>
+            <div class="card-tip" style="border-left: 4px solid var(--primary); background-color: #f2f7f3;">**الإرشادات:** ركز على بطاقة واحدة. اسأل: كيف يمكن لراشد أن يُظهر مهارة [اسم البطاقة] في هذا الموقف؟</div>
+        </div>
+
+        <!-- 4. أسئلة التفكير (5 بطاقات) -->
+        <div class="card-group-container" style="background-color: #e6eef4;">
+            <h2 class="group-header" style="border-color: var(--cognition); color: var(--cognition);">4. أسئلة التفكير (الأزرق البحري - المنطق والتخطيط)</h2>
+            <div class="flex flex-wrap justify-center">
+                <div class="card-example" style="background-color: var(--cognition); color: var(--light);" data-title="ماذا بعد؟" data-tip="نصيحة: تُستخدم لإنهاء المشهد الحالي وبدء التخطيط للمشهد التالي. (المنطق التسلسلي)">ماذا بعد؟ 🤔</div>
+                <div class="card-example" style="background-color: var(--cognition); color: var(--light);" data-title="تذكر" data-tip="نصيحة: اجعل الطفل يعيد سرد جزء من القصة (تعزيز الذاكرة السردية).">تذكر 🧠</div>
+                <div class="card-example" style="background-color: var(--cognition); color: var(--light);" data-title="خطط" data-tip="نصيحة: قبل البدء، اطلب منه ترتيب 3 خطوات لإكمال مهمة. (التفكير الاستراتيجي)">خطط 🗺️</div>
+                <div class="card-example" style="background-color: var(--cognition); color: var(--light);" data-title="لماذا؟" data-tip="نصيحة: سؤال مفتوح لتعزيز التفكير السببي. اسأل: 'لماذا' فعل الجمل ذلك؟">لماذا؟ ❓</div>
+                <div class="card-example" style="background-color: var(--cognition); color: var(--light);" data-title="ماذا لو؟" data-tip="نصيحة: سؤال افتراضي لخلق مسارات بديلة في القصة. (الإبداع والتفكير الجانبي)">ماذا لو؟ ✨</div>
+            </div>
+            <div class="card-tip" style="border-left: 4px solid var(--cognition); background-color: #f2f7fb;">**الإرشادات:** هذه البطاقات هي الأقوى؛ استخدمها للتدخل في القصة وتوجيهها نحو مهارات المنطق العليا.</div>
+        </div>
+        
+        <!-- 5. التحديات البيئية (5 بطاقات) -->
+        <div class="card-group-container" style="background-color: #e9e5e3;">
+            <h2 class="group-header" style="border-color: var(--challenge); color: var(--challenge);">5. التحديات البيئية (البني الداكن - حل المشكلات)</h2>
+            <div class="flex flex-wrap justify-center">
+                <div class="card-example" style="background-color: var(--challenge); color: var(--light);" data-title="عاصفة رملية" data-tip="نصيحة: عند استخدامها، يجب على الشخصيات أن 'تختبئ' في 'الخيمة' أو خلف 'النخلة'.">عاصفة رملية 🌪️</div>
+                <div class="card-example" style="background-color: var(--challenge); color: var(--light);" data-title="ضياع الأثر" data-tip="نصيحة: عند استخدامها، يجب على راشد أن 'يخطط' أو 'يطلب المساعدة' من الجدة.">ضياع الأثر 👣</div>
+                <div class="card-example" style="background-color: var(--challenge); color: var(--light);" data-title="نقص المياه" data-tip="نصيحة: اجعل هذه البطاقة الدافع الرئيسي للبحث عن 'بئر الماء'.">نقص المياه 🚱</div>
+                <div class="card-example" style="background-color: var(--challenge); color: var(--light);" data-title="الليل" data-tip="نصيحة: استخدمها لتحديد نهاية فترة اللعب أو لتعليم مفاهيم الظلام والأمان.">الليل 🌑</div>
+                <div class="card-example" style="background-color: var(--challenge); color: var(--light);" data-title="مفترس" data-tip="نصيحة: يظهر 'ثعلب الفنك' أو 'الصقر' بشكل مفاجئ لتهديد 'اليربوع'.">مفترس 🦅</div>
+            </div>
+            <div class="card-tip" style="border-left: 4px solid var(--challenge); background-color: #f7f3f1;">**الإرشادات:** تُستخدم هذه البطاقات لتقديم عقبات خارجية، مما يجبر الشخصيات على استخدام بطاقات 'المهارات' أو 'السلوك'.</div>
+        </div>
+
+    </div>
+
+    <!-- النافذة المنبثقة التفصيلية (Modal) -->
+    <div id="info-modal-overlay" class="modal-overlay" onclick="hideDetails()">
+        <div id="info-modal-content" class="modal-content bg-white p-6 md:p-8 relative rounded-xl" onclick="event.stopPropagation()">
+            <button onclick="hideDetails()" class="absolute top-3 left-3 text-3xl font-bold p-1 leading-none rounded-full" style="color: var(--dark);">&times;</button>
+            <h3 id="modal-title" class="text-3xl font-bold mb-2" style="color: var(--accent);"></h3>
+            
+            <h4 class="text-xl font-bold mt-4 mb-2" style="color: var(--primary);">💡 نصيحة الاستخدام للأم:</h4>
+            <p id="modal-tip" class="text-lg text-gray-700 leading-relaxed p-3 border-2 rounded-lg" style="border-color: var(--secondary);"></p>
+
+            <h4 class="text-xl font-bold mt-6 mb-2" style="color: var(--dark);">📐 مواصفات البطاقة:</h4>
+            <ul class="list-disc pr-5 text-gray-700">
+                <li>الحجم: 7 سم × 10 سم.</li>
+                <li>المادة: ورق مقوى سميك 300 جرام/م2، كسوة مطفية.</li>
+                <li>التمييز: يتم تمييز كل مجموعة من المجموعات الخمس بلون مختلف من باليت Toyla.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const cards = document.querySelectorAll('.card-example');
+        const modalOverlay = document.getElementById('info-modal-overlay');
+
+        cards.forEach(card => {
+            card.addEventListener('click', function() {
+                const title = this.getAttribute('data-title');
+                const tip = this.getAttribute('data-tip');
+                
+                document.getElementById('modal-title').textContent = title;
+                document.getElementById('modal-tip').textContent = tip;
+                
+                const groupColor = window.getComputedStyle(this).getPropertyValue('background-color');
+                document.getElementById('info-modal-content').style.borderColor = groupColor;
+                
+                modalOverlay.style.display = 'flex';
+            });
+        });
+
+        function hideDetails() {
+            modalOverlay.style.display = 'none';
+        }
+    </script>
+
+</body>
+</html>

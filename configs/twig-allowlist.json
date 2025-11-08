@@ -1,0 +1,15 @@
+{
+  "tags": [
+    "extends", "include", "block", "for", "if", "set", "trans"
+  ],
+  "filters": [
+    "t", "escape", "raw", "upper", "lower", "length"
+  ],
+  "functions": [
+    "path", "asset"
+  ],
+  "sallaHelpers": [
+    "salla.product", "salla.products", "salla.store", "salla.cart"
+  ]
+}
+

@@ -6,23 +6,20 @@ import fs from 'fs';
 import path from 'path';
 
 const URLS = [
-  'https://docs.salla.dev/421943m0#locate-layout-files',
-  'https://docs.salla.dev/421943m0#master-layout-hooks',
-  'https://docs.salla.dev/421943m0#using-layouts',
-  'https://docs.salla.dev/421943m0#build-a-new-layout',
+  // Official developer portal (primary)
+  'https://developers.salla.sa/en',
+  'https://developers.salla.sa/docs/theme-getting-started',
+  'https://developers.salla.sa/docs/theme-json-reference',
+  'https://developers.salla.sa/docs/theme-cli',
+  'https://developers.salla.sa/docs/theme-submission',
+  // Legacy mirrors (keep as fallback)
   'https://docs.salla.dev/421943m0',
-  'https://docs.salla.dev/421886m0',
-  'https://docs.salla.dev/421929m0#helpers',
-  'https://docs.salla.dev/421929m0#filters',
+  'https://docs.salla.dev/421929m0',
   'https://docs.salla.dev/422580m0',
-  'https://docs.salla.dev/422580m0#home-components',
-  'https://docs.salla.dev/422580m0#header-components',
-  'https://docs.salla.dev/422580m0#footer-components',
-  'https://docs.salla.dev/422580m0#products-components',
   'https://docs.salla.dev/422556m0',
-  "https://docs.salla.dev/422610m0#sdk's-main-apis"
-  , 'https://docs.salla.dev/422690m0'
-  , 'https://docs.salla.dev/422553m0#configuration'
+  "https://docs.salla.dev/422610m0#sdk's-main-apis",
+  'https://docs.salla.dev/422690m0',
+  'https://docs.salla.dev/422553m0#configuration'
 ];
 
 const OUT = path.resolve('configs', 'knowledge', 'salla-docs.json');

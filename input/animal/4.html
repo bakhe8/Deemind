@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دليل الهوية البصرية التفاعلي لمتجر تويلي</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&family=Noto+Sans+Arabic:wght@300;500&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Toyla's Warm & Artistic Palette -->
+    <!-- Application Structure Plan: The application is designed as a living, interactive brand style guide. It translates the static markdown report into a dynamic experience. The structure flows thematically from Colors, to Typography, to Aesthetic Style. The key interaction is the "Color Palette" section, where users can click on a color swatch to see its intended use applied live to a sample component. This provides immediate, tangible feedback, making the brand's vision understandable at a glance. A sticky navigation facilitates exploration. -->
+    <!-- Visualization & Content Choices: Report Info: Color Palette -> Goal: Demonstrate usage -> Viz/Method: Interactive HTML swatches with JS -> Interaction: On-click, JS updates the CSS of a sample card -> Justification: Far more effective than a static table, this interaction shows *how* the colors work together. | Report Info: Typography rules -> Goal: Display fonts -> Viz/Method: Styled HTML text blocks -> Justification: Shows the fonts in their intended contexts (headings vs. body). | Report Info: Aesthetic Style -> Goal: Describe feel -> Viz/Method: Styled cards with icons -> Justification: Visually organizes abstract concepts. No quantitative data was present, so no charts were needed. CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans Arabic', 'Tajawal', sans-serif;
+            background-color: #FEFCF3; /* creamy white */
+        }
+        .font-headline {
+             font-family: 'Tajawal', sans-serif;
+        }
+        .font-body {
+             font-family: 'Noto Sans Arabic', sans-serif;
+        }
+        .smooth-transition {
+            transition: all 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-[#FEFCF3] text-gray-800 antialiased">
+
+    <header class="bg-[#F5E5C9]/80 backdrop-blur-sm shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-3xl font-bold font-headline text-gray-800">هوية تويلي</h1>
+            <div class="hidden md:flex space-x-8 space-x-reverse">
+                <a href="#palette" class="text-gray-700 hover:text-[#F07F69] smooth-transition font-semibold">الألوان</a>
+                <a href="#typography" class="text-gray-700 hover:text-[#F07F69] smooth-transition font-semibold">الخطوط</a>
+                <a href="#aesthetic" class="text-gray-700 hover:text-[#F07F69] smooth-transition font-semibold">النمط الجمالي</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-6 md:p-12">
+
+        <!-- Hero Section -->
+        <section class="text-center py-20">
+            <h2 class="text-4xl md:text-6xl font-bold font-headline mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#8DB596] to-[#E5A96F]">هادئ، فني، ومدروس</h2>
+            <p class="text-lg max-w-3xl mx-auto text-gray-600 mt-6 font-body">
+                دليل تفاعلي لاستكشاف الهوية البصرية لمتجر **Toyla – تويلي**. تم تصميم كل عنصر ليعكس إحساساً بالدفء الريفي، الرقة الفنية، والجودة غير القابلة للنقاش.
+            </p>
+        </section>
+
+        <!-- Color Palette Section -->
+        <section id="palette" class="py-16">
+            <h2 class="text-3xl font-bold font-headline text-center mb-4">I. لوحة الألوان</h2>
+            <p class="text-center text-gray-600 max-w-3xl mx-auto mb-12 font-body">تم اختيار لوحة ألوان هادئة ودافئة لتعكس الجودة والرقي الفني. انقر على أي لون لرؤية استخدامه المقترح عملياً.</p>
+            
+            <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    <div class="color-swatch cursor-pointer group" data-color="#F5E5C9" data-use="background">
+                        <div class="w-full h-24 rounded-lg shadow-md" style="background-color: #F5E5C9;"></div>
+                        <h3 class="font-bold mt-2 font-headline">البيج الرملي</h3>
+                        <p class="text-sm text-gray-500 font-body">#F5E5C9</p>
+                    </div>
+                    <div class="color-swatch cursor-pointer group" data-color="#FEFCF3" data-use="card-background">
+                        <div class="w-full h-24 rounded-lg shadow-md" style="background-color: #FEFCF3;"></div>
+                        <h3 class="font-bold mt-2 font-headline">الأبيض الكريمي</h3>
+                        <p class="text-sm text-gray-500 font-body">#FEFCF3</p>
+                    </div>
+                    <div class="color-swatch cursor-pointer group" data-color="#8DB596" data-use="accent">
+                        <div class="w-full h-24 rounded-lg shadow-md" style="background-color: #8DB596;"></div>
+                        <h3 class="font-bold mt-2 font-headline">الأخضر المريمي</h3>
+                        <p class="text-sm text-gray-500 font-body">#8DB596</p>
+                    </div>
+                    <div class="color-swatch cursor-pointer group" data-color="#E5A96F" data-use="text">
+                        <div class="w-full h-24 rounded-lg shadow-md" style="background-color: #E5A96F;"></div>
+                        <h3 class="font-bold mt-2 font-headline">الوردي الخجول</h3>
+                        <p class="text-sm text-gray-500 font-body">#E5A96F</p>
+                    </div>
+                    <div class="color-swatch cursor-pointer group" data-color="#F07F69" data-use="cta">
+                        <div class="w-full h-24 rounded-lg shadow-md" style="background-color: #F07F69;"></div>
+                        <h3 class="font-bold mt-2 font-headline">المرجاني المطفي</h3>
+                        <p class="text-sm text-gray-500 font-body">#F07F69</p>
+                    </div>
+                     <div class="color-swatch cursor-pointer group" data-color="#4A4A4A" data-use="default-text">
+                        <div class="w-full h-24 rounded-lg shadow-md bg-gray-700"></div>
+                        <h3 class="font-bold mt-2 font-headline">النص الأساسي</h3>
+                        <p class="text-sm text-gray-500 font-body">#4A4A4A</p>
+                    </div>
+                </div>
+
+                <div id="demo-area" class="p-8 rounded-2xl smooth-transition" style="background-color: #F5E5C9;">
+                    <div id="demo-card" class="bg-[#FEFCF3] rounded-xl shadow-xl p-6 smooth-transition">
+                        <h3 id="demo-title" class="text-2xl font-bold font-headline mb-2 smooth-transition" style="color: #4A4A4A;">بطاقة منتج تويلي</h3>
+                        <p id="demo-text" class="font-body text-gray-600 mb-6 smooth-transition" style="color: #4A4A4A;">هذا النص يعرض كيف تبدو الخطوط والألوان معًا لتعكس هوية العلامة التجارية الدافئة والفنية.</p>
+                        <button id="demo-button" class="w-full py-3 px-4 rounded-lg font-bold font-headline text-white smooth-transition" style="background-color: #F07F69;">شراء الآن</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Typography Section -->
+        <section id="typography" class="py-16 bg-white rounded-2xl shadow-lg mt-12">
+            <h2 class="text-3xl font-bold font-headline text-center mb-4">II. الخطوط والطباعة</h2>
+            <p class="text-center text-gray-600 max-w-3xl mx-auto mb-12 font-body">تمزج الاستراتيجية بين خط عصري واحترافي للجودة، وخط ودود ومستدير للعب.</p>
+            <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
+                <div class="text-center">
+                    <h3 class="text-xl font-bold font-headline mb-4 border-b pb-2">عناوين رئيسية وشعار (Tajawal)</h3>
+                    <p class="font-headline text-4xl font-bold">جودة وفن في كل هدية</p>
+                    <p class="font-body mt-2 text-gray-500">يعكس الاحترافية والجودة. جريء وثابت.</p>
+                </div>
+                <div class="text-center">
+                    <h3 class="text-xl font-bold font-headline mb-4 border-b pb-2">نصوص وصفية وقصص (Noto Sans Arabic)</h3>
+                    <p class="font-body text-lg">صُممت هذه اللعبة لتكون بداية لمحادثات دافئة ولحظات لا تُنسى بينكِ وبين طفلكِ.</p>
+                    <p class="font-body mt-2 text-gray-500">يضمن سهولة القراءة ويعطي شعوراً بالدفء والود.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Aesthetic Style Section -->
+        <section id="aesthetic" class="py-16">
+            <h2 class="text-3xl font-bold font-headline text-center mb-4">III. النمط الجمالي للمنتج والشخصيات</h2>
+            <p class="text-center text-gray-600 max-w-3xl mx-auto mb-12 font-body">النمط المختار هو **الحد الأدنى باللمسة الفنية**، للارتقاء بالمنتج من مجرد "لعبة" إلى "قطعة فنية".</p>
+            <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-2xl shadow-lg smooth-transition hover:shadow-xl hover:-translate-y-1">
+                    <h3 class="text-2xl font-bold font-headline mb-4">1. الشخصيات (الملصقات)</h3>
+                    <ul class="space-y-4 font-body">
+                        <li class="flex items-start"><span class="text-2xl mr-3 text-[#8DB596]">🎨</span><div><strong class="block">خطوط بسيطة:</strong> نظيفة وأنيقة مع لمسة ألوان مائية تجعلها تبدو كأنها مرسومة باليد.</div></li>
+                        <li class="flex items-start"><span class="text-2xl mr-3 text-[#E5A96F]">😊</span><div><strong class="block">تعبيرات واضحة:</strong> تركيز على تعابير الوجه (فرح، حزن، غضب) لدعم تنمية الذكاء العاطفي.</div></li>
+                    </ul>
+                </div>
+                <div class="bg-white p-8 rounded-2xl shadow-lg smooth-transition hover:shadow-xl hover:-translate-y-1">
+                    <h3 class="text-2xl font-bold font-headline mb-4">2. التغليف والديكور</h3>
+                    <ul class="space-y-4 font-body">
+                        <li class="flex items-start"><span class="text-2xl mr-3 text-[#F5E5C9]">📦</span><div><strong class="block">تصميمات نظيفة:</strong> معتمدة على البيج الرملي والأخضر المريمي مع نقوش طبيعية بسيطة.</div></li>
+                        <li class="flex items-start"><span class="text-2xl mr-3 text-[#F07F69]">♻️</span><div><strong class="block">تغليف قابل لإعادة الاستخدام:</strong> يعمل كصندوق تخزين للعبة، مما يعزز القيمة والجودة.</div></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-[#F5E5C9] text-center py-6 mt-12 border-t border-gray-200">
+        <p class="text-gray-600 font-body">دليل هوية تويلي (Toyla) &copy; 2025</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const swatches = document.querySelectorAll('.color-swatch');
+            const demoArea = document.getElementById('demo-area');
+            const demoCard = document.getElementById('demo-card');
+            const demoTitle = document.getElementById('demo-title');
+            const demoText = document.getElementById('demo-text');
+            const demoButton = document.getElementById('demo-button');
+
+            swatches.forEach(swatch => {
+                swatch.addEventListener('click', () => {
+                    const color = swatch.dataset.color;
+                    const use = swatch.dataset.use;
+
+                    switch (use) {
+                        case 'background':
+                            demoArea.style.backgroundColor = color;
+                            break;
+                        case 'card-background':
+                            demoCard.style.backgroundColor = color;
+                            break;
+                        case 'accent':
+                            demoCard.style.borderColor = color;
+                            demoCard.classList.add('border-l-8');
+                            break;
+                        case 'text':
+                            demoTitle.style.color = color;
+                            demoText.style.color = color;
+                            break;
+                        case 'cta':
+                            demoButton.style.backgroundColor = color;
+                            break;
+                        case 'default-text':
+                             demoTitle.style.color = color;
+                             demoText.style.color = color;
+                             break;
+                    }
+                });
+            });
+
+            // Smooth scrolling for navigation
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetElement = document.querySelector(this.getAttribute('href'));
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+

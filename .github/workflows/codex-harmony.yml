@@ -23,6 +23,16 @@ jobs:
           npm run deemind:build demo -- --sanitize --i18n
           npm run deemind:build gimni -- --sanitize --i18n
           npm run deemind:validate
+      - name: Salla Schema & Baseline Drift Checks
+        run: |
+          npm run salla:validate:schema || true
+          node tools/salla-demo-compare.js raed demo || true
+          node tools/salla-demo-compare.js luna demo || true
+          node tools/salla-demo-compare.js mono demo || true
+          node tools/salla-schema-diff.js demo || true
+          node tools/compare-to-raed-structure.js || true
+      - name: Enforce Salla Drift Thresholds
+        run: node tools/enforce-salla-gates.js
       - name: Run Codex Harmony Check
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -38,3 +48,7 @@ jobs:
           path: |
             logs/codex-harmony-report.md
             logs/harmony-score.json
+            reports/salla-schema-diff.md
+            reports/salla-demo-diff.raed.md
+            reports/salla-demo-diff.luna.md
+            reports/salla-demo-diff.mono.md

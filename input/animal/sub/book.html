@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تصميم كتاب الخلفيات: رمال المغامرات</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8DB596;   /* الأخضر المريمي (نمو/تعليم) */
+            --secondary: #E5A96F; /* البيج الرملي (دفء/أصالة) */
+            --accent: #F07F69;    /* المرجاني المطفي (إبداع/حيوية) */
+            --light: #FEFCF3;     /* الأبيض الكريمي (نقاء) */
+            --dark: #4A4A4A;      /* النص الأساسي */
+        }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+        }
+        .book-container {
+            width: 100%;
+            max-width: 800px;
+            height: 500px; /* ثابت نسبياً للعرض الجمالي */
+            max-height: 80vh;
+            perspective: 1500px;
+        }
+        .page {
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease-in-out;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background-color: var(--light);
+            border: 1px solid var(--dark);
+            background-size: cover;
+            background-position: center;
+        }
+        .pagination-dot {
+            transition: all 0.3s ease;
+        }
+        .pagination-dot.active {
+            background-color: var(--accent);
+            width: 20px;
+        }
+        .page-content-box {
+            background-color: rgba(254, 252, 243, 0.9); /* White Cream with slight transparency */
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="antialiased flex flex-col items-center py-10">
+
+    <header class="text-center mb-10 max-w-2xl mx-auto">
+        <h1 class="text-4xl font-bold mb-2" style="color: var(--primary);">📖 كتاب الخلفيات: مسرح القصة</h1>
+        <p class="text-lg text-gray-600">تصميم هيكلي لـ 12 مشهداً من البيئة المحلية. استخدم الأسهم للتنقل بين الصفحات واكتشاف تفاصيل كل مشهد.</p>
+    </header>
+
+    <div class="book-container relative mx-auto rounded-lg overflow-hidden flex items-center justify-center">
+        <!-- منطقة عرض الصفحة -->
+        <div id="page-display" class="page w-full h-full relative rounded-lg border-4 p-6" style="border-color: var(--secondary);">
+            <!-- محتوى المشهد يظهر هنا -->
+            <div id="scene-title" class="text-2xl font-bold mb-2" style="color: var(--dark);"></div>
+            <p id="scene-description" class="text-gray-700 mb-4"></p>
+            
+            <!-- لوحة الملاحظات التفاعلية (للتوجيه الأم/المعلم) -->
+            <div id="prompt-box" class="absolute top-4 left-4 p-3 page-content-box w-48 hidden">
+                <h4 class="font-bold text-sm" style="color: var(--accent);">ملاحظة توجيهية:</h4>
+                <p id="prompt-text" class="text-xs mt-1"></p>
+            </div>
+
+            <!-- معلومات الإنتاج (أسفل يسار الشاشة) -->
+             <div class="absolute bottom-4 right-4 p-2 page-content-box text-xs" style="color: var(--primary);">
+                المادة: ورق مقوى سميك (400 جرام) - تجليد سلك علوي
+            </div>
+            
+             <!-- منطقة فارغة (مثال) -->
+             <div class="absolute inset-x-1/4 top-1/4 h-1/2 flex items-center justify-center border-2 border-dashed rounded-lg opacity-50" style="border-color: var(--dark);">
+                <span class="text-sm">منطقة فارغة لوضع الشخصيات التفاعلية هنا</span>
+            </div>
+        </div>
+        
+        <!-- أزرار التحكم -->
+        <button id="prev-page" class="absolute right-2 top-1/2 transform -translate-y-1/2 z-10 bg-white p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors" style="color: var(--primary);">
+            <span style="font-size: 1.5rem;">&#x25C0;</span> 
+        </button>
+        <button id="next-page" class="absolute left-2 top-1/2 transform -translate-y-1/2 z-10 bg-white p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors" style="color: var(--primary);">
+             <span style="font-size: 1.5rem;">&#x25B6;</span>
+        </button>
+    </div>
+
+    <!-- مؤشرات الصفحات -->
+    <div id="pagination-dots" class="flex justify-center space-x-2 mt-6">
+    </div>
+
+    <script>
+        const scenes = [
+            { id: 1, title: "واحة النخيل الهادئة", desc: "بركة ماء صغيرة وأشجار نخيل. مشهد مثالي لمغامرات التجمع والتعارف بين الحيوانات.", color: 'var(--primary)', bg: 'linear-gradient(to bottom, #d4f0d6, var(--primary))', prompt: "ابدأ القصة بسؤال: ماذا لو كانت الحيوانات تشعر بالوحدة؟" },
+            { id: 2, title: "واحة النخيل (جهة التجمع)", desc: "مشهد أوسع يظهر مساحة للتخزين والجلوس. يشجع على قصص المساعدة والعمل الجماعي.", color: 'var(--primary)', bg: 'linear-gradient(to bottom, #c0e3c2, var(--primary))', prompt: "ركز على مهارة: كيف يمكن للشخصيات أن تتشارك الطعام أو الموارد؟" },
+            { id: 3, title: "الكثبان الرملية (وقت الغروب)", desc: "تلال رملية متموجة مع ظل طويل. المشهد يدعم قصص السفر، التحدي، أو البحث عن الأمان.", color: 'var(--secondary)', bg: 'linear-gradient(to bottom, #f7d2a9, var(--secondary))', prompt: "استخدم بطاقة 'خائف' أو 'شجاع': ما هو أكبر تحدٍ يواجهه البطل الآن؟" },
+            { id: 4, title: "الكثبان الرملية (شروق الشمس)", desc: "الألوان فاتحة وناعمة. مثالي لقصص الأمل، البدايات الجديدة، أو الاكتشاف بعد ليلة طويلة.", color: 'var(--secondary)', bg: 'linear-gradient(to bottom, #fcebc7, var(--secondary))', prompt: "ركز على مهارة: صف شعور الشخصية وهي ترى الشمس تشرق لأول مرة في القصة." },
+            { id: 5, title: "الوادي الصخري/مخيم البدو", desc: "تضاريس صخرية وجبلية مع خلفية لمخيم بسيط. مكان للاستراحة، تبادل الحكايات، والاجتماع العائلي.", color: 'var(--dark)', bg: 'linear-gradient(to bottom, #f0e6d6, #d1c8bd)', prompt: "ابدأ القصة بسؤال: ماذا يمكن أن يتعلم الجيل الصغير من الجدة الحكواتية؟" },
+            { id: 6, title: "الوادي الصخري (مسار الرحلة)", desc: "طريق ضيق بين الصخور يظهر صعوبة الحركة. مثالي لقصص القيادة واتخاذ القرار.", color: 'var(--dark)', bg: 'linear-gradient(to bottom, #e8dfd3, #b8aea5)', prompt: "ركز على مهارة: كيف يختار القائد المسار الصحيح عندما تكون الخيارات صعبة؟" },
+            { id: 7, title: "سوق القرية القديم", desc: "مشهد اجتماعي بأقواس ومتاجر صغيرة. يدعم قصص الحوار، التفاوض، والتجارة البسيطة.", color: 'var(--accent)', bg: 'linear-gradient(to bottom, #f7e0da, #f07f69)', prompt: "استخدم بطاقة 'يتفاوض': كيف يشتري البطل شيئاً يحتاجه بمساعدة أصدقائه؟" },
+            { id: 8, title: "سوق القرية (وقت اللقاء)", desc: "مساحة مفتوحة للقاء وتبادل الأخبار. يركز على العلاقات الاجتماعية وبناء الصداقات.", color: 'var(--accent)', bg: 'linear-gradient(to bottom, #faebe6, #e99b8a)', prompt: "ابدأ القصة بسؤال: من هو الشخص الذي لم يره البطل منذ زمن طويل؟ وماذا قال له؟" },
+            { id: 9, title: "فضاء سماء الليل (للأحلام)", desc: "خلفية سماء مظلمة مع نجوم ساطعة. مشهد يشجع على الأفكار المجردة، الأحلام، أو المشاعر العميقة.", color: '#1a1a2e', bg: 'linear-gradient(to bottom, #4a4e69, #1a1a2e)', textCol: 'var(--light)', prompt: "ركز على مهارة: إذا كان بإمكان البطل أن يحلم بأي شيء، فماذا سيكون حلمه؟" },
+            { id: 10, title: "فضاء سماء الليل (قمر مكتمل)", desc: "نفس الخلفية لكن مع قمر كبير ولامع. يوحي بالغموض، القصص الخيالية، أو الكشف عن سر.", color: '#1a1a2e', bg: 'linear-gradient(to bottom, #3f425c, #1a1a2e)', textCol: 'var(--light)', prompt: "استخدم بطاقة 'متعجب': ما هو السر الغريب الذي كشفه القمر للبطل؟" },
+            { id: 11, title: "مزرعة النخيل والمياه (وقت الحصاد)", desc: "مشهد عملي يركز على الحصاد والري. يدعم قصص المهارات الحياتية، المسؤولية، والمساعدة الأسرية.", color: 'var(--primary)', bg: 'linear-gradient(to bottom, #d4f0d6, #a8cfa8)', prompt: "ركز على مهارة: كيف يمكن لجميع الشخصيات أن تعمل معاً لتحقيق هدف كبير؟" },
+            { id: 12, title: "مزرعة النخيل (مكان اللعب)", desc: "مساحة واسعة وخضراء داخل المزرعة للعب والاحتفال بالنجاح بعد العمل.", color: 'var(--primary)', bg: 'linear-gradient(to bottom, #c0e3c2, #8DB596)', prompt: "ابدأ القصة بسؤال: كيف احتفلت الشخصيات بنجاحهم؟ وماذا تعلموا من العمل الشاق؟" }
+        ];
+
+        let currentPageIndex = 0;
+        const pageDisplay = document.getElementById('page-display');
+        const sceneTitle = document.getElementById('scene-title');
+        const sceneDescription = document.getElementById('scene-description');
+        const promptBox = document.getElementById('prompt-box');
+        const promptText = document.getElementById('prompt-text');
+        const prevButton = document.getElementById('prev-page');
+        const nextButton = document.getElementById('next-page');
+        const paginationDots = document.getElementById('pagination-dots');
+
+        function updatePageDisplay() {
+            const scene = scenes[currentPageIndex];
+            
+            // تحديث تصميم الصفحة
+            pageDisplay.style.backgroundImage = scene.bg ? `linear-gradient(${scene.bg})` : '';
+            pageDisplay.style.borderColor = scene.color;
+            pageDisplay.style.color = scene.textCol || 'var(--dark)';
+            pageDisplay.querySelector('.absolute.bottom-4').style.color = scene.textCol || 'var(--dark)';
+
+            // تحديث المحتوى النصي
+            sceneTitle.textContent = `${scene.id}. ${scene.title}`;
+            sceneDescription.textContent = scene.desc;
+            
+            // تحديث مربع التوجيه
+            if (scene.prompt) {
+                promptBox.classList.remove('hidden');
+                promptText.textContent = scene.prompt;
+                promptBox.style.backgroundColor = scene.textCol === 'var(--light)' ? 'rgba(74, 74, 74, 0.9)' : 'rgba(254, 252, 243, 0.9)';
+                promptBox.style.color = scene.textCol === 'var(--light)' ? 'var(--light)' : 'var(--dark)';
+            } else {
+                promptBox.classList.add('hidden');
+            }
+
+            // تحديث مؤشرات الصفحات
+            document.querySelectorAll('.pagination-dot').forEach((dot, index) => {
+                dot.classList.remove('active');
+                dot.style.backgroundColor = (index === currentPageIndex) ? 'var(--accent)' : 'var(--secondary)';
+            });
+
+            // تحديث أزرار التنقل
+            prevButton.disabled = currentPageIndex === 0;
+            nextButton.disabled = currentPageIndex === scenes.length - 1;
+            prevButton.style.opacity = currentPageIndex === 0 ? 0.5 : 1;
+            nextButton.style.opacity = currentPageIndex === scenes.length - 1 ? 0.5 : 1;
+        }
+
+        function createPaginationDots() {
+            scenes.forEach((_, index) => {
+                const dot = document.createElement('button');
+                dot.classList.add('pagination-dot', 'w-3', 'h-3', 'rounded-full', 'mx-1');
+                dot.addEventListener('click', () => {
+                    currentPageIndex = index;
+                    updatePageDisplay();
+                });
+                paginationDots.appendChild(dot);
+            });
+        }
+
+        prevButton.addEventListener('click', () => {
+            if (currentPageIndex > 0) {
+                currentPageIndex--;
+                updatePageDisplay();
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (currentPageIndex < scenes.length - 1) {
+                currentPageIndex++;
+                updatePageDisplay();
+            }
+        });
+
+        createPaginationDots();
+        updatePageDisplay();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دليل شخصيات أبطال الرمال - Toyla</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8DB596;   /* الأخضر المريمي */
+            --secondary: #E5A96F; /* البيج الرملي */
+            --accent: #F07F69;    /* المرجاني المطفي */
+            --light: #FEFCF3;     /* الأبيض الكريمي */
+            --dark: #4A4A4A;      /* النص الأساسي */
+        }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+        }
+        .spec-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        .spec-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+        }
+        .figure-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            @apply shadow-md hover:shadow-xl hover:scale-[1.03];
+        }
+        .figure-art {
+            min-height: 100px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            border-radius: 6px 6px 0 0;
+            position: relative;
+            background: linear-gradient(to top, #fcf8f0, #ffffff);
+        }
+        .figure-icon {
+            font-size: 3rem; 
+            margin-bottom: 5px;
+            transition: transform 0.3s ease;
+        }
+        .figure-card:hover .figure-icon {
+            transform: scale(1.1);
+        }
+        .category-header {
+            border-right: 8px solid var(--accent);
+            @apply pr-4 py-2 mb-4 font-bold text-2xl;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 50;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            width: 90%;
+            max-width: 800px;
+            z-index: 60;
+            border: 4px solid var(--secondary);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .scene-container {
+            background: linear-gradient(to bottom, #f7d2a9, var(--secondary)); /* خلفية رملية دافئة */
+            height: 500px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .character {
+            position: absolute;
+            bottom: 30px; 
+            transition: all 0.4s ease-in-out;
+            cursor: pointer;
+            text-align: center;
+        }
+        .character-art {
+            position: relative;
+            background-color: var(--light); 
+            border: 2px solid var(--dark);
+            border-radius: 8px;
+            padding-bottom: 5px; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .character:hover .character-art {
+            transform: translateY(-10px) rotate(2deg);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+        }
+        .base-slot {
+            width: 80%;
+            height: 5px;
+            background-color: var(--dark);
+            margin: 0 auto;
+            border-radius: 3px;
+        }
+        .info-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 400px;
+            z-index: 20;
+            background-color: var(--light);
+            border: 4px solid var(--primary);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+        .icon-accent {
+            background-color: var(--accent);
+            color: var(--light);
+            padding: 5px 10px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+        }
+        .spec-label {
+            @apply font-bold text-base mb-1 block p-1 rounded-sm;
+            background-color: var(--secondary);
+            color: var(--dark);
+        }
+        .spec-value {
+            @apply text-sm text-gray-700 mb-3;
+        }
+        .color-chip {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 5px;
+            border: 1px solid #ccc;
+        }
+        .size-12cm { font-size: 4.5rem; } /* الجمل، النخلة */
+        .size-10cm { font-size: 4rem; }  /* الجدة، المها */
+        .size-8cm { font-size: 3.5rem; }  /* الطفل، الخيمة */
+        .size-6cm { font-size: 3rem; }   /* الفنك، بئر الماء */
+        .size-4cm { font-size: 2.5rem; }  /* العناصر الصغيرة */
+    </style>
+</head>
+<body class="antialiased flex flex-col items-center py-10">
+
+    <header class="text-center mb-12 max-w-4xl mx-auto">
+        <h1 class="text-4xl font-bold mb-2" style="color: var(--accent);">🦁 الشخصيات التفاعلية: أبطال الرمال</h1>
+        <p class="text-lg text-gray-600">دليل شامل للشخصيات، مواصفاتها، واستخداماتها في سرد القصص التفاعلية</p>
+    </header>
+
+    <!-- المواصفات الفنية -->
+    <section class="max-w-5xl mx-auto mb-16">
+        <h2 class="text-3xl font-bold mb-6 text-center" style="color: var(--primary);">📋 المواصفات الفنية</h2>
+        
+        <div class="grid md:grid-cols-3 gap-6 mb-12">
+            <div class="spec-card bg-white p-6 rounded-lg shadow-md border-r-4" style="border-color: var(--secondary);" onclick="alert('المادة: ورق مقوى عالي الكثافة (Hardboard) بسمك 2.5 مم.\nالقيمة: ضمان المتانة ومقاومة الانثناء أو الكسر من الاستخدام المتكرر.')">
+                <div class="flex items-center space-x-3 space-x-reverse">
+                    <div class="text-3xl" style="color: var(--secondary);">🧱</div>
+                    <div>
+                        <h3 class="font-bold text-xl">مادة فائقة المتانة</h3>
+                        <p class="text-gray-600 text-sm">سمك 2.5 مم (Hardboard)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="spec-card bg-white p-6 rounded-lg shadow-md border-r-4" style="border-color: var(--primary);" onclick="alert('التصميم: طباعة مزدوجة (على الوجهين) لتمكين الطفل من تغيير اتجاه الشخصية دون قلبها.\nالقيمة: زيادة مرونة اللعب والإخراج القصصي.')">
+                 <div class="flex items-center space-x-3 space-x-reverse">
+                    <div class="text-3xl" style="color: var(--primary);">↔️</div>
+                    <div>
+                        <h3 class="font-bold text-xl">طباعة مزدوجة الاتجاه</h3>
+                        <p class="text-gray-600 text-sm">لمرونة الحركة في المشهد</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="spec-card bg-white p-6 rounded-lg shadow-md border-r-4" style="border-color: var(--accent);" onclick="alert('الكسوة: بلاستيكية مطفية (Matte Finish) على الوجهين.\nالقيمة: مقاومة الخدوش وبصمات الأصابع، ومنع انعكاس الضوء على الرسم، مما يجعله صديقاً للعين.')">
+                <div class="flex items-center space-x-3 space-x-reverse">
+                    <div class="text-3xl" style="color: var(--accent);">✨</div>
+                    <div>
+                        <h3 class="font-bold text-xl">لمسة نهائية مطفية</h3>
+                        <p class="text-gray-600 text-sm">لمقاومة الخدوش وسهولة التنظيف</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- آلية التثبيت -->
+        <div class="max-w-6xl mx-auto bg-gray-100 p-8 rounded-xl shadow-inner border" style="border-color: var(--dark);">
+            <h2 class="text-2xl font-bold mb-6 text-center" style="color: var(--dark);">آلية التثبيت (مقياس A4)</h2>
+            
+            <div class="flex justify-center items-end h-64">
+                
+                <!-- شخصية 1: الجمل (12 سم - الأطول) -->
+                <div class="mx-6 text-center">
+                    <div class="character-art" style="height: 120px; width: 150px; border-color: var(--secondary);">
+                        <div class="text-7xl">🐪</div>
+                        <div class="base-slot" style="background-color: var(--secondary);"></div>
+                    </div>
+                    <div class="mt-4 font-semibold">الجمل صابر (12 سم)</div>
+                </div>
+
+                <!-- شخصية 2: الجدة الحكواتية (10 سم - متوسط) -->
+                <div class="mx-6 text-center">
+                    <div class="character-art" style="height: 100px; width: 80px; border-color: var(--primary);">
+                         <div class="text-6xl">👵</div>
+                         <div class="base-slot" style="background-color: var(--primary);"></div>
+                    </div>
+                    <div class="mt-4 font-semibold">الجدة نورا (10 سم)</div>
+                </div>
+
+                <!-- شخصية 3: الطفل المغامر (8 سم - الأصغر) -->
+                <div class="mx-6 text-center">
+                    <div class="character-art" style="height: 80px; width: 60px; border-color: var(--accent);">
+                         <div class="text-5xl">👶</div>
+                         <div class="base-slot" style="background-color: var(--accent);"></div>
+                    </div>
+                    <div class="mt-4 font-semibold">الطفل راشد (8 سم)</div>
+                </div>
+
+                <!-- شخصية 4: ثعلب الفنك (6 سم - صغير) -->
+                <div class="mx-6 text-center">
+                    <div class="character-art" style="height: 60px; width: 50px; border-color: var(--secondary);">
+                         <div class="text-3xl">🦊</div>
+                         <div class="base-slot" style="background-color: var(--secondary);"></div>
+                    </div>
+                    <div class="mt-4 font-semibold">ثعلب الفنك (6 سم)</div>
+                </div>
+                
+                <!-- آلية التثبيت -->
+                <div class="mx-6 text-center pt-8">
+                    <div class="character-art h-40 w-40 flex flex-col items-center justify-center border-dashed" style="background-color: var(--light); border-color: var(--primary);">
+                        <div class="w-1/3 h-10 border-2 rounded-t-lg" style="border-color: var(--primary); background-color: var(--primary);"></div>
+                        <div class="w-1/3 h-8 border-2 border-t-0" style="border-color: var(--dark); background-color: var(--dark);"></div>
+                        <p class="text-xs mt-2 font-bold" style="color: var(--dark);">آلية Slot Base</p>
+                    </div>
+                    <div class="mt-4 text-sm font-normal text-gray-500">آلية التثبيت المنفصلة</div>
+                </div>
+            </div>
+
+            <p class="text-center text-sm text-gray-500 mt-10 p-4 rounded-lg bg-white shadow-sm border" style="border-color: var(--primary);">
+                **ملاحظة:** يمثل المقياس المرئي أعلاه الأبعاد النسبية للشخصيات (الجمل 12 سم، الطفل 8 سم) بالإضافة إلى آلية **القاعدة التثبيتية (Base Slot)** التي تتيح للشخصية الوقوف بشكل ثابت على مسرح القصة.
+            </p>
+        </div>
+    </section>
+
+    <!-- محاكاة المشهد التفاعلي -->
+    <section class="max-w-6xl mx-auto mb-16">
+        <h2 class="text-3xl font-bold mb-6 text-center" style="color: var(--primary);">✨ تطبيق الهوية البصرية على الشخصيات الرئيسية</h2>
+        <p class="text-lg text-gray-600 text-center mb-6">محاكاة عملية لأبعاد الشخصيات وتطبيق الألوان. انقر على كل شخصية لمعرفة دورها وقيمتها التعليمية.</p>
+
+        <!-- منطقة محاكاة المشهد -->
+        <div class="scene-container w-full max-w-5xl mx-auto">
+            
+            <!-- الجمل "صابر" -->
+            <div id="char-camel" class="character w-40 left-[10%] cursor-pointer" onclick="showInfo('صابر الوفي', 'الجمل', 'رمز الصبر والتحمل والرحلات. يحمل أثقال القصة، ويدعم قصص المثابرة.', 'الأخضر المريمي (#8DB596) على السرج')">
+                <div class="character-art" style="height: 120px; width: 150px; border-color: var(--secondary);">
+                    <div class="text-7xl">🐪</div>
+                    <div class="base-slot" style="background-color: var(--secondary);"></div>
+                </div>
+                <p class="mt-2 font-semibold">الجمل صابر (12 سم)</p>
+            </div>
+
+            <!-- الجدة "نورا" -->
+            <div id="char-grandma" class="character w-20 left-[45%] cursor-pointer" onclick="showInfo('نورا الحكواتية', 'الجدة', 'رمز الحكمة والخبرة، وناقلة القصص. تشجع الطفل على الإصغاء واحترام المعرفة المحلية.', 'الأخضر المريمي (#8DB596) للملابس')">
+                 <div class="character-art" style="height: 100px; width: 80px; border-color: var(--primary);">
+                    <div class="text-6xl">👵</div>
+                    <div class="base-slot" style="background-color: var(--primary);"></div>
+                </div>
+                <p class="mt-2 font-semibold">الجدة نورا (10 سم)</p>
+            </div>
+
+            <!-- الطفل "راشد" -->
+            <div id="char-boy" class="character w-16 right-[20%] cursor-pointer" onclick="showInfo('راشد المغامر', 'الطفل', 'البطل الرئيسي. يتخذ القرارات، يكتشف ويواجه التحديات. يعزز الشجاعة والتعبير.', 'المرجاني المطفي (#F07F69) على الحزام')">
+                 <div class="character-art" style="height: 80px; width: 60px; border-color: var(--accent);">
+                    <div class="text-5xl">👶</div>
+                    <div class="base-slot" style="background-color: var(--accent);"></div>
+                </div>
+                <p class="mt-2 font-semibold">الطفل راشد (8 سم)</p>
+            </div>
+
+            <!-- لوحة عرض التفاصيل التفاعلية -->
+            <div id="info-modal" class="info-box">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 id="info-name" class="text-2xl font-bold" style="color: var(--primary);"></h3>
+                    <button onclick="hideInfo()" class="text-2xl font-bold p-1 leading-none rounded-full" style="color: var(--dark);">
+                        &times;
+                    </button>
+                </div>
+                <p class="text-sm mb-2"><span class="icon-accent">الدور</span> <span id="info-role" class="font-bold"></span></p>
+                <p id="info-value" class="text-gray-700 mb-4"></p>
+                <p class="text-sm"><span class="icon-accent">تطبيق اللون</span> <span id="info-color" class="font-bold"></span></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- الكتالوج التفصيلي للشخصيات -->
+    <section class="w-full max-w-7xl mx-auto p-4 mb-16">
+        <h2 class="text-3xl font-bold mb-10 text-center" style="color: var(--accent);">🔍 الكتالوج المرجعي المتكامل لشخصيات Toyla</h2>
+
+        <!-- مجموعة الشخصيات البشرية (2 قطعة) -->
+        <h2 class="category-header" style="border-color: var(--primary); color: var(--primary);">👤 الشخصيات البشرية (رمز الحوار)</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-10">
+            <!-- الجدة نورا -->
+            <div class="figure-card rounded-lg bg-white" data-char='{"name":"الجدة نورا الحكواتية","role":"رمز الحكمة والخبرة ونقل القصص. تشجع على مهارة الإصغاء.","size":"10 سم","color":"الأخضر المريمي (#8DB596) للملابس الأساسية (الهدوء والثقة).","accent":"الأبيض الكريمي (#FEFCF3) كخطوط تطريز بسيطة لإضافة لمسة فخامة."}' onclick="showDetails(this.dataset.char)">
+                <div class="figure-art">
+                    <span class="figure-icon" style="color: var(--primary);">👵</span>
+                </div>
+                <div class="p-3 text-center">الجدة نورا</div>
+            </div>
+            <!-- الطفل راشد -->
+            <div class="figure-card rounded-lg bg-white" data-char='{"name":"الطفل راشد المغامر","role":"البطل، رمز الحركة، الاستكشاف، واتخاذ القرارات. يعزز الشجاعة والتعبير عن الذات.","size":"8 سم","color":"البيج الرملي الفاتح (#E5A96F) للزي المحلي.","accent":"المرجاني المطفي (#F07F69) كنطاق للخصر أو قبعة، ليعكس طاقته وحيويته."}' onclick="showDetails(this.dataset.char)">
+                <div class="figure-art">
+                    <span class="figure-icon" style="color: var(--accent);">👶</span>
+                </div>
+                <div class="p-3 text-center">الطفل راشد</div>
+            </div>
+        </div>
+
+        <!-- مجموعة الحيوانات (5 قطع) -->
+        <h2 class="category-header" style="border-color: var(--secondary); color: var(--secondary);">🦁 حيوانات البيئة المحلية (رمز التحدي والتكيف)</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-10">
+            <!-- الجمل صابر -->
+            <div class="figure-card rounded-lg bg-white" data-char='{"name":"الجمل صابر الوفي","role":"رمز الصبر والقوة والتحمل. يستخدم لقصص الترحال والمثابرة.","size":"12 سم (الأطول)","color":"تدرجات البيج الرملي (#E5A96F).","accent":"الأخضر المريمي (#8DB596) على حبل اللجام/السرج لربطه بهوية المنتج التعليمية."}' onclick="showDetails(this.dataset.char)">
+                <div class="figure-art">
+                    <span class="figure-icon" style="color: var(--secondary);">🐪</span>
+                </div>
+                <div class="p-3 text-center">الجمل صابر</div>
+            </div>
+            <!-- المها العربي -->
+            <div class="figure-card rounded-lg bg-white" data-char='{"name":"المها العربي الرشيق","role":"رمز الجمال، العزلة، والتكيف في البيئة القاسية. يستخدم لقصص البحث عن الموارد.","size":"9 سم","color":"الأبيض الكريمي (#FEFCF3) والبيج الفاتح للجسم.","accent":"خطوط بسيطة بلون داكن (var(--dark)) على القرون لتعزيز الرشاقة."}' onclick="showDetails(this.dataset.char)">
+                <div class="figure-art">
+                    <span class="figure-icon" style="color: var(--light); text-shadow: 1px 1px 2px var(--dark);">🦌</span>
+                </div>
+                <div class="p-3 text-center">المها العربي</div>
+            </div>
+            <!-- ثعلب الفنك -->
+            <div class="figure-card rounded-lg bg-white" data-char='{"name":"ثعلب الفنك الذكي","role":"رمز المكر، الذكاء، وحل المشكلات. يستخدم لقصص التفكير الجانبي.","size":"6 سم (الأصغر)","color":"لون فاتح (أبيض كريمي) مع لمسة رملية.","accent":"لمسات بسيطة من المرجاني (#F07F69) على طرف الأذن لإبراز الحيوية."}' onclick="showDetails(this.dataset.char)">
+                <div class="figure-art">
+                    <span class="figure-icon" style="color: var(--secondary);">🦊</span>
+                </div>
+                <div class="p-3 text-center">ثعلب الفنك</div>
+            </div>
+            <!-- الصقر -->
+            <div class="figure-card rounded-lg bg-white" data-char='{"name":"الصقر الباحث","role":"رمز الحرية، الرؤية الواضحة، والتخطيط. يستخدم لقصص التوجيه من مكان عالٍ.","size":"7 سم","color":"تدرجات بني هادئة (قريبة من var(--dark)).","accent":"الجناحان بلون فاتح (الأبيض الكريمي) لإظهار العظمة."}' onclick="showDetails(this.dataset.char)">
+                <div class="figure-art">
+                    <span class="figure-icon" style="color: var(--dark);">🦅</span>
+                </div>
+                <div class="p-3 text-center">الصقر</div>
+            </div>
+            <!-- اليربوع -->
+            <div class="figure-card rounded-lg bg-white" data-char='{"name":"اليربوع (أو حيوان صغير)","role":"رمز المفاجأة، أو الحذر من المخاطر الصغيرة. يستخدم لتعليم التفاعل الهادئ مع المخاطر.","size":"4 سم (صغير جداً)","color":"تدرجات رمادية/بنية محايدة.","accent":"لا يوجد."}' onclick="showDetails(this.dataset.char)">
+                <div class="figure-art">
+                    <span class="figure-icon" style="color: var(--dark);">🐁</span>
+                </div>
+                <div class="p-3 text-center">اليربوع</div>
+            </div>
+        </div>
+
+        <!-- مجموعة العناصر الأساسية (3 قطع) -->
+        <h2 class="category-header" style="border-color: var(--accent); color: var(--accent);">🌿 العناصر الأساسية (رمز الاستقرار والتجمع)</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-10">
+            <!-- النخلة -->
+            <div class="figure-card rounded-lg bg-white" data-char='{"name":"النخلة المثمرة","role":"رمز الرزق، الحياة، والاستقرار في الواحة. نقطة مرجعية في الخلفيات.","size":"12 سم (الأطول)","color":"الأخضر المريمي (#8DB596) للسعف.","accent":"البيج الرملي (#E5A96F) لجذع الشجرة والتمر."}' onclick="showDetails(this.dataset.char)">
+                <div class="figure-art">
+                    <span class="figure-icon" style="color: var(--primary);">🌴</span>
+                </div>
+                <div class="p-3 text-center">النخلة</div>
+            </div>
+            <!-- الخيمة -->
+            <div class="figure-card rounded-lg bg-white" data-char='{"name":"خيمة الترحال","role":"رمز الأمان، المأوى، ومكان الاجتماع العائلي.","size":"9 سم","color":"البيج الرملي (#E5A96F) للنسيج الأساسي.","accent":"خطوط وأعمدة داكنة (var(--dark)) لزيادة التفاصيل."}' onclick="showDetails(this.dataset.char)">
+                <div class="figure-art">
+                    <span class="figure-icon" style="color: var(--secondary);">⛺</span>
+                </div>
+                <div class="p-3 text-center">خيمة الترحال</div>
+            </div>
+            <!-- بئر الماء -->
+            <div class="figure-card rounded-lg bg-white" data-char='{"name":"بئر الماء/البركة","role":"رمز المورد، والهدف الذي تسعى إليه الشخصيات (مفتاح حل الألغاز).","size":"6 سم (عرض)","color":"تدرجات رمادية باردة.","accent":"الأزرق الفاتح (غير موجود في الباليت الأساسي) لتمثيل الماء، يظهر كـ 'لون مشهد' داخل البئر."}' onclick="showDetails(this.dataset.char)">
+                <div class="figure-art">
+                    <span class="figure-icon" style="color: #4a6c98;">💧</span>
+                </div>
+                <div class="p-3 text-center">بئر الماء</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- النافذة المنبثقة التفصيلية (Modal) -->
+    <div id="info-modal-overlay" class="modal-overlay" onclick="hideDetails()">
+        <div id="info-modal-content" class="modal-content bg-white p-6 md:p-8 relative rounded-xl" onclick="event.stopPropagation()">
+            <button onclick="hideDetails()" class="absolute top-3 left-3 text-3xl font-bold p-1 leading-none rounded-full" style="color: var(--dark);">&times;</button>
+            <h3 id="modal-name" class="text-3xl font-bold mb-4" style="color: var(--accent);"></h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-lg">
+                <div class="p-4 rounded-lg" style="background-color: #e6f0e7;">
+                    <p class="font-bold mb-1" style="color: var(--dark);">🌟 الدور السردي والقيمي:</p>
+                    <p id="modal-role" class="text-base text-gray-700"></p>
+                </div>
+                <div class="p-4 rounded-lg" style="background-color: #f7ede3;">
+                    <p class="font-bold mb-1" style="color: var(--dark);">📏 المقياس والحجم:</p>
+                    <p id="modal-size" class="text-base text-gray-700"></p>
+                </div>
+            </div>
+            
+            <h4 class="text-xl font-bold mt-6 mb-2" style="color: var(--accent);">🎨 تطبيق الهوية البصرية (Toyla Vibe):</h4>
+            
+            <p class="text-base mb-2">
+                <span class="font-bold mr-2" style="color: var(--primary);">اللون الأساسي:</span> 
+                <span id="modal-color-name" class="font-semibold text-gray-700"></span>
+            </p>
+            <p class="text-base">
+                <span class="font-bold mr-2" style="color: var(--accent);">لمسة التركيز (Accent):</span> 
+                <span id="modal-accent-name" class="font-semibold text-gray-700"></span>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // وظائف للعرض التفاعلي
+        function showInfo(name, role, value, color) {
+            const modal = document.getElementById('info-modal');
+            document.getElementById('info-name').textContent = name;
+            document.getElementById('info-role').textContent = role;
+            document.getElementById('info-value').textContent = value;
+            document.getElementById('info-color').textContent = color;
+            modal.style.display = 'block';
+        }
+
+        function hideInfo() {
+            document.getElementById('info-modal').style.display = 'none';
+        }
+
+        function showDetails(charJson) {
+            const char = JSON.parse(charJson);
+            const modalOverlay = document.getElementById('info-modal-overlay');
+            
+            document.getElementById('modal-name').textContent = char.name;
+            document.getElementById('modal-role').textContent = char.role;
+            document.getElementById('modal-size').textContent = char.size;
+            document.getElementById('modal-color-name').textContent = char.color;
+            document.getElementById('modal-accent-name').textContent = char.accent;
+
+            modalOverlay.style.display = 'flex';
+        }
+
+        function hideDetails() {
+            document.getElementById('info-modal-overlay').style.display = 'none';
+        }
+    </script>
+
+</body>
+</html>

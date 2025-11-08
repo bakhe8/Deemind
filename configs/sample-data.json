@@ -1,0 +1,18 @@
+{
+  "store": {
+    "name": "Deemind Demo Store",
+    "locale": "ar",
+    "direction": "rtl"
+  },
+  "products": [
+    { "id": 101, "name": "تيشيرت كلاسيك", "price": 69.0, "image": "images/p1.jpg" },
+    { "id": 102, "name": "حذاء رياضي", "price": 199.0, "image": "images/p2.jpg" },
+    { "id": 103, "name": "حقيبة يد", "price": 149.0, "image": "images/p3.jpg" },
+    { "id": 104, "name": "ساعة أنيقة", "price": 299.0, "image": "images/p4.jpg" }
+  ],
+  "categories": [
+    { "id": 1, "name": "وصل حديثاً" },
+    { "id": 2, "name": "الأكثر مبيعاً" }
+  ]
+}
+

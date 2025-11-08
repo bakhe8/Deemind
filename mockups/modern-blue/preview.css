@@ -1,0 +1,14 @@
+/* Mockup Tokens & Base Styles */
+body{font-family:var(--font-base);margin:0;color:var(--color-secondary)}
+.container{max-width:1200px;margin:auto;padding:var(--spacing-md)}
+.navbar{display:flex;align-items:center;justify-content:space-between;gap:var(--spacing-md);padding:var(--spacing-md)}
+.brand{color:var(--color-secondary);text-decoration:none;font-weight:600}
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:var(--spacing-lg);align-items:center;padding:var(--spacing-lg);background:linear-gradient(180deg,#fff,#eef);border-radius:var(--radius-md)}
+.hero .cta{background:var(--color-primary);color:#fff;border:none;padding:12px 20px;border-radius:var(--radius-md);cursor:pointer;transition:opacity var(--transition-md)}
+.hero .cta:hover{opacity:.9}
+.grid-4{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:var(--spacing-md)}
+.card{border:1px solid rgba(0,0,0,.08);border-radius:var(--radius-md);padding:var(--spacing-md)}
+.banner{margin:var(--spacing-lg) 0;padding:var(--spacing-lg);background:var(--color-primary);color:#fff;border-radius:var(--radius-md);text-align:center}
+.footer{padding:var(--spacing-md);text-align:center;color:#667}
+:dir(rtl) .navbar{direction:rtl}
+:dir(ltr) .navbar{direction:ltr}

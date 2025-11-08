@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خطة عمل مشروع تويلي (Toyla) التفاعلية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Toyla's Warm & Artistic Palette (Sand, Cream, Sage, Coral) -->
+    <!-- Application Structure Plan: The application is structured as an interactive pitch deck. It follows a narrative flow: from the high-level vision, it drills down into the target audience, the product solution, and finally, the marketing strategy. This thematic structure, combined with a sticky navigation bar, allows stakeholders to easily explore the business plan. The key interaction is the visualization of the target audience's motivations, turning a qualitative statement into a quantitative-feeling insight. This design prioritizes persuasive storytelling over a rigid report structure. -->
+    <!-- Visualization & Content Choices: Report Info: Target Audience Motivations -> Goal: Compare priorities -> Viz: Doughnut Chart (Chart.js/Canvas) -> Interaction: Animated load, tooltips on hover -> Justification: The chart visually quantifies the mother's purchasing drivers (Quality, Education, Art), making the persona analysis more impactful than a simple text list. The rest of the report is presented using interactive cards (HTML/CSS with hover effects) and clear typographic hierarchy to organize information digestibly. All choices avoid SVG/Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #FEFCF3; /* Creamy White */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .smooth-transition {
+            transition: all 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-[#FEFCF3] text-gray-800 antialiased">
+
+    <header class="bg-[#F5E5C9]/80 backdrop-blur-sm shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-3xl font-bold text-gray-800">تويلي (Toyla)</h1>
+            <div class="hidden md:flex space-x-8 space-x-reverse">
+                <a href="#vision" class="text-gray-700 hover:text-[#F07F69] smooth-transition font-semibold">الرؤية</a>
+                <a href="#audience" class="text-gray-700 hover:text-[#F07F69] smooth-transition font-semibold">الفئة المستهدفة</a>
+                <a href="#product" class="text-gray-700 hover:text-[#F07F69] smooth-transition font-semibold">المنتج</a>
+                <a href="#marketing" class="text-gray-700 hover:text-[#F07F69] smooth-transition font-semibold">التسويق</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-6 md:p-12">
+
+        <!-- Hero Section -->
+        <section class="text-center py-20">
+            <h2 class="text-4xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#8DB596] to-[#E5A96F]">هدايا تتحول إلى إرث عاطفي</h2>
+            <p class="text-lg max-w-3xl mx-auto text-gray-600 mt-6">
+                خطة عمل أولية لمتجر **تويلي (Toyla)**: الوجهة الأولى للأمهات الباحثات عن هدايا فنية وهادفة تنمي ذكاء أطفالهن العاطفي.
+            </p>
+        </section>
+
+        <!-- Vision Section -->
+        <section id="vision" class="py-16">
+            <h2 class="text-3xl font-bold text-center mb-12">رؤيتنا وهوية علامتنا التجارية</h2>
+            <div class="max-w-5xl mx-auto grid md:grid-cols-3 gap-8 text-center">
+                <div class="bg-white p-8 rounded-2xl shadow-lg border-b-8 border-[#E5A96F] smooth-transition hover:shadow-2xl hover:-translate-y-2">
+                    <div class="text-5xl mb-4">💡</div>
+                    <h3 class="text-2xl font-bold mb-2">شعار القيمة</h3>
+                    <p class="text-gray-600">بناء الذكاء العاطفي (EQ) من خلال اللعب التفاعلي، وليس فقط الذكاء المعرفي (IQ).</p>
+                </div>
+                <div class="bg-white p-8 rounded-2xl shadow-lg border-b-8 border-[#8DB596] smooth-transition hover:shadow-2xl hover:-translate-y-2">
+                    <div class="text-5xl mb-4">🎯</div>
+                    <h3 class="text-2xl font-bold mb-2">الرؤية الجوهرية</h3>
+                    <p class="text-gray-600">أن نكون الوجهة الأولى للهدايا الفنية التي تُترك كإرث عاطفي جميل بين الأم وطفلها.</p>
+                </div>
+                <div class="bg-white p-8 rounded-2xl shadow-lg border-b-8 border-[#F07F69] smooth-transition hover:shadow-2xl hover:-translate-y-2">
+                     <div class="text-5xl mb-4">🏷️</div>
+                    <h3 class="text-2xl font-bold mb-2">الاسم: تويلي</h3>
+                    <p class="text-gray-600">اسم يجمع بين اللعب (Toy) والجمالية، سهل النطق ويوحي بالرقة والتفاعل.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Target Audience Section -->
+        <section id="audience" class="py-16 bg-white rounded-2xl shadow-lg">
+            <h2 class="text-3xl font-bold text-center mb-12">الفئة المستهدفة: الأم العصرية الباحثة عن القيمة</h2>
+            <p class="text-center text-gray-600 max-w-3xl mx-auto mb-12">منتجاتنا مصممة لتتحدث مباشرة إلى عقلية وقيم الأمهات في الفئة العمرية 25-40 سنة.</p>
+            <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+                <div class="bg-gray-50 p-8 rounded-2xl">
+                    <h3 class="text-2xl font-bold mb-4 text-center">كيف يتحدث المنتج إليها؟</h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start"><span class="text-xl mr-3 text-[#8DB596]">✓</span> <div><strong class="block">لباحثة عن الجودة:</strong> "منتجاتنا مصممة لتدوم، باستخدام مواد صديقة للبيئة وآمنة."</div></li>
+                        <li class="flex items-start"><span class="text-xl mr-3 text-[#E5A96F]">✓</span> <div><strong class="block">لمهتمة بالفن:</strong> "تصاميمنا فنية تليق بغرفة طفلك وتناسب ذوقك الرفيع."</div></li>
+                        <li class="flex items-start"><span class="text-xl mr-3 text-[#F07F69]">✓</span> <div><strong class="block">لمن تولي أهمية للتعليم:</strong> "هديتنا أداة لتعليم التعبير عن الذات وبناء الحوار."</div></li>
+                        <li class="flex items-start"><span class="text-xl mr-3 text-gray-500">✓</span> <div><strong class="block">لمن تقدر التفاعل العائلي:</strong> "اقضوا وقتاً ثميناً في بناء القصص معاً، بعيداً عن الشاشات."</div></li>
+                    </ul>
+                </div>
+                 <div>
+                    <h3 class="text-2xl font-bold mb-4 text-center">المحفز الشرائي الأقوى لديها</h3>
+                     <div class="chart-container">
+                        <canvas id="audienceChart"></canvas>
+                    </div>
+                 </div>
+            </div>
+        </section>
+
+        <!-- Product Section -->
+        <section id="product" class="py-16">
+            <h2 class="text-3xl font-bold text-center mb-12">المنتج الأساسي: لوحة بناء الحوار</h2>
+            <div class="max-w-6xl mx-auto grid lg:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-xl shadow-md flex flex-col">
+                    <h3 class="text-xl font-bold mb-3 text-center">المكونات الرئيسية</h3>
+                    <ul class="space-y-3 text-gray-700 flex-grow">
+                        <li class="flex"><span class="mr-2">1.</span><strong>خلفية القصة:</strong> لوحة فنية ثابتة (غابة، بحر).</li>
+                        <li class="flex"><span class="mr-2">2.</span><strong>شخصيات القصة:</strong> ملصقات قابلة لإعادة الاستخدام.</li>
+                        <li class="flex"><span class="mr-2">3.</span><strong>كُتيب الحوار:</strong> دليل إرشادي للأم لبدء القصة.</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-md flex flex-col">
+                    <h3 class="text-xl font-bold mb-3 text-center">المهارات النامية لدى الطفل</h3>
+                    <div class="flex flex-wrap gap-2 justify-center flex-grow items-center">
+                        <span class="bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">الذكاء اللغوي</span>
+                        <span class="bg-pink-100 text-pink-800 text-sm font-semibold px-3 py-1 rounded-full">الذكاء العاطفي</span>
+                        <span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">الذكاء الاجتماعي</span>
+                        <span class="bg-yellow-100 text-yellow-800 text-sm font-semibold px-3 py-1 rounded-full">المهارات الحركية</span>
+                    </div>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-md flex flex-col">
+                    <h3 class="text-xl font-bold mb-3 text-center">القيمة المضافة والتغليف</h3>
+                    <p class="text-gray-700 flex-grow">التركيز على **التفاعل اليدوي** بعيداً عن الشاشات، مع تغليف فاخر كصندوق هدية جاهز لزيادة القيمة المتصورة للمنتج.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Marketing Strategy Section -->
+        <section id="marketing" class="py-16 bg-gray-800 text-white rounded-2xl shadow-lg">
+            <h2 class="text-3xl font-bold text-center mb-12">استراتيجيتنا التسويقية الأولية</h2>
+            <div class="max-w-5xl mx-auto grid md:grid-cols-3 gap-8 text-center">
+                <div class="bg-gray-700 p-6 rounded-xl smooth-transition hover:bg-gray-600">
+                    <h3 class="text-xl font-bold mb-3 text-[#F07F69]">المحتوى المرئي</h3>
+                    <p>عرض سيناريوهات لعب دافئة على Instagram و Pinterest لجذب الأم التي تهتم بالصورة والجودة العالية.</p>
+                </div>
+                <div class="bg-gray-700 p-6 rounded-xl smooth-transition hover:bg-gray-600">
+                    <h3 class="text-xl font-bold mb-3 text-[#E5A96F]">الشراكات المؤثرة</h3>
+                    <p>التعاون مع مدونات الأمهات والتربية الإيجابية لعمل مراجعات تركز على جودة المنتج وقيمته التعليمية.</p>
+                </div>
+                <div class="bg-gray-700 p-6 rounded-xl smooth-transition hover:bg-gray-600">
+                    <h3 class="text-xl font-bold mb-3 text-[#8DB596]">المنتج الإضافي</h3>
+                    <p>إطلاق طقم ديكور لغرفة الطفل بتصاميم موحدة وقابلة للتخصيص لتعزيز البيئة القصصية وتكرار الشراء.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-[#F5E5C9] text-center py-6 mt-12 border-t border-gray-200">
+        <p class="text-gray-600">خطة عمل مشروع تويلي (Toyla) &copy; 2025</p>
+    </footer>
+
+    <script>
+        // Chart.js doughnut chart for target audience
+        const ctx = document.getElementById('audienceChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['الشعور بأنها تختار هدية فريدة ومدروسة', 'الجودة والمتانة', 'القيمة التعليمية والهادفة', 'التصميم الفني الأنيق'],
+                    datasets: [{
+                        label: 'محفزات الشراء',
+                        data: [40, 25, 20, 15],
+                        backgroundColor: [
+                            '#F07F69', // Muted Coral
+                            '#8DB596', // Sage Green
+                            '#E5A96F', // Shy Pink
+                            '#A8D8EA'  // Light Blue - artistic
+                        ],
+                        borderColor: '#ffffff',
+                        borderWidth: 4,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    family: "'Tajawal', sans-serif",
+                                    size: 14,
+                                }
+                            }
+                        },
+                        tooltip: {
+                            bodyFont: {
+                                family: "'Tajawal', sans-serif",
+                            },
+                            titleFont: {
+                                family: "'Tajawal', sans-serif",
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetElement = document.querySelector(this.getAttribute('href'));
+                if (targetElement) {
+                     targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

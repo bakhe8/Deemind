@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خارطة طريق منتج تويلا التفاعلية</title>
+    <!-- Chosen Palette: Toyla Branding (Sage, Sand, Coral, Cream) -->
+    <!-- Application Structure Plan: A tabbed SPA is chosen to present the product roadmap in a non-linear, digestible format. The structure separates the core concepts (Overview, Components, Visuals, Strategy) into distinct, interactive sections. This allows stakeholders to quickly access specific information without scrolling through a long document, enhancing usability and clarity. -->
+    <!-- Visualization & Content Choices: 1. Value Prop (Goal: Inform) -> Doughnut Chart (Chart.js) -> Represents the conceptual breakdown of the product's value, adding a visual anchor. 2. Components (Goal: Organize/Inform) -> Interactive Cards (HTML/CSS/JS) -> Allows users to explore details of each product part on demand, more engaging than a static table. 3. Visual Identity (Goal: Inform/Compare) -> Interactive Color Swatches (JS) -> Demonstrates the application of the brand palette dynamically, making the concept tangible. 4. Strategy (Goal: Inform) -> Icon-based list (HTML/Tailwind) -> Improves scannability of key launch tactics. All methods avoid SVG/Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8DB596;
+            --secondary: #E5A96F;
+            --accent: #F07F69;
+            --light: #FEFCF3;
+            --dark: #4A4A4A;
+        }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        .component-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .component-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .section-content {
+            display: none;
+        }
+        .section-content.active {
+            display: block;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto px-4 py-8">
+        
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold" style="color: var(--primary);">
+                🎠 تويلا
+            </h1>
+            <p class="text-lg md:text-xl mt-2" style="color: var(--secondary);">خارطة طريق المنتج الأول: <span class="font-bold" style="color: var(--accent);">رمال المغامرات</span></p>
+        </header>
+
+        <nav class="flex justify-center border-b mb-8 space-x-4 sm:space-x-8">
+            <button class="nav-link active py-4 px-2 sm:px-4 text-sm sm:text-base font-semibold" data-target="overview">نظرة عامة</button>
+            <button class="nav-link py-4 px-2 sm:px-4 text-sm sm:text-base font-semibold" data-target="components">مكونات المنتج</button>
+            <button class="nav-link py-4 px-2 sm:px-4 text-sm sm:text-base font-semibold" data-target="visuals">الهوية البصرية</button>
+            <button class="nav-link py-4 px-2 sm:px-4 text-sm sm:text-base font-semibold" data-target="strategy">استراتيجية الإطلاق</button>
+        </nav>
+
+        <main>
+            <section id="overview" class="section-content active">
+                 <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold mb-2" style="color: var(--dark);">جوهر المنتج وقيمته</h2>
+                    <p class="max-w-2xl mx-auto text-gray-600">هذه المجموعة هي المنتج الرائد الذي يجمع بين التفاعل الجذاب والقيمة التعليمية العميقة، مع التركيز على البيئة المحلية لتقديم تجربة فريدة للأم والطفل.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-lg shadow-sm border-r-4" style="border-color: var(--primary);">
+                            <h3 class="font-bold text-xl mb-2">الرسالة للأم</h3>
+                            <p class="text-gray-700">"امنحي طفلك دور مُخرج القصة! شاهديه يبني قصصه عن بيئته المحلية، يعبر عن شخصيته، وينمي الخيال ومهارات الحوار في كل مرة."</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-sm border-r-4" style="border-color: var(--secondary);">
+                            <h3 class="font-bold text-xl mb-2">الجمهور المستهدف</h3>
+                            <p class="text-gray-700">الأمهات اللاتي يبحثن عن هدايا وقيمة تعليمية وعاطفية لأطفالهن بعمر 3-7 سنوات.</p>
+                        </div>
+                         <div class="bg-white p-6 rounded-lg shadow-sm border-r-4" style="border-color: var(--accent);">
+                            <h3 class="font-bold text-xl mb-2">القيمة المضافة</h3>
+                            <p class="text-gray-700">جسر يربط بين الخيال والواقع، ويشجع الطفل على التعبير العاطفي والاجتماعي من خلال اللعب التفاعلي.</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="chart-container">
+                            <canvas id="valuePropositionChart"></canvas>
+                        </div>
+                         <p class="text-center text-sm text-gray-500 mt-2">توزيع القيمة التعليمية للمنتج</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="components" class="section-content">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold mb-2" style="color: var(--dark);">مكونات "رمال المغامرات"</h2>
+                    <p class="max-w-2xl mx-auto text-gray-600">كل مكون مصمم بجودة عالية ليمنح الطفل عالماً مصغراً متيناً وقابلاً للتغيير، مما يعزز الإبداع واللعب المستدام.</p>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="component-card bg-white p-6 rounded-lg text-center border-t-4" style="border-color: var(--secondary);">
+                        <div class="text-4xl mb-4">📖</div>
+                        <h3 class="text-xl font-bold mb-2">كتاب الخلفيات</h3>
+                        <p class="text-gray-600 text-sm">كتاب مقوى A4 بتجليد سلكي، يحوي 12 مشهداً من البيئة المحلية (واحة، صحراء، وادي).</p>
+                    </div>
+                    <div class="component-card bg-white p-6 rounded-lg text-center border-t-4" style="border-color: var(--accent);">
+                         <div class="text-4xl mb-4">🐪</div>
+                        <h3 class="text-xl font-bold mb-2">الشخصيات التفاعلية</h3>
+                        <p class="text-gray-600 text-sm">10 شخصيات متينة من ورق مقوى سميك (جمل، مها، طفل، جدة) بلمسة نهائية مطفية.</p>
+                    </div>
+                    <div class="component-card bg-white p-6 rounded-lg text-center border-t-4" style="border-color: var(--primary);">
+                        <div class="text-4xl mb-4">💬</div>
+                        <h3 class="text-xl font-bold mb-2">بطاقات الحوار</h3>
+                        <p class="text-gray-600 text-sm">بطاقات صغيرة (5x5 سم) بكلمات وأفعال (يجري، سعيد، يساعد) لدمجها في القصة.</p>
+                    </div>
+                    <div class="component-card bg-white p-6 rounded-lg text-center border-t-4" style="border-color: var(--dark);">
+                        <div class="text-4xl mb-4">📦</div>
+                        <h3 class="text-xl font-bold mb-2">الصندوق القوي</h3>
+                        <p class="text-gray-600 text-sm">صندوق متين قابل لإعادة الاستخدام، مصمم ليكون جزءاً من اللعب وسهل التخزين.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="visuals" class="section-content">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold mb-2" style="color: var(--dark);">هوية تويلا البصرية</h2>
+                    <p class="max-w-2xl mx-auto text-gray-600">تم اختيار الألوان بعناية لتعكس الدفء والنمو والإبداع، مما يخلق هوية بصرية متناغمة وجذابة للمنتج.</p>
+                </div>
+                 <div class="flex flex-col md:flex-row gap-8 items-center">
+                    <div class="w-full md:w-1/2">
+                        <div id="visual-demo-box" class="rounded-lg p-8 transition-colors duration-300" style="background-color: var(--primary);">
+                            <h3 id="visual-demo-title" class="text-2xl font-bold mb-2 transition-colors duration-300" style="color: var(--light);">مجموعة حكايات تويلا</h3>
+                            <p id="visual-demo-subtitle" class="mb-4 transition-colors duration-300" style="color: var(--light);">رمال المغامرات</p>
+                            <div id="visual-demo-accent" class="w-1/4 h-2 rounded-full transition-colors duration-300" style="background-color: var(--accent);"></div>
+                        </div>
+                        <p class="text-center text-sm text-gray-500 mt-2">نموذج تفاعلي لتطبيق الألوان</p>
+                    </div>
+                    <div class="w-full md:w-1/2 grid grid-cols-2 gap-4">
+                        <div class="color-swatch cursor-pointer p-4 rounded-lg bg-white shadow-sm text-center" data-color="#8DB596" data-role="box">
+                            <div class="w-full h-16 rounded mb-2" style="background-color: #8DB596;"></div>
+                            <h4 class="font-bold">الأخضر المريمي</h4>
+                            <p class="text-xs text-gray-500">أساسي (للصندوق)</p>
+                        </div>
+                        <div class="color-swatch cursor-pointer p-4 rounded-lg bg-white shadow-sm text-center" data-color="#E5A96F" data-role="box">
+                            <div class="w-full h-16 rounded mb-2" style="background-color: #E5A96F;"></div>
+                            <h4 class="font-bold">البيج الرملي</h4>
+                            <p class="text-xs text-gray-500">ثانوي (للخلفيات)</p>
+                        </div>
+                        <div class="color-swatch cursor-pointer p-4 rounded-lg bg-white shadow-sm text-center" data-color="#F07F69" data-role="accent">
+                            <div class="w-full h-16 rounded mb-2" style="background-color: #F07F69;"></div>
+                            <h4 class="font-bold">المرجاني المطفي</h4>
+                            <p class="text-xs text-gray-500">للتأكيد (للتفاصيل)</p>
+                        </div>
+                         <div class="color-swatch cursor-pointer p-4 rounded-lg bg-white shadow-sm text-center" data-color="#FEFCF3" data-role="text">
+                            <div class="w-full h-16 rounded mb-2 border" style="background-color: #FEFCF3;"></div>
+                            <h4 class="font-bold">الأبيض الكريمي</h4>
+                            <p class="text-xs text-gray-500">النصوص على الخلفيات الداكنة</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="strategy" class="section-content">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold mb-2" style="color: var(--dark);">استراتيجية إطلاق المنتج</h2>
+                    <p class="max-w-2xl mx-auto text-gray-600">التركيز على جذب الأم التي تبحث عن الجودة والقيمة العاطفية والتعليمية من خلال محتوى هادف وتعبئة مميزة.</p>
+                </div>
+                <div class="max-w-3xl mx-auto space-y-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm flex items-start space-x-4 space-x-reverse">
+                        <div class="text-3xl" style="color: var(--primary);">🎬</div>
+                        <div>
+                            <h3 class="font-bold text-xl mb-1">المحتوى التسويقي الهادف</h3>
+                            <p class="text-gray-700">إنشاء فيديوهات قصيرة تظهر أطفالاً وهم يبدعون قصصهم الخاصة، مع التركيز على تطور الحوار والخيال لديهم لشرح القيمة التعليمية للأمهات.</p>
+                        </div>
+                    </div>
+                     <div class="bg-white p-6 rounded-lg shadow-sm flex items-start space-x-4 space-x-reverse">
+                        <div class="text-3xl" style="color: var(--accent);">🎁</div>
+                        <div>
+                            <h3 class="font-bold text-xl mb-1">التعبئة كهدايا فريدة</h3>
+                            <p class="text-gray-700">عرض المجموعة كـ "هدية مولود فريدة" تختلف عن الهدايا التقليدية، حيث أنها "هدية للذاكرة والذكاء" ويمكن دمجها مع منتجات أخرى لتكوين طقم متكامل.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.section-content');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    const targetId = link.dataset.target;
+
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+                    link.classList.add('active');
+
+                    sections.forEach(section => {
+                        if (section.id === targetId) {
+                            section.classList.add('active');
+                        } else {
+                            section.classList.remove('active');
+                        }
+                    });
+                });
+            });
+
+            const ctx = document.getElementById('valuePropositionChart');
+            if(ctx) {
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['تنمية الخيال', 'التعبير العاطفي', 'الارتباط بالبيئة', 'مهارات الحوار'],
+                        datasets: [{
+                            label: 'القيمة التعليمية',
+                            data: [40, 25, 20, 15],
+                            backgroundColor: [
+                                'rgba(229, 169, 111, 0.8)',
+                                'rgba(240, 127, 105, 0.8)',
+                                'rgba(141, 181, 150, 0.8)',
+                                'rgba(74, 74, 74, 0.7)',
+                            ],
+                            borderColor: [
+                                'rgba(229, 169, 111, 1)',
+                                'rgba(240, 127, 105, 1)',
+                                'rgba(141, 181, 150, 1)',
+                                'rgba(74, 74, 74, 1)',
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    font: {
+                                        family: "'Tajawal', sans-serif"
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                rtl: true,
+                                bodyFont: {
+                                    family: "'Tajawal', sans-serif"
+                                },
+                                titleFont: {
+                                    family: "'Tajawal', sans-serif"
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const colorSwatches = document.querySelectorAll('.color-swatch');
+            const demoBox = document.getElementById('visual-demo-box');
+            const demoTitle = document.getElementById('visual-demo-title');
+            const demoSubtitle = document.getElementById('visual-demo-subtitle');
+            const demoAccent = document.getElementById('visual-demo-accent');
+
+            colorSwatches.forEach(swatch => {
+                swatch.addEventListener('click', () => {
+                    const color = swatch.dataset.color;
+                    const role = swatch.dataset.role;
+
+                    if (role === 'box') {
+                        demoBox.style.backgroundColor = color;
+                        if (color === '#8DB596') {
+                            demoTitle.style.color = '#FEFCF3';
+                            demoSubtitle.style.color = '#FEFCF3';
+                        } else {
+                            demoTitle.style.color = '#4A4A4A';
+                            demoSubtitle.style.color = '#4A4A4A';
+                        }
+                    } else if (role === 'accent') {
+                        demoAccent.style.backgroundColor = color;
+                    } else if (role === 'text') {
+                        demoTitle.style.color = color;
+                        demoSubtitle.style.color = color;
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

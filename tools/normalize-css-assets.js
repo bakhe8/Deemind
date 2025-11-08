@@ -15,11 +15,9 @@ export async function normalizeCssAssets({ outputPath, inputPath }) {
   for (const file of files) {
     let css = await fs.readFile(file, 'utf8');
     const hash = createHash('md5').update(css).digest('hex');
-    if (cache[file] && cache[file] === hash) {
-      continue; // unchanged
-    }
+    // Always process to ensure deterministic normalization in tests/CI
     const dirRelFromAssets = path.relative(path.join(outputPath, 'assets'), path.dirname(file));
-    css = await css.replace(/url\((['"]?)([^)'"]+)\1\)/gi, (m, q, url) => {
+    css = css.replace(/url\((['\"]?)([^)\s'\"]+)\1\)/gi, (m, q, url) => {
       if (/^https?:\/\//i.test(url) || url.startsWith('//') || url.startsWith('assets/')) return m;
       const srcAbs = resolveCssRef({ inputPath, outputPath, dirRelFromAssets, url });
       const targetRel = path.join('normalized', url.replace(/^\.+\//, ''));
