@@ -320,6 +320,22 @@ try { cache = await fs.readJson(cacheFile); } catch (e) { /_ ignore \*/
 
 - Imports: fs-extra, path, child_process, ajv
 
+## tools/codex-autopilot.js
+
+/\*\*
+
+- Codex Autopilot — runs Deemind directives locally without GitHub Actions.
+-
+- Responsibilities:
+- - Load .env values (optional) for OPENAI / Salla / GitHub tokens.
+- - Read codex-directives/\*.md in sorted order.
+- - Map each directive to a set of local commands (npm/node scripts).
+- - Execute commands sequentially, logging results to /logs and /reports.
+- - Auto-commit and push if everything succeeds (optional).
+    \*/
+
+* Imports: fs-extra, path, child_process
+
 ## tools/codex-auto-eval.js
 
 /\*\*
