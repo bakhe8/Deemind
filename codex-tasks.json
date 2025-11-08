@@ -2,5 +2,153 @@
   "queue": [
     "Reduce ESLint warnings; tighten rules incrementally",
     "Run static analysis and address cycles/unused dependencies"
+  ],
+  "autopRuns": [
+    {
+      "task": "codex:autopilot",
+      "status": "failure",
+      "started": "2025-11-08T08:34:07.480Z",
+      "finished": "2025-11-08T08:34:18.134Z",
+      "entries": [
+        {
+          "directive": "000-factory-full-plan.md",
+          "task": "Build demo theme",
+          "status": "success"
+        },
+        {
+          "directive": "000-factory-full-plan.md",
+          "task": "Build gimni theme",
+          "status": "success"
+        },
+        {
+          "directive": "000-factory-full-plan.md",
+          "task": "Lint workspace",
+          "status": "success"
+        },
+        {
+          "directive": "000-factory-full-plan.md",
+          "task": "Run Deemind tests",
+          "status": "success"
+        },
+        {
+          "directive": "000-factory-full-plan.md",
+          "task": "Update harmony summary",
+          "status": "success"
+        },
+        {
+          "directive": "000-factory-full-plan.md",
+          "task": "Refresh dashboard data",
+          "status": "success"
+        },
+        {
+          "directive": "004-mockup-expansion-plan.md",
+          "task": "Validate mockups",
+          "status": "success"
+        },
+        {
+          "directive": "005-permission-policy.md",
+          "task": "Sync Salla docs",
+          "status": "success"
+        },
+        {
+          "directive": "006-autonomous-execution.md",
+          "task": "Run harmony check",
+          "status": "success"
+        },
+        {
+          "directive": "006-collaboration-mode.md",
+          "task": "Update dashboard bridge",
+          "status": "success"
+        },
+        {
+          "directive": "007-interactive-bridge.md",
+          "task": "Sync UI bridge data",
+          "status": "success"
+        },
+        {
+          "directive": "007-task-taxonomy.md",
+          "task": "Run doctor audit",
+          "status": "failed"
+        },
+        {
+          "directive": "007-task-taxonomy.md",
+          "status": "failed",
+          "note": "Stopped remaining tasks for this directive."
+        }
+      ]
+    },
+    {
+      "task": "codex:autopilot",
+      "status": "success",
+      "started": "2025-11-08T08:36:26.278Z",
+      "finished": "2025-11-08T08:36:38.156Z",
+      "entries": [
+        {
+          "directive": "000-factory-full-plan.md",
+          "task": "Build demo theme",
+          "status": "success"
+        },
+        {
+          "directive": "000-factory-full-plan.md",
+          "task": "Build gimni theme",
+          "status": "success"
+        },
+        {
+          "directive": "000-factory-full-plan.md",
+          "task": "Lint workspace",
+          "status": "success"
+        },
+        {
+          "directive": "000-factory-full-plan.md",
+          "task": "Run Deemind tests",
+          "status": "success"
+        },
+        {
+          "directive": "000-factory-full-plan.md",
+          "task": "Update harmony summary",
+          "status": "success"
+        },
+        {
+          "directive": "000-factory-full-plan.md",
+          "task": "Refresh dashboard data",
+          "status": "success"
+        },
+        {
+          "directive": "004-mockup-expansion-plan.md",
+          "task": "Validate mockups",
+          "status": "success"
+        },
+        {
+          "directive": "005-permission-policy.md",
+          "task": "Sync Salla docs",
+          "status": "success"
+        },
+        {
+          "directive": "006-autonomous-execution.md",
+          "task": "Run harmony check",
+          "status": "success"
+        },
+        {
+          "directive": "006-collaboration-mode.md",
+          "task": "Update dashboard bridge",
+          "status": "success"
+        },
+        {
+          "directive": "007-interactive-bridge.md",
+          "task": "Sync UI bridge data",
+          "status": "success"
+        },
+        {
+          "directive": "007-task-taxonomy.md",
+          "task": "Run doctor audit",
+          "status": "success"
+        },
+        {
+          "directive": "009-build-visual-dashboard.md",
+          "task": "Regenerate local dashboard",
+          "status": "success"
+        }
+      ]
+    }
   ]
 }

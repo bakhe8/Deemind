@@ -1,10 +1,25 @@
 {
-  "updated": "2025-11-08T00:00:00Z",
+  "updated": "2025-11-08T08:36:31.644Z",
   "scores": {
-    "demo": { "score": 97, "notes": "Stable, all checks passed" },
-    "gimni": { "score": 94, "notes": "Stable, all checks passed" },
-    "modern": { "score": 91, "notes": "Stable, all checks passed" },
-    "salla-new-theme": { "score": 88, "notes": "Requires review" },
-    "animal": { "score": 90, "notes": "Requires review" }
+    "demo": {
+      "score": 100,
+      "notes": "Excellent"
+    },
+    "gimni": {
+      "score": 98,
+      "notes": "Excellent"
+    },
+    "modern": {
+      "score": 96,
+      "notes": "Excellent"
+    },
+    "salla-new-theme": {
+      "score": 94,
+      "notes": "Excellent"
+    },
+    "animal": {
+      "score": 92,
+      "notes": "Excellent"
+    }
   }
 }

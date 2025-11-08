@@ -1,0 +1,26 @@
+{
+  "port": 5757,
+  "root": ".",
+  "logDir": "logs",
+  "reportsDir": "reports",
+  "outputDir": "output",
+  "token": "",
+  "tasks": {
+    "build-all": {
+      "command": "npm",
+      "args": ["run", "codex:autopilot", "--", "--no-push"]
+    },
+    "build-demo": {
+      "command": "npm",
+      "args": ["run", "deemind:build", "demo"]
+    },
+    "validate": {
+      "command": "npm",
+      "args": ["run", "deemind:validate"]
+    },
+    "doctor": {
+      "command": "npm",
+      "args": ["run", "doctor"]
+    }
+  }
+}

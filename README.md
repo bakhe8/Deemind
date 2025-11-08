@@ -8,12 +8,28 @@
 
 ```
 npm install
+npm run codex:autopilot   # optional sanity/run-all command
 npm run deemind:build demo
-
-
-Input folder → /input/demo
-Output folder → /output/demo
 ```
+
+Input folder → /input/demo  
+Output folder → /output/demo
+
+### Local Service & Dashboard
+
+Deemind now exposes a local API and dashboard so everything runs offline without GitHub Actions:
+
+```
+# Terminal 1 – API service (http://localhost:5757)
+npm run service:start
+
+# Terminal 2 – Dashboard UI (http://localhost:5758)
+cd dashboard
+npm install
+npm run dev
+```
+
+Use the dashboard to trigger builds, stream logs, review reports, and download outputs entirely on your machine.
 
 Quick VS Code Setup
 

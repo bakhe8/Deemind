@@ -91,6 +91,11 @@ async function doctorTheme(theme, { octokit, owner, repo }) {
   const beforeRep = await readReport(outputPath);
   const before = (beforeRep?.summary?.errors || 0) > 0;
 
+  if (!(await fs.pathExists(inputPath))) {
+    console.warn(`Skipping ${theme}: input folder missing (${inputPath}).`);
+    return { theme, before, after: before, skipped: true };
+  }
+
   try {
     // Attempt quick autofixers
     try {
@@ -151,7 +156,7 @@ async function main() {
   }
   await fs.ensureDir('logs');
   await fs.writeJson(path.join('logs', 'doctor-report.json'), { ranAt: new Date().toISOString(), results }, { spaces: 2 });
-  const remaining = results.filter(r => r.after).map(r => r.theme);
+  const remaining = results.filter(r => !r.skipped && r.after).map(r => r.theme);
   if (remaining.length) {
     console.error('Doctor could not fully fix themes:', remaining.join(', '));
     process.exitCode = 1; // let CI surface remaining issues

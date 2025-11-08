@@ -1,14 +1,12 @@
 {
-  "generatedAt": "2025-11-08T05:59:57.415Z",
-  "harmonyAverage": 92,
-  "docsCoverage": 95,
+  "generatedAt": "2025-11-08T08:36:38.087Z",
+  "harmonyAverage": 96,
+  "docsCoverage": 96,
   "docStats": {
-    "count": 21,
+    "count": 22,
     "directives": 8,
-    "reports": 24,
-    "missing": [
-      "docs/CI_CD.md"
-    ],
+    "reports": 29,
+    "missing": ["docs/CI_CD.md"],
     "directiveEntries": [
       {
         "name": "000-factory-full-plan.md",
@@ -63,8 +61,8 @@
   "themes": [
     {
       "name": "demo",
-      "score": 97,
-      "notes": "Stable, all checks passed",
+      "score": 100,
+      "notes": "Excellent",
       "preview": "../visual/demo/latest.png",
       "buildReport": "../build-demo.md",
       "validateReport": "../validate-demo.md",
@@ -73,8 +71,8 @@
     },
     {
       "name": "gimni",
-      "score": 94,
-      "notes": "Stable, all checks passed",
+      "score": 98,
+      "notes": "Excellent",
       "preview": "../visual/gimni/latest.png",
       "buildReport": "../build-gimni.md",
       "validateReport": "../validate-gimni.md",
@@ -83,8 +81,8 @@
     },
     {
       "name": "modern",
-      "score": 91,
-      "notes": "Stable, all checks passed",
+      "score": 96,
+      "notes": "Excellent",
       "preview": "../visual/modern/latest.png",
       "buildReport": "../build-modern.md",
       "validateReport": "../validate-modern.md",
@@ -93,8 +91,8 @@
     },
     {
       "name": "salla-new-theme",
-      "score": 88,
-      "notes": "Requires review",
+      "score": 94,
+      "notes": "Excellent",
       "preview": "../visual/salla-new-theme/latest.png",
       "buildReport": "../build-salla-new-theme.md",
       "validateReport": "../validate-salla-new-theme.md",
@@ -103,8 +101,8 @@
     },
     {
       "name": "animal",
-      "score": 90,
-      "notes": "Requires review",
+      "score": 92,
+      "notes": "Excellent",
       "preview": "../visual/animal/latest.png",
       "buildReport": "../build-animal.md",
       "validateReport": "../validate-animal.md",
@@ -114,23 +112,13 @@
   ],
   "schemaDrift": [
     {
-      "title": "gimni harmony",
+      "title": "salla-new-theme harmony",
       "detail": "Score 94 below 95 — review assets",
       "level": "medium"
     },
     {
-      "title": "modern harmony",
-      "detail": "Score 91 below 95 — review assets",
-      "level": "medium"
-    },
-    {
-      "title": "salla-new-theme harmony",
-      "detail": "Score 88 below 95 — review assets",
-      "level": "medium"
-    },
-    {
       "title": "animal harmony",
-      "detail": "Score 90 below 95 — review assets",
+      "detail": "Score 92 below 95 — review assets",
       "level": "medium"
     }
   ],
@@ -139,7 +127,7 @@
   "lighthouse": [],
   "visualReports": [],
   "systemLog": "",
-  "ciSummary": "Awaiting run",
-  "healthScore": 92.3,
+  "ciSummary": "Manual",
+  "healthScore": 94.2,
   "uiVersion": "1.0.0"
 }

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-11-08T05:59:57.415Z",
+  "generatedAt": "2025-11-08T08:36:38.087Z",
   "scripts": [
     {
       "name": "deemind:build",
@@ -220,6 +220,10 @@
     {
       "name": "dashboard",
       "command": "node tools/dashboard-open.js"
+    },
+    {
+      "name": "codex:autopilot",
+      "command": "node tools/codex-autopilot.js"
     }
   ],
   "tools": [
@@ -266,6 +270,10 @@
     {
       "name": "codex-auto-eval",
       "path": "../../tools/codex-auto-eval.js"
+    },
+    {
+      "name": "codex-autopilot",
+      "path": "../../tools/codex-autopilot.js"
     },
     {
       "name": "codex-deep-reeval",
@@ -612,7 +620,7 @@
       "path": "../../docs/deemind_checklist.md"
     },
     {
-      "name": "Modules Map",
+      "name": "Modules",
       "path": "../../docs/modules.md"
     },
     {
@@ -632,6 +640,10 @@
       "path": "../../docs/salla-web-components.md"
     },
     {
+      "name": "Deemind — Weekly Status",
+      "path": "../../docs/status.md"
+    },
+    {
       "name": "Validation",
       "path": "../../docs/validation.md"
     },
@@ -644,10 +656,7 @@
       "path": "../../docs/workflows.md"
     }
   ],
-  "schemaFields": [
-    "engine",
-    "adapter"
-  ],
+  "schemaFields": ["engine", "adapter"],
   "settingsKeys": [
     "defaultTheme",
     "encoding",
@@ -665,10 +674,10 @@
   "taskLog": [],
   "systemLog": "",
   "features": [
-    "55 npm scripts",
-    "71 tooling modules",
+    "56 npm scripts",
+    "72 tooling modules",
     "12 config files",
     "2 schema fields",
-    "21 docs"
+    "22 docs"
   ]
 }
