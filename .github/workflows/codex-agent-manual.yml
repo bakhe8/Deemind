@@ -1,0 +1,38 @@
+name: Codex Agent Manual Trigger
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  codex:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      actions: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - name: Auto-generate docs first
+        run: node tools/codex-auto-docs.js
+      - name: Run Deemind Agent (self-driven)
+        run: node tools/deemind-agent.js
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Auto-merge trivial Codex PRs (label: codex-trivial)
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          PR=$(gh pr list --search 'label:codex-trivial is:open' -q '.[0].number' || true)
+          if [ -n "$PR" ]; then
+            gh pr merge --auto --merge "$PR"
+          else
+            echo "No codex-trivial PRs to auto-merge."
+          fi
