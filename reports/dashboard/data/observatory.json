@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2025-11-08T08:36:38.087Z",
+  "generatedAt": "2025-11-08T09:14:31.342Z",
   "harmonyAverage": 96,
   "docsCoverage": 96,
   "docStats": {
     "count": 22,
     "directives": 8,
-    "reports": 29,
+    "reports": 28,
     "missing": ["docs/CI_CD.md"],
     "directiveEntries": [
       {
