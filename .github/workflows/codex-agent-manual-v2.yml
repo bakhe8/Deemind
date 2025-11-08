@@ -1,7 +1,7 @@
-name: Codex Agent Manual Trigger
+name: Codex Agent Manual Trigger v2
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: {}
 
 jobs:
   codex:

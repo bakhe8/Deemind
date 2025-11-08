@@ -1,6 +1,6 @@
-name: Codex Maintenance (Deemind Tools)
+name: Codex Maintenance (Deemind Tools) v2
 on:
-  workflow_dispatch:
+  workflow_dispatch: {}
   schedule:
     - cron: "0 */6 * * *"
   workflow_run:
