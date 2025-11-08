@@ -1,10 +1,14 @@
 import express from 'express';
+import cors, { CorsOptions } from 'cors';
 import fs from 'fs-extra';
 import path from 'path';
 import { v4 as uuid } from 'uuid';
+import dotenv from 'dotenv';
 import { TaskRunner } from './task-runner.js';
 import { makeAuthMiddleware } from './security.js';
 import { ServiceLogger } from './logger.js';
+
+dotenv.config();
 
 const CONFIG_PATH = path.join(process.cwd(), 'service', 'config.json');
 
@@ -18,11 +22,32 @@ async function loadConfig() {
 async function main() {
   const config = await loadConfig();
   const app = express();
-  const logger = new ServiceLogger(config.root || process.cwd());
+  const rootDir = process.env.DEEMIND_ROOT || config.root || process.cwd();
+  const logger = new ServiceLogger(rootDir);
   const runner = new TaskRunner();
-  const token = config.token || process.env.DEEMIND_SERVICE_TOKEN || '';
+  const token = process.env.DEEMIND_SERVICE_TOKEN || config.token || '';
   const auth = makeAuthMiddleware(token);
 
+  const allowedOriginsEnv = process.env.DASHBOARD_ORIGIN
+    ? process.env.DASHBOARD_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean)
+    : undefined;
+  const configuredOrigins = allowedOriginsEnv || config.allowedOrigins;
+
+  const corsOptions: CorsOptions = {
+    origin: (_origin, callback) => {
+      if (!configuredOrigins || configuredOrigins === '*' || configuredOrigins === '*') {
+        return callback(null, true);
+      }
+      const list = Array.isArray(configuredOrigins) ? configuredOrigins : [configuredOrigins];
+      if (!_origin || list.includes(_origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('Origin not allowed'), false);
+    },
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Deemind-Token'],
+  };
+  app.use(cors(corsOptions));
   app.use(express.json());
 
   runner.on('task-started', (task) => logger.write(`Task started: ${task?.label}`));
@@ -53,22 +78,62 @@ async function main() {
     });
   });
 
+  const reportsDir = path.join(rootDir, config.reportsDir || 'reports');
+  const outputDir = path.join(rootDir, config.outputDir || 'output');
+
   app.get('/api/reports', auth, async (_req, res) => {
-    const reportsDir = path.join(config.root || process.cwd(), config.reportsDir || 'reports');
     if (!(await fs.pathExists(reportsDir))) {
       return res.json([]);
     }
     const entries = await fs.readdir(reportsDir);
-    res.json(entries);
+    const detailed = await Promise.all(
+      entries.map(async (name) => {
+        const full = path.join(reportsDir, name);
+        const stat = await fs.stat(full);
+        if (!stat.isFile()) return null;
+        return {
+          name,
+          size: stat.size,
+          modified: stat.mtime.toISOString(),
+          url: `/reports/${encodeURIComponent(name)}`,
+        };
+      }),
+    );
+    res.json(detailed.filter(Boolean).sort((a, b) => (a!.name < b!.name ? 1 : -1)));
   });
 
   app.get('/api/outputs', auth, async (_req, res) => {
-    const outputDir = path.join(config.root || process.cwd(), config.outputDir || 'output');
     if (!(await fs.pathExists(outputDir))) {
       return res.json([]);
     }
     const entries = await fs.readdir(outputDir);
-    res.json(entries);
+    const detailed = await Promise.all(
+      entries.map(async (name) => {
+        const full = path.join(outputDir, name);
+        const stat = await fs.stat(full);
+        const isDir = stat.isDirectory();
+        const encoded = encodeURIComponent(name);
+        const manifestPath = path.join(full, 'manifest.json');
+        const reportPath = path.join(full, 'report-extended.json');
+        const manifestExists = isDir && (await fs.pathExists(manifestPath));
+        const reportExists = isDir && (await fs.pathExists(reportPath));
+        return {
+          name,
+          type: isDir ? 'theme' : 'file',
+          size: stat.size,
+          modified: stat.mtime.toISOString(),
+          manifestUrl: manifestExists ? `/output/${encoded}/manifest.json` : null,
+          reportUrl: reportExists ? `/output/${encoded}/report-extended.json` : null,
+          browseUrl: isDir ? `/output/${encoded}` : `/output/${encoded}`,
+        };
+      }),
+    );
+    res.json(detailed.filter(Boolean).sort((a, b) => (a!.modified < b!.modified ? 1 : -1)));
+  });
+
+  app.get('/api/log/history', auth, async (_req, res) => {
+    const lines = await logger.tail(200);
+    res.json(lines);
   });
 
   app.get('/api/log/stream', auth, (req, res) => {
@@ -86,7 +151,10 @@ async function main() {
     });
   });
 
-  const port = config.port || 5757;
+  app.use('/reports', auth, express.static(reportsDir));
+  app.use('/output', auth, express.static(outputDir));
+
+  const port = Number(process.env.SERVICE_PORT || config.port || 5757);
   app.listen(port, () => logger.write(`Service listening on http://localhost:${port}`));
 }
 

@@ -16,4 +16,14 @@ export class ServiceLogger {
     fs.appendFileSync(this.logFile, entry);
     console.log(entry.trim());
   }
+
+  async tail(maxLines = 200) {
+    try {
+      const content = await fs.readFile(this.logFile, 'utf8');
+      const lines = content.split(/\r?\n/).filter(Boolean);
+      return lines.slice(-maxLines);
+    } catch {
+      return [];
+    }
+  }
 }

@@ -7,13 +7,31 @@ type StatusResponse = {
   queue: Array<{ label: string }>;
 };
 
+type ReportEntry = {
+  name: string;
+  size: number;
+  modified: string;
+  url: string;
+};
+
+type OutputEntry = {
+  name: string;
+  type: 'theme' | 'file';
+  size: number;
+  modified: string;
+  manifestUrl: string | null;
+  reportUrl: string | null;
+  browseUrl: string;
+};
+
 export default function App() {
   const [status, setStatus] = useState<StatusResponse>({ current: null, queue: [] });
-  const [reports, setReports] = useState<string[]>([]);
-  const [outputs, setOutputs] = useState<string[]>([]);
+  const [reports, setReports] = useState<ReportEntry[]>([]);
+  const [outputs, setOutputs] = useState<OutputEntry[]>([]);
   const [logLines, setLogLines] = useState<string[]>([]);
   const [taskLoading, setTaskLoading] = useState(false);
   const [token, setToken] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
 
   const headers = useMemo(() => {
     const h: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -21,15 +39,46 @@ export default function App() {
     return h;
   }, [token]);
 
+  const withTokenParam = (path: string) => {
+    const url = new URL(path, SERVICE_URL);
+    if (token) url.searchParams.set('token', token);
+    return url.toString();
+  };
+
+  const formatBytes = (bytes: number) => {
+    if (!Number.isFinite(bytes)) return '—';
+    if (bytes < 1024) return `${bytes} B`;
+    const units = ['KB', 'MB', 'GB'];
+    let value = bytes / 1024;
+    let unitIndex = 0;
+    while (value >= 1024 && unitIndex < units.length - 1) {
+      value /= 1024;
+      unitIndex++;
+    }
+    return `${value.toFixed(1)} ${units[unitIndex]}`;
+  };
+
+  const formatDate = (iso: string) => {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '—';
+    return d.toLocaleString();
+  };
+
   async function refresh() {
-    const [statusRes, reportsRes, outputsRes] = await Promise.all([
-      fetch(`${SERVICE_URL}/api/status`, { headers }),
-      fetch(`${SERVICE_URL}/api/reports`, { headers }),
-      fetch(`${SERVICE_URL}/api/outputs`, { headers }),
-    ]);
-    if (statusRes.ok) setStatus(await statusRes.json());
-    if (reportsRes.ok) setReports(await reportsRes.json());
-    if (outputsRes.ok) setOutputs(await outputsRes.json());
+    setError(null);
+    try {
+      const [statusRes, reportsRes, outputsRes] = await Promise.all([
+        fetch(`${SERVICE_URL}/api/status`, { headers }),
+        fetch(`${SERVICE_URL}/api/reports`, { headers }),
+        fetch(`${SERVICE_URL}/api/outputs`, { headers }),
+      ]);
+      if (statusRes.ok) setStatus(await statusRes.json());
+      if (reportsRes.ok) setReports(await reportsRes.json());
+      if (outputsRes.ok) setOutputs(await outputsRes.json());
+      await loadLogHistory();
+    } catch (err: any) {
+      setError(err?.message || 'Unable to reach service');
+    }
   }
 
   async function runTask(task: string) {
@@ -53,15 +102,53 @@ export default function App() {
 
   useEffect(() => {
     refresh();
+    const interval = setInterval(refresh, 10000);
+    return () => clearInterval(interval);
   }, [headers]);
 
+  const loadLogHistory = async () => {
+    try {
+      const res = await fetch(withTokenParam('/api/log/history'), { headers });
+      if (res.ok) {
+        setLogLines(await res.json());
+      }
+    } catch {
+      // ignore failures, SSE will update once connected
+    }
+  };
+
   useEffect(() => {
-    const source = new EventSource(`${SERVICE_URL}/api/log/stream`);
-    source.onmessage = (event) => {
-      setLogLines((prev) => [...prev.slice(-200), event.data]);
+    let source: EventSource | null = null;
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const connect = () => {
+      if (source) {
+        source.close();
+        source = null;
+      }
+      const streamUrl = withTokenParam('/api/log/stream');
+      source = new EventSource(streamUrl);
+      source.onmessage = (event) => {
+        setLogLines((prev) => [...prev.slice(-200), event.data]);
+        setError(null);
+      };
+      source.onerror = () => {
+        setError('Lost connection to log stream. Retrying…');
+        if (!retryTimer) {
+          retryTimer = setTimeout(() => {
+            retryTimer = null;
+            connect();
+          }, 5000);
+        }
+      };
     };
-    return () => source.close();
-  }, []);
+
+    connect();
+    return () => {
+      if (retryTimer) clearTimeout(retryTimer);
+      if (source) source.close();
+    };
+  }, [token]);
 
   return (
     <div className="min-h-screen bg-surface text-slate-900">
@@ -82,6 +169,11 @@ export default function App() {
       </header>
 
       <main className="max-w-5xl mx-auto p-6 space-y-6">
+        {error && (
+          <div className="bg-red-100 text-red-700 border border-red-200 px-4 py-2 rounded">
+            {error}
+          </div>
+        )}
         <section className="bg-white rounded-lg shadow p-5">
           <h2 className="text-lg font-semibold mb-3">Run Tasks</h2>
           <div className="flex flex-wrap gap-3">
@@ -117,10 +209,17 @@ export default function App() {
           <div className="bg-white rounded-lg shadow p-5">
             <h2 className="text-lg font-semibold mb-3">Reports</h2>
             <ul className="space-y-2 max-h-64 overflow-auto">
+              {reports.length === 0 && <p className="text-sm text-slate-500">No reports yet.</p>}
               {reports.map((r) => (
-                <li key={r} className="text-sm">
-                  <a className="text-primary underline" href={`../reports/${r}`} target="_blank" rel="noreferrer">
-                    {r}
+                <li key={r.name} className="text-sm flex items-center justify-between gap-4">
+                  <div>
+                    <p className="font-medium text-slate-900">{r.name}</p>
+                    <p className="text-xs text-slate-500">
+                      {formatBytes(r.size)} • {formatDate(r.modified)}
+                    </p>
+                  </div>
+                  <a className="text-primary underline" href={withTokenParam(r.url)} target="_blank" rel="noreferrer">
+                    Open
                   </a>
                 </li>
               ))}
@@ -129,12 +228,35 @@ export default function App() {
           <div className="bg-white rounded-lg shadow p-5">
             <h2 className="text-lg font-semibold mb-3">Outputs</h2>
             <ul className="space-y-2 max-h-64 overflow-auto">
+              {outputs.length === 0 && <p className="text-sm text-slate-500">No themes generated yet.</p>}
               {outputs.map((o) => (
-                <li key={o} className="text-sm flex justify-between">
-                  <span>{o}</span>
-                  <a className="text-primary underline" href={`../output/${o}`} target="_blank" rel="noreferrer">
-                    View
-                  </a>
+                <li key={o.name} className="text-sm">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="font-medium text-slate-900">
+                        {o.name} <span className="text-xs uppercase text-slate-400">({o.type})</span>
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {formatDate(o.modified)}
+                        {o.manifestUrl && ' • manifest'}
+                      </p>
+                    </div>
+                    <div className="flex gap-3">
+                      {o.manifestUrl && (
+                        <a className="text-primary underline" href={withTokenParam(o.manifestUrl)} target="_blank" rel="noreferrer">
+                          Manifest
+                        </a>
+                      )}
+                      {o.reportUrl && (
+                        <a className="text-primary underline" href={withTokenParam(o.reportUrl)} target="_blank" rel="noreferrer">
+                          Report
+                        </a>
+                      )}
+                      <a className="text-primary underline" href={withTokenParam(o.browseUrl)} target="_blank" rel="noreferrer">
+                        Browse
+                      </a>
+                    </div>
+                  </div>
                 </li>
               ))}
             </ul>

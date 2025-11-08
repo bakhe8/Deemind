@@ -1,0 +1,70 @@
+﻿# Deemind Local Launcher
+param(
+  [int]$ServiceTimeout = 45,
+  [int]$DashboardTimeout = 30
+)
+
+function Stop-PortProcess {
+  param([int]$Port)
+  try {
+    $connections = Get-NetTCPConnection -State Listen -LocalPort $Port -ErrorAction Stop
+    $pids = $connections | Select-Object -ExpandProperty OwningProcess -Unique | Where-Object { $_ -gt 0 }
+    foreach ($pid in $pids) {
+      try {
+        $proc = Get-Process -Id $pid -ErrorAction Stop
+        if ($proc.Path -like '*deemind*' -or $proc.Path -like '*node.exe*') {
+          Write-Host "🧹 Stopping process $pid on port $Port ($($proc.Path))"
+          Stop-Process -Id $pid -Force -ErrorAction Stop
+        }
+      } catch {}
+    }
+  } catch {
+    # port not in use
+  }
+}
+
+function Wait-ForUrl {
+  param(
+    [string]$Url,
+    [int]$TimeoutSeconds,
+    [string]$Label = "Service"
+  )
+
+  $elapsed = 0
+  $interval = 2
+  Write-Host "⌛ Waiting for $Label on $Url ..."
+  while ($elapsed -lt $TimeoutSeconds) {
+    try {
+      $response = Invoke-WebRequest -Uri $Url -UseBasicParsing -TimeoutSec 3
+      if ($response.StatusCode -ge 200 -and $response.StatusCode -lt 500) {
+        Write-Host "✅ $Label is up."
+        return $true
+      }
+    } catch {
+      # still starting, retry shortly
+    }
+    Start-Sleep -Seconds $interval
+    $elapsed += $interval
+  }
+  Write-Warning "$Label did not respond within $TimeoutSeconds seconds."
+  return $false
+}
+
+$projectRoot = "C:\Users\Bakheet\Documents\peojects\deemind"
+$dashboardDir = Join-Path $projectRoot 'dashboard'
+$serviceUrl = "http://localhost:5757/api/status"
+$dashboardUrl = "http://localhost:5758/"
+
+Stop-PortProcess -Port 5757
+Stop-PortProcess -Port 5758
+
+Write-Host "🚀 Starting Deemind service..."
+Start-Process powershell -ArgumentList "-NoLogo -Command cd `"$projectRoot`"; npm run service:start" -WorkingDirectory $projectRoot | Out-Null
+Wait-ForUrl -Url $serviceUrl -TimeoutSeconds $ServiceTimeout -Label "Service"
+
+Write-Host "🖥  Starting Deemind dashboard..."
+Start-Process powershell -ArgumentList "-NoLogo -Command cd `"$dashboardDir`"; npm run dev" -WorkingDirectory $dashboardDir | Out-Null
+Wait-ForUrl -Url $dashboardUrl -TimeoutSeconds $DashboardTimeout -Label "Dashboard"
+
+Write-Host "🌐 Opening dashboard UI..."
+Start-Process $dashboardUrl
