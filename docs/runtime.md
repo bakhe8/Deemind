@@ -77,6 +77,8 @@ Runtime stub endpoints (when running):
 | `POST /api/auth/login`, `/api/auth/logout`, `/api/auth/me`           | Mock auth lifecycle.                                      |
 | `POST /api/store/locale`                                             | Switch `en`/`ar`; triggers RTL and dictionary changes.    |
 | `GET/POST /api/twilight`                                             | Enable/disable the Twilight/NEXUS shim for previews.      |
+| `GET /api/runtime/analytics`                                         | Stream recent API calls (method/path/status/duration).    |
+| `GET /api/runtime/scenarios`                                         | Return the latest scenario runner logs.                   |
 
 ### Dashboard integration
 
@@ -132,5 +134,12 @@ Toggle the Twilight shim from the dashboard Settings page (or via `POST /api/twi
 - Dashboard socket bridge for real-time runtime analytics.
 - Twilight/NEXUS bridge to load platform JS components locally.
 - Additional platform adapters (Zid, Shopify) reusing the same stub infrastructure.
+
+### Scenario runner
+
+`npm run runtime:scenario <theme> <flow...>` executes scripted flows (add-to-cart, checkout, wishlist). Pass multiple scenarios or use `--chain=add-to-cart,checkout` to run sequentially. Results are logged to `logs/runtime-scenarios/*.json` and surfaced via:
+
+- `/api/runtime/scenarios` → used by the Dashboard Validation page
+- Each log captures `chain`, per-scenario status, and every HTTP step with request/response payloads.
 
 Until then, Version 1.0 already delivers a complete offline experience: build, preview, interact, and inspect every theme without leaving your machine.

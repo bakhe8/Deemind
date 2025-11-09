@@ -10,7 +10,23 @@ const rootDir = path.resolve(__dirname, '..');
 
 const args = process.argv.slice(2);
 const theme = args[0] || 'demo';
-const scenarioName = (args[1] || 'checkout').toLowerCase();
+const chainFlag = args.find((arg) => arg.startsWith('--chain='));
+let scenarioChain = [];
+if (chainFlag) {
+  scenarioChain = chainFlag
+    .split('=')[1]
+    .split(',')
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+} else if (args.length > 1) {
+  scenarioChain = args
+    .slice(1)
+    .filter((arg) => !arg.startsWith('--'))
+    .map((arg) => arg.toLowerCase());
+}
+if (!scenarioChain.length) {
+  scenarioChain = ['checkout'];
+}
 const port = Number(process.env.RUNTIME_PORT || process.env.PREVIEW_PORT || 4100);
 
 const scenarioDir = path.join(rootDir, 'logs', 'runtime-scenarios');
@@ -56,8 +72,11 @@ const flows = {
   },
 };
 
-if (!flows[scenarioName]) {
-  console.error(`❌ Unknown scenario "${scenarioName}". Available: ${Object.keys(flows).join(', ')}`);
+const invalidScenarios = scenarioChain.filter((name) => !flows[name]);
+if (invalidScenarios.length) {
+  console.error(
+    `❌ Unknown scenarios: ${invalidScenarios.join(', ')}. Available: ${Object.keys(flows).join(', ')}`,
+  );
   process.exit(1);
 }
 
@@ -110,19 +129,21 @@ async function runScenario() {
   }
   const session = {
     theme,
-    scenario: scenarioName,
+    chain: scenarioChain,
     port,
     startedAt: new Date().toISOString(),
     steps: [],
+    scenarios: [],
   };
 
   const controller = await ensureStubRunning();
 
-  async function requestStep(method, urlPath, body) {
+  async function requestStep(method, urlPath, body, scenarioLabel = scenarioChain[0]) {
     const entry = {
       method,
       path: urlPath,
       body: body ?? null,
+      scenario: scenarioLabel,
       startedAt: new Date().toISOString(),
     };
     try {
@@ -150,15 +171,36 @@ async function runScenario() {
   }
 
   try {
-    await flows[scenarioName]({ requestStep });
+    for (const scenarioName of scenarioChain) {
+      const segment = {
+        name: scenarioName,
+        startedAt: new Date().toISOString(),
+      };
+      try {
+        await flows[scenarioName]({
+          requestStep: (method, urlPath, body) => requestStep(method, urlPath, body, scenarioName),
+        });
+        segment.succeeded = true;
+      } catch (error) {
+        segment.succeeded = false;
+        segment.error = error instanceof Error ? error.message : String(error);
+        session.error = segment.error;
+        session.succeeded = false;
+        session.scenarios.push({ ...segment, finishedAt: new Date().toISOString() });
+        throw error;
+      }
+      segment.finishedAt = new Date().toISOString();
+      session.scenarios.push(segment);
+    }
     session.succeeded = true;
   } catch (error) {
-    session.succeeded = false;
-    session.error = error instanceof Error ? error.message : String(error);
-    console.error(`❌ Scenario failed: ${session.error}`);
+    if (!session.error) {
+      session.error = error instanceof Error ? error.message : String(error);
+    }
+    console.error(`❌ Scenario chain failed: ${session.error}`);
   } finally {
     session.finishedAt = new Date().toISOString();
-    const fileName = `${theme}-${scenarioName}-${Date.now()}.json`;
+    const fileName = `${theme}-${scenarioChain.join('_')}-${Date.now()}.json`;
     await fs.writeJson(path.join(scenarioDir, fileName), session, { spaces: 2 });
     console.log(`📝 Scenario log written to logs/runtime-scenarios/${fileName}`);
     if (controller.process) {
@@ -169,7 +211,7 @@ async function runScenario() {
   if (!session.succeeded) {
     process.exitCode = 1;
   } else {
-    console.log('✅ Scenario completed successfully.');
+    console.log('✅ Scenario chain completed successfully.');
   }
 }
 

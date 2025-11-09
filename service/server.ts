@@ -94,6 +94,42 @@ async function readRuntimeAnalytics(logPath: string, limit = 50) {
     .filter(Boolean);
 }
 
+async function readScenarioRuns(dir: string, limit = 10) {
+  if (!(await fs.pathExists(dir))) return [];
+  const files = await fs.readdir(dir);
+  const enriched = await Promise.all(
+    files
+      .filter((name) => name.endsWith('.json'))
+      .map(async (name) => {
+        const full = path.join(dir, name);
+        const stat = await fs.stat(full).catch(() => null);
+        return stat ? { name, full, mtime: stat.mtimeMs } : null;
+      }),
+  );
+  const selected = enriched
+    .filter(Boolean)
+    .sort((a, b) => (b!.mtime || 0) - (a!.mtime || 0))
+    .slice(0, limit) as Array<{ name: string; full: string; mtime: number }>;
+
+  const runs = [];
+  for (const item of selected) {
+    const data = await safeReadJson(item.full);
+    if (!data) continue;
+    runs.push({
+      file: item.name,
+      theme: data.theme,
+      chain: data.chain || (data.scenario ? [data.scenario] : []),
+      scenarios: data.scenarios || [],
+      steps: Array.isArray(data.steps) ? data.steps.length : 0,
+      startedAt: data.startedAt,
+      finishedAt: data.finishedAt,
+      succeeded: Boolean(data.succeeded),
+      error: data.error || null,
+    });
+  }
+  return runs;
+}
+
 function computeCompleteness(structure) {
   const expected = 4; // layouts, pages, components, locales
   const present = ['layouts', 'pages', 'components', 'locales'].reduce((acc, key) => (structure[key]?.length ? acc + 1 : acc), 0);
@@ -215,6 +251,8 @@ async function main() {
   const baselineLogsDir = path.join(logsDir, 'baseline');
   const stateDir = path.join(rootDir, 'runtime', 'state');
   const twilightConfigFile = path.join(rootDir, 'runtime', 'twilight', 'config.json');
+  const analyticsLogPath = path.join(rootDir, 'logs', 'runtime-analytics.jsonl');
+  const scenarioLogDir = path.join(logsDir, 'runtime-scenarios');
   const stubState: {
     process: ChildProcess | null;
     theme: string | null;
@@ -529,6 +567,12 @@ async function main() {
     const limit = Number(req.query.limit) || 50;
     const entries = await readRuntimeAnalytics(analyticsLogPath, limit);
     res.json({ entries });
+  });
+
+  app.get('/api/runtime/scenarios', auth, async (req, res) => {
+    const limit = Number(req.query.limit) || 10;
+    const runs = await readScenarioRuns(scenarioLogDir, limit);
+    res.json({ runs });
   });
 
   app.get('/api/store/diff', auth, async (req, res) => {

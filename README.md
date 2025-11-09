@@ -105,15 +105,15 @@ curl -X POST http://localhost:5050/api/store/preset \
 The dashboard Settings page now lists all presets so you can flip between “Electro”, “Fashion”, etc. on demand; overrides are accepted as JSON to tweak a section ad hoc.
 Use the **Preview Diff** button to see which partials and store fields will change before committing the preset.
 
-Automate common flows against the stub (cart, checkout, wishlist):
+Automate common flows (cart, checkout, wishlist) or chain them together:
 
 ```
 npm run runtime:scenario demo add-to-cart
-npm run runtime:scenario demo checkout
-npm run runtime:scenario demo wishlist
+npm run runtime:scenario demo checkout wishlist
+npm run runtime:scenario demo --chain=add-to-cart,wishlist,checkout
 ```
 
-Each run hits the local APIs, records every request/response, and writes a log under `logs/runtime-scenarios/`. The runner will start the stub automatically if it isn’t already running (default port `4100`).
+Each run hits the local APIs, records every request/response, and writes a log under `logs/runtime-scenarios/`. The runner will start the stub automatically if it isn’t already running (default port `4100`). The dashboard Validation page now lists the latest scenario runs so QA can inspect chains directly in the UI.
 
 ### Quick VS Code Setup
 

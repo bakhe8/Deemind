@@ -107,3 +107,7 @@ export async function updateTwilightStatus(enabled: boolean) {
 export async function fetchRuntimeAnalytics(limit = 40) {
   return apiJson<{ entries: any[] }>(`/api/runtime/analytics?limit=${limit}`);
 }
+
+export async function fetchScenarioRuns(limit = 10) {
+  return apiJson<{ runs: any[] }>(`/api/runtime/scenarios?limit=${limit}`);
+}

@@ -3,6 +3,7 @@ import StatsCard from '../components/StatsCard';
 import { fetchThemes, fetchThemeReports, type ThemeSummary } from '../api/themes';
 import StubStatusCard from '../components/StubStatusCard';
 import RuntimeEventFeed from '../components/RuntimeEventFeed';
+import ScenarioRunsPanel from '../components/ScenarioRunsPanel';
 
 export default function ValidationQA() {
   const [themes, setThemes] = useState<ThemeSummary[]>([]);
@@ -44,6 +45,7 @@ export default function ValidationQA() {
         <StatsCard title="Whitelisted" value={warnings.filter((w: any) => w.type?.includes('baseline')).length} accent="green" />
       </div>
       <RuntimeEventFeed />
+      <ScenarioRunsPanel />
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4">
         <h2 className="text-lg font-semibold mb-4">Validation Report</h2>
         {errors.length === 0 && warnings.length === 0 && <p className="text-sm text-slate-500">No validator output yet.</p>}
