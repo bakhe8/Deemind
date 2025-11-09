@@ -7,6 +7,10 @@ import path from 'path';
 import { globSync } from 'glob';
 import { createHash } from 'crypto';
 
+const SALLA_DIR = path.resolve('core', 'salla');
+const ALWAYS_ALLOWED_FILTERS = new Set(['t', 'trans', 'raw', 'escape', 'e', 'default', 'upper', 'lower', 'length', 'json_encode', 'merge', 'keys']);
+import { buildTwigDependencyGraph } from './twig-dependency-graph.js';
+
 export async function validateExtended(themePath) {
   const report = {
     errors: [],
@@ -19,6 +23,7 @@ export async function validateExtended(themePath) {
   if (typeof process !== 'undefined' && process.env && typeof process.env.REQUIRE_I18N !== 'undefined') {
     settings.requireI18n = String(process.env.REQUIRE_I18N).toLowerCase() === 'true';
   }
+  const sallaRefs = await loadSallaReferences();
 
   // 1) UTF-8 encoding check
   for (const file of globSync(`${themePath}/**/*.{html,twig,css,js}`, { nodir: true })) {
@@ -144,18 +149,42 @@ export async function validateExtended(themePath) {
   }
   report.checks.scripts = true;
 
+  if (sallaRefs.filters.size) {
+    const filterRe = /\|\s*([a-zA-Z_][\w]*)/g;
+    for (const file of twigs) {
+      const content = await fs.readFile(file, 'utf8');
+      const relFile = path.relative(themePath, file).replace(/\\/g, '/');
+      const seen = new Set();
+      let match;
+      while ((match = filterRe.exec(content))) {
+        const name = (match[1] || '').toLowerCase();
+        if (name) seen.add(name);
+      }
+      for (const filterName of seen) {
+        if (!ALWAYS_ALLOWED_FILTERS.has(filterName) && !sallaRefs.filters.has(filterName)) {
+          report.warnings.push({
+            type: 'filter-unknown',
+            file: relFile,
+            message: `Twig filter "${filterName}" not found in synced Salla filters.`,
+          });
+        }
+      }
+    }
+  }
+
   // 3) Include / extends cycles
-  const deps = {};
-  for (const file of twigs) {
-    const content = await fs.readFile(file, 'utf8');
-    const matches = Array.from(content.matchAll(/{%\s*(include|extends)\s*['"]([^'"]+)['"]/g));
-    const includes = matches.map(m => path.join(themePath, m[2]).replace(/\\/g,'/'));
-    deps[file.replace(/\\/g,'/')] = includes;
+  try {
+    const depInfo = await buildTwigDependencyGraph(themePath);
+    if (depInfo.cycles.length) {
+      report.errors.push({
+        type: 'dependency-cycle',
+        message: `Include/extends cycle detected (${depInfo.cycles.length}). See reports/twig-dependency-${path.basename(themePath)}.md`,
+      });
+    }
+    report.checks.dependencies = true;
+  } catch (err) {
+    report.warnings.push({ type: 'dependency-scan', message: `Dependency scan skipped: ${err.message}` });
   }
-  if (detectCycle(deps)) {
-    report.errors.push({ type: 'dependency-cycle', message: 'Include/extends cycle detected.' });
-  }
-  report.checks.dependencies = true;
 
   // 4) Asset link validation
   // const assets = globSync(`${themePath}/assets/**/*`, { nodir: true });
@@ -273,10 +302,15 @@ export async function validateExtended(themePath) {
 
   // 6d) Web Components (custom elements) checks (warn-only)
   try {
-    const knowPath = path.resolve('configs', 'knowledge', 'salla-docs.json');
-    if (await fs.pathExists(knowPath)) {
-      const know = await fs.readJson(knowPath);
-      const knownTags = new Set(((know.webComponents && know.webComponents.tags) || []).map(t => t.toLowerCase()));
+    let knownTags = sallaRefs.components;
+    if (!knownTags.size) {
+      const knowPath = path.resolve('configs', 'knowledge', 'salla-docs.json');
+      if (await fs.pathExists(knowPath)) {
+        const know = await fs.readJson(knowPath);
+        knownTags = new Set(((know.webComponents && know.webComponents.tags) || []).map(t => t.toLowerCase()));
+      }
+    }
+    if (knownTags.size) {
       const rxTag = /<\s*([a-z][a-z0-9-]+)(\s|>)/g;
       const used = new Set();
       for (const f of twigs) {
@@ -357,26 +391,72 @@ export async function validateExtended(themePath) {
   return report;
 }
 
-function detectCycle(graph) {
-  const visited = new Set();
-  const stack = new Set();
-  function dfs(node) {
-    if (stack.has(node)) return true;
-    if (visited.has(node)) return false;
-    visited.add(node); stack.add(node);
-    for (const dep of graph[node] || []) {
-      if (dfs(dep)) return true;
-    }
-    stack.delete(node);
-    return false;
-  }
-  return Object.keys(graph).some(dfs);
-}
-
 async function loadBudgets() {
   try {
     return await fs.readJson('configs/budgets.json');
   } catch {
     return { maxCSS: 300000, maxJS: 400000 };
   }
+}
+
+async function readJsonIfExists(p) {
+  try {
+    return await fs.readJson(p);
+  } catch {
+    return null;
+  }
+}
+
+function extractFilterSet(data) {
+  const set = new Set();
+  if (!data) return set;
+  if (Array.isArray(data)) {
+    data.forEach((entry) => {
+      if (typeof entry === 'string') set.add(entry.toLowerCase());
+      else if (entry && typeof entry === 'object' && entry.name) set.add(String(entry.name).toLowerCase());
+    });
+  } else if (typeof data === 'object') {
+    if (Array.isArray(data.filters)) {
+      data.filters.forEach((entry) => {
+        if (typeof entry === 'string') set.add(entry.toLowerCase());
+        else if (entry && entry.name) set.add(String(entry.name).toLowerCase());
+      });
+    }
+    Object.keys(data).forEach((key) => {
+      if (key !== 'filters') set.add(key.toLowerCase());
+    });
+  }
+  return set;
+}
+
+function extractComponentSet(data) {
+  const set = new Set();
+  if (!data) return set;
+  const add = (value) => {
+    if (typeof value === 'string') set.add(value.toLowerCase());
+  };
+  if (Array.isArray(data)) {
+    data.forEach(add);
+  } else if (typeof data === 'object') {
+    if (Array.isArray(data.webComponents)) data.webComponents.forEach(add);
+    if (Array.isArray(data.components)) data.components.forEach(add);
+    if (data.layouts && typeof data.layouts === 'object') {
+      Object.keys(data.layouts).forEach((key) => add(key));
+    }
+    Object.keys(data).forEach((key) => {
+      if (key.startsWith('salla-')) add(key);
+    });
+  }
+  return set;
+}
+
+async function loadSallaReferences() {
+  const [filtersJson, partialsJson] = await Promise.all([
+    readJsonIfExists(path.join(SALLA_DIR, 'filters.json')),
+    readJsonIfExists(path.join(SALLA_DIR, 'partials.json')),
+  ]);
+  return {
+    filters: extractFilterSet(filtersJson),
+    components: extractComponentSet(partialsJson),
+  };
 }

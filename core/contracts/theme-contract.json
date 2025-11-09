@@ -1,0 +1,134 @@
+﻿{
+  "$id": "ThemeContract",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["input", "parsed", "adapted", "validated"],
+  "properties": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "folder": { "type": "string" },
+        "assets": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["folder"],
+      "additionalProperties": true
+    },
+    "parsed": {
+      "type": "object",
+      "properties": {
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["page", "componentCount"],
+            "properties": {
+              "page": { "type": "string" },
+              "componentCount": { "type": "number" },
+              "sharedComponents": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "unchanged": { "type": "boolean" }
+            },
+            "additionalProperties": true
+          }
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "selector", "page"],
+            "properties": {
+              "id": { "type": "string" },
+              "selector": { "type": "string" },
+              "signature": { "type": "string" },
+              "page": { "type": "string" },
+              "shared": { "type": "boolean" },
+              "order": { "type": "number" },
+              "classes": { "type": "string" }
+            },
+            "additionalProperties": true
+          }
+        },
+        "conflicts": {
+          "type": "array",
+          "items": { "type": "object" }
+        },
+        "assets": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "cssMapSample": { "type": "object" },
+        "templateHints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "page": { "type": "string" },
+              "hints": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "semanticStats": {
+          "type": "object",
+          "properties": {
+            "placeholdersApplied": { "type": "number", "minimum": 0 },
+            "bareTokensApplied": { "type": "number", "minimum": 0 },
+            "i18nNodesWrapped": { "type": "number", "minimum": 0 },
+            "i18nAttributesWrapped": { "type": "number", "minimum": 0 },
+            "sanitizedInlineHandlers": { "type": "number", "minimum": 0 },
+            "blockedExternalScripts": { "type": "number", "minimum": 0 }
+          },
+          "additionalProperties": true
+        },
+        "confidence": { "type": ["number", "null"] }
+      },
+      "required": ["sections", "components"],
+      "additionalProperties": true
+    },
+    "adapted": {
+      "type": "object",
+      "properties": {
+        "twig": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "metadata": { "type": "object" }
+      },
+      "required": ["twig"],
+      "additionalProperties": true
+    },
+    "validated": {
+      "type": "object",
+      "properties": {
+        "status": { "enum": ["pass", "fail", "pending"] },
+        "warnings": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "errors": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "counts": {
+          "type": "object",
+          "properties": {
+            "warnings": { "type": "number", "minimum": 0 },
+            "errors": { "type": "number", "minimum": 0 }
+          },
+          "additionalProperties": true
+        }
+      },
+      "required": ["status"],
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

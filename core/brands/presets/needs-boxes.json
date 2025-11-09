@@ -1,0 +1,46 @@
+{
+  "slug": "needs-boxes",
+  "name": "ُNEEDS BOXES",
+  "colors": {
+    "--font-main": "'Alexandria'",
+    "--color-primary": "#49318c",
+    "--color-primary-dark": "#230b66",
+    "--color-primary-light": "#6f57b2",
+    "--color-primary-reverse": "#fffdff"
+  },
+  "fonts": [
+    "Alexandria",
+    "DINNextLTArabic",
+    "-apple-system",
+    "BlinkMacSystemFont",
+    "var(--font-main)",
+    "ui-monospace",
+    "SFMono-Regular",
+    "Menlo",
+    "Monaco",
+    "Consolas",
+    "Liberation Mono",
+    "Courier New",
+    "inherit",
+    "PingARLT",
+    "system-ui",
+    "Segoe UI",
+    "Roboto",
+    "Ubuntu",
+    "Cantarell",
+    "Noto Sans",
+    "inherit!important",
+    "sallaicons",
+    "sallaicons}salla-slider .model-entry .s-toggle-switcher{pointer-events:auto}salla-slider .model-entry:before{--tw-content:\\e9a0",
+    "sallaicons!important",
+    "sallaicons}.rating-actions{align-items:center",
+    "sallaicons}.offer-slider .s-slider-block__title h2{font-size:1.125rem",
+    "arial",
+    "serif}.s-toggle .s-toggle-input:checked+div.s-toggle-switcher-bg-white:before{--tw-border-opacity:1",
+    "sallaicons !important"
+  ],
+  "source": {
+    "html": "input\\needsboxes\\index.html",
+    "extractedAt": "2025-11-09T10:01:57.343Z"
+  }
+}

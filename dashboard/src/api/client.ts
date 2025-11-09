@@ -11,6 +11,10 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
     headers['Content-Type'] = 'application/json';
   }
   if (token) headers.Authorization = `Bearer ${token}`;
+  if (typeof window !== 'undefined') {
+    const mode = window.localStorage.getItem('deemindMode');
+    if (mode) headers['X-Deemind-Mode'] = mode;
+  }
   const res = await fetch(`${SERVICE_URL}${path}`, { ...options, headers });
   if (!res.ok) {
     const text = await res.text();

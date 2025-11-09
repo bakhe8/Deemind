@@ -1,0 +1,21 @@
+{
+  "id": "demo-store",
+  "name": "Deemind Atelier",
+  "currency": {
+    "code": "SAR",
+    "symbol": "ر.س",
+    "format": "{{ amount }} ر.س"
+  },
+  "language": "ar",
+  "domain": "https://demo.deemind.local",
+  "social": {
+    "instagram": "https://instagram.com/deemind",
+    "twitter": "https://twitter.com/deemind",
+    "tiktok": "https://tiktok.com/@deemind"
+  },
+  "support": {
+    "email": "support@deemind.local",
+    "phone": "+966500000001",
+    "hours": "Sun-Thu 9:00-18:00"
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "input": {
+    "folder": "demo",
+    "assets": []
+  },
+  "parsed": {
+    "sections": [
+      {
+        "page": "index.html",
+        "componentCount": 0,
+        "sharedComponents": [],
+        "unchanged": false
+      }
+    ],
+    "components": [],
+    "conflicts": [],
+    "assets": [],
+    "cssMapSample": {
+      "index.html": {}
+    },
+    "templateHints": [
+      {
+        "page": "index.html",
+        "hints": ["product"]
+      }
+    ],
+    "confidence": 1,
+    "semanticStats": {
+      "placeholdersApplied": 1,
+      "bareTokensApplied": 1,
+      "i18nNodesWrapped": 0,
+      "i18nAttributesWrapped": 0,
+      "sanitizedInlineHandlers": 0,
+      "blockedExternalScripts": 0
+    }
+  },
+  "adapted": {
+    "twig": [],
+    "metadata": {}
+  },
+  "validated": {
+    "status": "fail",
+    "warnings": [
+      "raw-baseline | output\\demo\\partials\\home\\products-slider.twig | | raw preserved from baseline fallback. Override input to customize.",
+      "raw-baseline | output\\demo\\partials\\footer\\footer.twig | | raw preserved from baseline fallback. Override input to customize.",
+      "raw-baseline | output\\demo\\pages\\page-single.twig | | raw preserved from baseline fallback. Override input to customize.",
+      "raw-baseline | output\\demo\\pages\\product\\index.twig | | raw preserved from baseline fallback. Override input to customize.",
+      "raw-baseline | output\\demo\\pages\\brands\\single.twig | | raw preserved from baseline fallback. Override input to customize.",
+      "raw-baseline | output\\demo\\pages\\blog\\single.twig | | raw preserved from baseline fallback. Override input to customize.",
+      "filter-unknown | partials/home/youtube.twig | Twig filter \"variable\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/youtube.twig | Twig filter \"type\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/youtube.twig | Twig filter \"description\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/youtube.twig | Twig filter \"youtube_id\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/youtube.twig | Twig filter \"string\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/youtube.twig | Twig filter \"position\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/youtube.twig | Twig filter \"int\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/youtube.twig | Twig filter \"sorting\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/testimonials.twig | Twig filter \"variable\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/testimonials.twig | Twig filter \"type\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/testimonials.twig | Twig filter \"description\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/testimonials.twig | Twig filter \"limit\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/testimonials.twig | Twig filter \"string\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/testimonials.twig | Twig filter \"maximum\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/testimonials.twig | Twig filter \"sort\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/testimonials.twig | Twig filter \"hide_customer_info\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/testimonials.twig | Twig filter \"bool\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/testimonials.twig | Twig filter \"show\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/store-features.twig | Twig filter \"variable\" not found in synced Salla filters."
+    ],
+    "errors": [
+      "raw-disallowed | output\\demo\\pages\\thank-you.twig | | raw used without allowlist",
+      "raw-disallowed | output\\demo\\pages\\landing-page.twig | | raw used without allowlist",
+      "raw-disallowed | output\\demo\\pages\\cart.twig | | raw used without allowlist",
+      "raw-disallowed | output\\demo\\pages\\product\\single.twig | | raw used without allowlist",
+      "raw-disallowed | output\\demo\\pages\\customer\\orders\\single.twig | | raw used without allowlist",
+      "sample-strings | output\\demo\\pages\\cart.twig | Sample placeholder string found."
+    ],
+    "counts": {
+      "warnings": 701,
+      "errors": 6
+    }
+  }
+}

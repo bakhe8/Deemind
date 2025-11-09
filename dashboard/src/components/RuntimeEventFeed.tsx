@@ -3,10 +3,11 @@ import { usePreviewEvents } from '../hooks/usePreviewEvents';
 type Props = {
   title?: string;
   limit?: number;
+  theme?: string;
 };
 
-export default function RuntimeEventFeed({ title = 'Runtime Events', limit = 10 }: Props) {
-  const { events, connected, theme } = usePreviewEvents();
+export default function RuntimeEventFeed({ title = 'Runtime Events', limit = 10, theme }: Props) {
+  const { events, connected, theme: streamingTheme } = usePreviewEvents({ theme });
   const list = events.slice(0, limit);
 
   return (
@@ -15,14 +16,9 @@ export default function RuntimeEventFeed({ title = 'Runtime Events', limit = 10 
         <div>
           <h2 className="text-lg font-semibold">{title}</h2>
           <p className="text-xs text-slate-500">
-            {connected ? (
-              <>
-                Listening to stub
-                {theme ? ` (${theme})` : ''}.
-              </>
-            ) : (
-              'Waiting for stub events…'
-            )}
+            {connected
+              ? `Listening to ${streamingTheme || theme || 'stub'}`
+              : 'Waiting for stub events…'}
           </p>
         </div>
       </div>
@@ -46,4 +42,3 @@ export default function RuntimeEventFeed({ title = 'Runtime Events', limit = 10 
     </div>
   );
 }
-

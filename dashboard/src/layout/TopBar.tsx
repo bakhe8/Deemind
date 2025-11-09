@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useDashboardStore } from '../store/useDashboardStore';
 import { fetchStatus } from '../api/system';
 import { useRuntimeStub } from '../hooks/useRuntimeStub';
+import ModeSwitch from '../components/ModeSwitch';
 
 export default function TopBar() {
   const token = useDashboardStore((state) => state.token);
@@ -24,6 +25,7 @@ export default function TopBar() {
         <p className="text-xs text-slate-500">Current Task: {status.current?.label || 'Idle'}</p>
       </div>
       <div className="flex items-center gap-4">
+        <ModeSwitch />
         <div className="flex items-center gap-2 text-xs text-slate-500">
           <span
             className={`inline-flex h-2.5 w-2.5 rounded-full ${
@@ -49,4 +51,3 @@ export default function TopBar() {
     </header>
   );
 }
-

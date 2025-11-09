@@ -1,0 +1,310 @@
+{
+  "store": {
+    "id": "demo-store",
+    "name": "Deemind Atelier",
+    "currency": {
+      "code": "SAR",
+      "symbol": "ر.س",
+      "format": "{{ amount }} ر.س"
+    },
+    "language": "ar",
+    "domain": "https://demo.deemind.local",
+    "social": {
+      "instagram": "https://instagram.com/deemind",
+      "twitter": "https://twitter.com/deemind",
+      "tiktok": "https://tiktok.com/@deemind"
+    },
+    "support": {
+      "email": "support@deemind.local",
+      "phone": "+966500000001",
+      "hours": "Sun-Thu 9:00-18:00"
+    }
+  },
+  "products": [
+    {
+      "id": 101,
+      "name": "Signature Canvas Backpack",
+      "slug": "signature-canvas-backpack",
+      "sku": "BAG-101",
+      "price": 329,
+      "badge": "New arrival",
+      "rating": 4.7,
+      "reviews": 182,
+      "media": [
+        "https://cdn.deemind.local/images/backpack-101-1.jpg",
+        "https://cdn.deemind.local/images/backpack-101-2.jpg"
+      ],
+      "options": {
+        "color": ["Desert Tan", "Midnight Black"],
+        "size": ["Compact", "Weekender"]
+      }
+    },
+    {
+      "id": 102,
+      "name": "Midnight Wireless Earbuds",
+      "slug": "midnight-wireless-earbuds",
+      "sku": "EAR-204",
+      "price": 199,
+      "badge": "Top rated",
+      "rating": 4.9,
+      "reviews": 241,
+      "media": ["https://cdn.deemind.local/images/earbuds-204-1.jpg"],
+      "options": {
+        "finish": ["Matte", "Glossy"]
+      }
+    },
+    {
+      "id": 103,
+      "name": "Smart Watch X2",
+      "slug": "smart-watch-x2",
+      "sku": "WATCH-302",
+      "price": 249,
+      "badge": "Limited",
+      "rating": 4.5,
+      "reviews": 96,
+      "media": ["https://cdn.deemind.local/images/watch-302-1.jpg"],
+      "options": {
+        "strap": ["Leather", "Silicone"],
+        "size": ["40mm", "44mm"]
+      }
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "New arrivals",
+      "slug": "new-arrivals",
+      "description": "Weekly drops curated for high-converting hero sections."
+    },
+    {
+      "id": 2,
+      "name": "Gadgets",
+      "slug": "gadgets",
+      "description": "Smart accessories and personal electronics."
+    },
+    {
+      "id": 3,
+      "name": "Soft goods",
+      "slug": "soft-goods",
+      "description": "Textiles, small leather goods, and lifestyle accents."
+    }
+  ],
+  "cart": {
+    "items": [
+      {
+        "id": 101,
+        "name": "Signature Canvas Backpack",
+        "price": 329,
+        "quantity": 1,
+        "media": "https://cdn.deemind.local/images/backpack-101-1.jpg",
+        "options": {
+          "color": "Desert Tan",
+          "size": "Weekender"
+        }
+      }
+    ],
+    "total": 329,
+    "currency": "SAR"
+  },
+  "user": {
+    "id": 42,
+    "name": "Rahaf Al-Mutairi",
+    "email": "rahaf@deemind.local",
+    "phone": "+966500000007",
+    "avatar": "https://cdn.deemind.local/avatars/rahaf.png",
+    "loyalty": {
+      "tier": "Gold",
+      "points": 1280
+    },
+    "addresses": [
+      {
+        "id": 1,
+        "label": "Home",
+        "city": "Riyadh",
+        "country": "Saudi Arabia"
+      }
+    ]
+  },
+  "locales": {
+    "en": {
+      "add_to_cart": "Add to Cart",
+      "checkout": "Checkout",
+      "cart_updated": "Cart updated",
+      "wishlist": "Wishlist"
+    },
+    "ar": {
+      "add_to_cart": "أضف إلى السلة",
+      "checkout": "إتمام الشراء",
+      "cart_updated": "تم تحديث السلة",
+      "wishlist": "قائمة الرغبات"
+    }
+  },
+  "hero": {
+    "eyebrow": "Flagship launch",
+    "title": "Power your workflow with the new Electro set",
+    "subtitle": "Curated gear, instant pickup, and full Arabic/English localization out of the box.",
+    "primaryCta": {
+      "label": "Shop gadgets",
+      "href": "/page/product/index"
+    },
+    "secondaryCta": {
+      "label": "View bundles",
+      "href": "/page/landing-page"
+    },
+    "media": "https://cdn.deemind.local/hero/tech-stack.png"
+  },
+  "navigation": [
+    {
+      "label": "Home",
+      "href": "/page/index"
+    },
+    {
+      "label": "Products",
+      "href": "/page/product/index"
+    },
+    {
+      "label": "Brands",
+      "href": "/page/brands/index"
+    },
+    {
+      "label": "Blog",
+      "href": "/page/blog/index"
+    }
+  ],
+  "wishlist": {
+    "items": []
+  },
+  "inventory": [],
+  "brands": [
+    {
+      "id": "needsboxes",
+      "label": "Needsboxes",
+      "href": "/page/brands/single"
+    },
+    {
+      "id": "nimbus",
+      "label": "Nimbus",
+      "href": "/page/brands/single"
+    },
+    {
+      "id": "aurora",
+      "label": "Aurora",
+      "href": "/page/brands/single"
+    }
+  ],
+  "blog": [],
+  "orders": [],
+  "data": {
+    "store": {
+      "id": 1305146709,
+      "name": "Deemind Atelier",
+      "currency": "SAR",
+      "language": "en",
+      "domain": "demo.deemind.local"
+    },
+    "products": [
+      {
+        "id": 101,
+        "name": "Signature Canvas Backpack",
+        "price": 329,
+        "badge": "New arrival",
+        "sku": "BAG-101",
+        "media": [
+          "https://cdn.deemind.local/images/bag-101-1.jpg",
+          "https://cdn.deemind.local/images/bag-101-2.jpg"
+        ]
+      },
+      {
+        "id": 102,
+        "name": "Midnight Wireless Earbuds",
+        "price": 199,
+        "badge": "Top rated",
+        "sku": "EAR-204",
+        "media": ["https://cdn.deemind.local/images/earbuds-204-1.jpg"]
+      },
+      {
+        "id": 103,
+        "name": "Smart Watch X2",
+        "price": 249,
+        "badge": "Limited",
+        "sku": "WATCH-302",
+        "media": ["https://cdn.deemind.local/images/watch-302-1.jpg"]
+      }
+    ],
+    "hero": {
+      "eyebrow": "Flagship launch",
+      "title": "Power your workflow with the new Electro set",
+      "subtitle": "Curated gear, instant pickup, and full Arabic/English localization out of the box.",
+      "primaryCta": {
+        "label": "Shop gadgets",
+        "href": "/page/product/index"
+      },
+      "secondaryCta": {
+        "label": "View bundles",
+        "href": "/page/landing-page"
+      },
+      "media": "https://cdn.deemind.local/hero/tech-stack.png"
+    },
+    "navigation": [
+      {
+        "label": "Home",
+        "href": "/page/index"
+      },
+      {
+        "label": "Products",
+        "href": "/page/product/index"
+      },
+      {
+        "label": "Brands",
+        "href": "/page/brands/index"
+      },
+      {
+        "label": "Blog",
+        "href": "/page/blog/index"
+      }
+    ],
+    "brands": [
+      {
+        "id": "needsboxes",
+        "label": "Needsboxes",
+        "href": "/page/brands/single"
+      },
+      {
+        "id": "nimbus",
+        "label": "Nimbus",
+        "href": "/page/brands/single"
+      },
+      {
+        "id": "aurora",
+        "label": "Aurora",
+        "href": "/page/brands/single"
+      }
+    ],
+    "cart": {
+      "items": [],
+      "total": 0,
+      "currency": "SAR"
+    },
+    "wishlist": {
+      "items": []
+    },
+    "locales": {
+      "en": {
+        "add_to_cart": "Add to Cart",
+        "checkout": "Checkout",
+        "cart_updated": "Cart updated",
+        "wishlist": "Wishlist"
+      },
+      "ar": {
+        "add_to_cart": "أضف إلى السلة",
+        "checkout": "إتمام الشراء",
+        "cart_updated": "تم تحديث السلة",
+        "wishlist": "قائمة الرغبات"
+      }
+    }
+  },
+  "meta": {
+    "demo": "electronics",
+    "generatedAt": "2025-11-09T07:42:22.861Z"
+  }
+}

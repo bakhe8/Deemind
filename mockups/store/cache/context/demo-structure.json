@@ -1,0 +1,329 @@
+{
+  "link": {
+    "url": "{{ link.url }}",
+    "label": "{{ link.label }}"
+  },
+  "trans": "{{ trans }}",
+  "thank_you_title": "{{ thank_you_title }}",
+  "order": {
+    "reference_id": "{{ order.reference_id }}",
+    "id": "{{ order.id }}",
+    "url": "{{ order.url }}",
+    "instructions": "{{ order.instructions }}",
+    "customer": {
+      "email": "{{ order.customer.email }}"
+    },
+    "created_at": "{{ order.created_at }}",
+    "status": {
+      "color": "{{ order.status.color }}",
+      "icon": "{{ order.status.icon }}",
+      "name": "{{ order.status.name }}"
+    },
+    "print_url": "{{ order.print_url }}",
+    "is_pending_payment": "{{ order.is_pending_payment }}",
+    "payment_url": "{{ order.payment_url }}",
+    "rating": {
+      "store": {
+        "content": "{{ order.rating.store.content }}",
+        "stars": "{{ order.rating.store.stars }}",
+        "id": "{{ order.rating.store.id }}"
+      },
+      "shipping": {
+        "content": "{{ order.rating.shipping.content }}",
+        "stars": "{{ order.rating.shipping.stars }}",
+        "id": "{{ order.rating.shipping.id }}"
+      }
+    }
+  },
+  "message": "{{ message }}",
+  "store": {
+    "contacts": {
+      "mobile": "{{ store.contacts.mobile }}",
+      "whatsapp": "{{ store.contacts.whatsapp }}"
+    },
+    "url": "{{ store.url }}",
+    "name": "{{ store.name }}",
+    "logo": "{{ store.logo }}",
+    "id": "{{ store.id }}",
+    "api": "{{ store.api }}",
+    "settings": {
+      "rating": {
+        "update_period": "{{ store.settings.rating.update_period }}"
+      }
+    }
+  },
+  "page": {
+    "title": "{{ page.title }}",
+    "content": "{{ page.content }}",
+    "id": "{{ page.id }}",
+    "slug": "{{ page.slug }}"
+  },
+  "loyalty": {
+    "image": "{{ loyalty.image }}",
+    "name": "{{ loyalty.name }}",
+    "description": "{{ loyalty.description }}",
+    "prize": {
+      "points": "{{ loyalty.prize.points }}",
+      "title": "{{ loyalty.prize.title }}"
+    }
+  },
+  "user": {
+    "loyalty_points": "{{ user.loyalty_points }}",
+    "language_code": "{{ user.language_code }}",
+    "language": {
+      "code": "{{ user.language.code }}",
+      "dir": "{{ user.language.dir }}"
+    },
+    "can_access_wallet": "{{ user.can_access_wallet }}",
+    "avatar": "{{ user.avatar }}",
+    "first_name": "{{ user.first_name }}",
+    "last_name": "{{ user.last_name }}",
+    "birthday": "{{ user.birthday }}",
+    "gender": "{{ user.gender }}",
+    "email": "{{ user.email }}",
+    "mobile": "{{ user.mobile }}",
+    "is_notifiable": "{{ user.is_notifiable }}"
+  },
+  "point": {
+    "icon": "{{ point.icon }}",
+    "color": "{{ point.color }}",
+    "points": "{{ point.points }}",
+    "description": "{{ point.description }}",
+    "url": "{{ point.url }}",
+    "name": "{{ point.name }}"
+  },
+  "prize_group": {
+    "items": "{{ prize_group.items }}",
+    "title": "{{ prize_group.title }}",
+    "type": "{{ prize_group.type }}"
+  },
+  "prize": {
+    "image": "{{ prize.image }}",
+    "name": "{{ prize.name }}",
+    "url": "{{ prize.url }}",
+    "description": "{{ prize.description }}",
+    "cost_points": "{{ prize.cost_points }}"
+  },
+  "img": "{{ img }}",
+  "landing": {
+    "show_quantity": "{{ landing.show_quantity }}",
+    "title": "{{ landing.title }}",
+    "content": "{{ landing.content }}",
+    "offer_ends_at": "{{ landing.offer_ends_at }}",
+    "products": "{{ landing.products }}"
+  },
+  "is_vertical": "{{ is_vertical }}",
+  "product": {
+    "name": "{{ product.name }}",
+    "id": "{{ product.id }}",
+    "promotion_title": "{{ product.promotion_title }}",
+    "calories": "{{ product.calories }}",
+    "brand": {
+      "url": "{{ product.brand.url }}",
+      "name": "{{ product.brand.name }}",
+      "logo": "{{ product.brand.logo }}"
+    },
+    "subtitle": "{{ product.subtitle }}",
+    "rating": {
+      "stars": "{{ product.rating.stars }}",
+      "count": "{{ product.rating.count }}"
+    },
+    "is_on_sale": "{{ product.is_on_sale }}",
+    "sale_price": "{{ product.sale_price }}",
+    "regular_price": "{{ product.regular_price }}",
+    "starting_price": "{{ product.starting_price }}",
+    "quantity": "{{ product.quantity }}",
+    "sku": "{{ product.sku }}",
+    "price": "{{ product.price }}",
+    "preorder": "{{ product.preorder }}",
+    "max_quantity": "{{ product.max_quantity }}",
+    "can_quick_buy": "{{ product.can_quick_buy }}",
+    "is_require_shipping": "{{ product.is_require_shipping }}",
+    "has_preorder_campaign": "{{ product.has_preorder_campaign }}",
+    "base_currency_price": "{{ product.base_currency_price }}",
+    "status": "{{ product.status }}",
+    "type": "{{ product.type }}",
+    "notify_availability": {
+      "subscribed": "{{ product.notify_availability.subscribed }}",
+      "channels": "{{ product.notify_availability.channels }}",
+      "subscribed_options": "{{ product.notify_availability.subscribed_options }}",
+      "options": "{{ product.notify_availability.options }}"
+    },
+    "add_to_cart_label": "{{ product.add_to_cart_label }}",
+    "options": "{{ product.options }}",
+    "weight": "{{ product.weight }}",
+    "notes": "{{ product.notes }}",
+    "attachments": "{{ product.attachments }}"
+  },
+  "item": {
+    "id": "{{ item.id }}",
+    "url": "{{ item.url }}",
+    "product_image": "{{ item.product_image }}",
+    "product_name": "{{ item.product_name }}",
+    "price": {
+      "getMoney": "{{ item.price.getMoney }}"
+    },
+    "offer": {
+      "names": "{{ item.offer.names }}"
+    },
+    "product_price": "{{ item.product_price }}",
+    "is_on_sale": "{{ item.is_on_sale }}",
+    "original_price": "{{ item.original_price }}",
+    "has_discount": "{{ item.has_discount }}",
+    "weight_label": "{{ item.weight_label }}",
+    "detailed_offers": "{{ item.detailed_offers }}",
+    "quantity": "{{ item.quantity }}",
+    "max_quantity": "{{ item.max_quantity }}",
+    "is_available": "{{ item.is_available }}",
+    "product": {
+      "id": "{{ item.product.id }}",
+      "url": "{{ item.product.url }}"
+    },
+    "image": "{{ item.image }}",
+    "name": "{{ item.name }}",
+    "total": "{{ item.total }}",
+    "booking_location": "{{ item.booking_location }}",
+    "note": "{{ item.note }}",
+    "rating": {
+      "content": "{{ item.rating.content }}",
+      "stars": "{{ item.rating.stars }}",
+      "id": "{{ item.rating.id }}"
+    }
+  },
+  "product_option": {
+    "id": "{{ product_option.id }}",
+    "quantity": "{{ product_option.quantity }}"
+  },
+  "cart": {
+    "free_shipping_bar": {
+      "percent": "{{ cart.free_shipping_bar.percent }}"
+    },
+    "sub_total": "{{ cart.sub_total }}",
+    "options_total": "{{ cart.options_total }}",
+    "has_shipping": "{{ cart.has_shipping }}",
+    "real_shipping_cost": "{{ cart.real_shipping_cost }}",
+    "coupon": "{{ cart.coupon }}",
+    "total_discount": "{{ cart.total_discount }}",
+    "tax_amount": "{{ cart.tax_amount }}",
+    "total": "{{ cart.total }}"
+  },
+  "theme": {
+    "is_rtl": "{{ theme.is_rtl }}",
+    "settings": {
+      "get": "{{ theme.settings.get }}",
+      "set": "{{ theme.settings.set }}"
+    },
+    "font": {
+      "path": "{{ theme.font.path }}",
+      "name": "{{ theme.font.name }}"
+    },
+    "color": {
+      "primary": "{{ theme.color.primary }}",
+      "darker": "{{ theme.color.darker }}",
+      "lighter": "{{ theme.color.lighter }}",
+      "reverse_text": "{{ theme.color.reverse_text }}"
+    }
+  },
+  "is_free": "{{ is_free }}",
+  "gift": {
+    "enabled": "{{ gift.enabled }}",
+    "text": "{{ gift.text }}",
+    "type": "{{ gift.type }}"
+  },
+  "image": {
+    "url": "{{ image.url }}",
+    "three_d_image_url": "{{ image.three_d_image_url }}",
+    "alt": "{{ image.alt }}",
+    "id": "{{ image.id }}",
+    "video_url": "{{ image.video_url }}"
+  },
+  "loop": {
+    "index": "{{ loop.index }}"
+  },
+  "product_desc": "{{ product_desc }}",
+  "tag": {
+    "url": "{{ tag.url }}",
+    "name": "{{ tag.name }}"
+  },
+  "pluralize": "{{ pluralize }}",
+  "gifting_intro": "{{ gifting_intro }}",
+  "filters": "{{ filters }}",
+  "sort": {
+    "id": "{{ sort.id }}",
+    "is_selected": "{{ sort.is_selected }}",
+    "name": "{{ sort.name }}"
+  },
+  "field": {
+    "id": "{{ field.id }}",
+    "label": "{{ field.label }}",
+    "value": "{{ field.value }}",
+    "type": "{{ field.type }}",
+    "required": "{{ field.required }}"
+  },
+  "article": {
+    "title": "{{ article.title }}",
+    "created_at": "{{ article.created_at }}",
+    "author": {
+      "url": "{{ article.author.url }}",
+      "name": "{{ article.author.name }}"
+    },
+    "image": {
+      "url": "{{ article.image.url }}",
+      "alt": "{{ article.image.alt }}"
+    },
+    "key": "{{ article.key }}",
+    "likes_count": "{{ article.likes_count }}",
+    "comments_count": "{{ article.comments_count }}",
+    "body": "{{ article.body }}",
+    "url": "{{ article.url }}",
+    "name": "{{ article.name }}",
+    "has_image": "{{ article.has_image }}",
+    "summary": "{{ article.summary }}"
+  },
+  "category": {
+    "is_current": "{{ category.is_current }}",
+    "url": "{{ category.url }}",
+    "name": "{{ category.name }}"
+  },
+  "articles": {
+    "next_page": "{{ articles.next_page }}"
+  },
+  "brand": {
+    "banner": "{{ brand.banner }}",
+    "name": "{{ brand.name }}",
+    "logo": "{{ brand.logo }}",
+    "description": "{{ brand.description }}",
+    "url": "{{ brand.url }}"
+  },
+  "char": "{{ char }}",
+  "reservation": {
+    "day": "{{ reservation.day }}",
+    "from": "{{ reservation.from }}",
+    "to": "{{ reservation.to }}"
+  },
+  "package": {
+    "shipping_company": {
+      "logo": "{{ package.shipping_company.logo }}",
+      "name": "{{ package.shipping_company.name }}",
+      "number": "{{ package.shipping_company.number }}",
+      "tracing_link": "{{ package.shipping_company.tracing_link }}"
+    },
+    "branch": {
+      "name": "{{ package.branch.name }}"
+    },
+    "status": {
+      "color": "{{ package.status.color }}",
+      "icon": "{{ package.status.icon }}",
+      "name": "{{ package.status.name }}"
+    }
+  },
+  "attachment": {
+    "type": "{{ attachment.type }}",
+    "url": "{{ attachment.url }}"
+  },
+  "option": {
+    "name": "{{ option.name }}",
+    "value": "{{ option.value }}",
+    "price": "{{ option.price }}"
+  }
+}

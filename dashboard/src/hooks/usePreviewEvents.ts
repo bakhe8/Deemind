@@ -7,21 +7,27 @@ export type RuntimeEvent = {
   receivedAt: string;
 };
 
-const EVENT_TYPES = ['status', 'cart', 'wishlist', 'session', 'store'];
+type Options = {
+  theme?: string;
+};
+
+const EVENT_TYPES = ['status', 'cart', 'wishlist', 'session', 'store', 'twilight', 'analytics'];
 const MAX_EVENTS = 40;
 
 function makeId(type: string) {
   return `${type}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
-export function usePreviewEvents() {
+export function usePreviewEvents(options: Options = {}) {
+  const { theme: targetTheme } = options;
   const [events, setEvents] = useState<RuntimeEvent[]>([]);
   const [connected, setConnected] = useState(false);
   const [theme, setTheme] = useState<string | null>(null);
 
   useEffect(() => {
     let closed = false;
-    const source = new EventSource('/api/preview/events');
+    const query = targetTheme ? `?theme=${encodeURIComponent(targetTheme)}` : '';
+    const source = new EventSource(`/api/preview/events${query}`);
     const handler = (evt: MessageEvent) => {
       if (closed) return;
       let payload: unknown = evt.data;
@@ -50,10 +56,9 @@ export function usePreviewEvents() {
       EVENT_TYPES.forEach((type) => source.removeEventListener(type, handler));
       source.close();
     };
-  }, []);
+  }, [targetTheme]);
 
   const latest = useMemo(() => events.slice(0, 5), [events]);
 
   return { events, latest, connected, theme };
 }
-

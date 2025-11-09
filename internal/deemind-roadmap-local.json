@@ -1,0 +1,145 @@
+{
+  "context": "🧭 Deemind × Salla — Complete Integration Blueprint",
+  "objective": "Finalize and optimize Deemind core pipeline for full Salla compatibility and local independence",
+  "phases": [
+    "Core stabilization",
+    "Salla schema & docs integration",
+    "Mock & validation layer",
+    "Dashboard coupling fixes",
+    "Windows & Electron deployment",
+    "Local autonomy and delivery pipeline"
+  ],
+  "version": "runtime-1.1-local",
+  "generatedAt": "2025-11-09T07:59:55.2911829+03:00",
+  "tasks": [
+    {
+      "id": "contracts-foundation",
+      "phase": "Core stabilization",
+      "title": "Establish core/contracts and canonical structure",
+      "priority": 1,
+      "status": "completed",
+      "updatedAt": "2025-11-09T07:59:55.2911829+03:00",
+      "notes": "Seeded ThemeContract, API contract, build report schema, and directory scaffolding under core/."
+    },
+    {
+      "id": "parser-foundation",
+      "phase": "Core stabilization",
+      "title": "Enhance parser with conflict-aware extraction aligned to contracts",
+      "priority": 2,
+      "status": "completed",
+      "updatedAt": "2025-11-09T08:03:03.3301923+03:00",
+      "notes": "runHybridParser now persists canonical/core-aligned theme.json with sections/components/conflicts."
+    },
+    {
+      "id": "semantic-mapper",
+      "phase": "Core stabilization",
+      "title": "Implement semantic mapper & i18n pass",
+      "priority": 3,
+      "status": "completed",
+      "updatedAt": "2025-11-09T08:04:54.7280458+03:00",
+      "notes": "Mapper now tracks placeholder/i18n/sanitize stats and writes them into canonical theme.json."
+    },
+    {
+      "id": "dependency-graph",
+      "phase": "Core stabilization",
+      "title": "Build Twig dependency graph for includes/extends ordering",
+      "priority": 4,
+      "status": "completed",
+      "updatedAt": "2025-11-09T08:08:17.5716611+03:00",
+      "notes": "New tools/twig-dependency-graph.js generates per-theme graph + validator reuse."
+    },
+    {
+      "id": "salla-schema-sync",
+      "phase": "Salla schema & docs integration",
+      "title": "Implement Salla schema/filter/partial sync tooling",
+      "priority": 5,
+      "status": "completed",
+      "updatedAt": "2025-11-09T07:59:55.2911829+03:00",
+      "notes": "tools/salla-sync.ts writes canonical snapshots + meta.json and is documented in README/docs."
+    },
+    {
+      "id": "docs-integration",
+      "phase": "Salla schema & docs integration",
+      "title": "Update docs/README/runbook to mirror Runtime 1.1",
+      "priority": 6,
+      "status": "completed",
+      "updatedAt": "2025-11-09T08:12:48.2747871+03:00",
+      "notes": "New Deemind-Architecture, Salla-Integration-Plan, Friction-Reduction-Plan, and updated README/runbook."
+    },
+    {
+      "id": "validator-suite",
+      "phase": "Mock & validation layer",
+      "title": "AJV + runtime validator aligned with Salla schema",
+      "priority": 7,
+      "status": "completed",
+      "updatedAt": "2025-11-09T08:24:07.4611270+03:00",
+      "notes": "CLI enforces ThemeContract + Salla schema via AJV; extended validator now reads synced filters/partials and writes results into canonical validated block."
+    },
+    {
+      "id": "mock-layer",
+      "phase": "Mock & validation layer",
+      "title": "Composable mock data layer + context builder",
+      "priority": 8,
+      "status": "completed",
+      "updatedAt": "2025-11-09T08:37:00.0000000+03:00",
+      "notes": "Added core/mock datasets, mock:data/mock:context scripts, preview/runtime now read cache context."
+    },
+    {
+      "id": "runtime-stub-upgrade",
+      "phase": "Mock & validation layer",
+      "title": "Align runtime stub & store composer with contracts",
+      "priority": 9,
+      "status": "pending",
+      "notes": "Ensure stub APIs, SSE, Twilight shim, and presets rely on composed data."
+    },
+    {
+      "id": "service-refactor",
+      "phase": "Dashboard coupling fixes",
+      "title": "Service API typed boundaries + task runner queue",
+      "priority": 10,
+      "status": "pending",
+      "notes": "Expose /api/run, job tracking, logs, and auth guards per contracts."
+    },
+    {
+      "id": "dashboard-control-center",
+      "phase": "Dashboard coupling fixes",
+      "title": "Dashboard orchestration for builds, runtime, scenarios, and diffs",
+      "priority": 11,
+      "status": "pending",
+      "notes": "UI consumes shared types and manages stub, builds, reports, presets."
+    },
+    {
+      "id": "observability-logs",
+      "phase": "Dashboard coupling fixes",
+      "title": "Central logger + SSE stream + structured reports",
+      "priority": 12,
+      "status": "pending",
+      "notes": "One JSONL log, SSE feed, reports stored under /reports."
+    },
+    {
+      "id": "windows-ops",
+      "phase": "Windows & Electron deployment",
+      "title": "Windows-first launcher + Electron optional bundle",
+      "priority": 13,
+      "status": "pending",
+      "notes": "start-deemind scripts, desktop:start, port cleanup."
+    },
+    {
+      "id": "testing-strategy",
+      "phase": "Local autonomy and delivery pipeline",
+      "title": "Unit + integration + scenario test harness",
+      "priority": 14,
+      "status": "completed",
+      "updatedAt": "2025-11-09T09:32:00.0000000+03:00",
+      "notes": "Added mock-layer test harness (npm run test:mock) and documented CLI testing commands."
+    },
+    {
+      "id": "delivery-pipeline",
+      "phase": "Local autonomy and delivery pipeline",
+      "title": "Package outputs + manifest + optional installer",
+      "priority": 15,
+      "status": "pending",
+      "notes": "Build manifest, ZIP outputs, and final deliverable pipeline."
+    }
+  ]
+}

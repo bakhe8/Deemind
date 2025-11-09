@@ -8,16 +8,22 @@ type AnalyticsEntry = {
   status: number;
   duration: number;
   preset?: string | null;
+  theme?: string | null;
 };
 
-export default function RuntimeAnalyticsTable() {
+type Props = {
+  theme?: string;
+  limit?: number;
+};
+
+export default function RuntimeAnalyticsTable({ theme, limit = 40 }: Props) {
   const [entries, setEntries] = useState<AnalyticsEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
     setLoading(true);
     try {
-      const res = await fetchRuntimeAnalytics(40);
+      const res = await fetchRuntimeAnalytics(limit, theme);
       setEntries(res.entries || []);
     } finally {
       setLoading(false);
@@ -26,14 +32,17 @@ export default function RuntimeAnalyticsTable() {
 
   useEffect(() => {
     load();
-  }, []);
+  }, [theme, limit]);
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4">
       <div className="flex items-center justify-between mb-3">
         <div>
           <h2 className="text-lg font-semibold">Runtime API Metrics</h2>
-          <p className="text-xs text-slate-500">Last {entries.length} API calls captured by the preview stub.</p>
+          <p className="text-xs text-slate-500">
+            Last {entries.length} API calls
+            {theme ? ` for ${theme}` : ''} captured by the preview stub.
+          </p>
         </div>
         <button className="btn-ghost text-xs" onClick={load} disabled={loading}>
           {loading ? 'Refreshing…' : 'Refresh'}
@@ -72,4 +81,3 @@ export default function RuntimeAnalyticsTable() {
     </div>
   );
 }
-

@@ -23,9 +23,16 @@ export type PreviewStatus = {
   pages: string[];
   timestamp: string | null;
 };
+export type PreviewMatrixEntry = PreviewStatus & {
+  theme: string;
+  missing: boolean;
+};
 export type UploadResponse = {
   theme: string;
   inputPath: string;
+  diff?: { added: string[]; removed: string[]; changed: string[] } | null;
+  preset?: Record<string, any> | null;
+  defaultsApplied?: string[] | null;
 };
 
 export async function fetchThemes() {
@@ -47,6 +54,23 @@ export async function saveThemeMetadata(theme: string, data: Record<string, any>
   });
 }
 
+export async function fetchThemePreset(theme: string) {
+  return apiJson<Record<string, any>>(`/api/themes/${encodeURIComponent(theme)}/preset`);
+}
+
+export async function saveThemePreset(theme: string, data: Record<string, any>) {
+  await apiFetch(`/api/themes/${encodeURIComponent(theme)}/preset`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function generateThemeDefaults(theme: string) {
+  return apiJson<{ success: boolean; applied: string[] }>(`/api/themes/${encodeURIComponent(theme)}/defaults`, {
+    method: 'POST',
+  });
+}
+
 export async function runThemeBuild(theme: string, options?: { diff?: boolean }) {
   await apiFetch(`/api/themes/${encodeURIComponent(theme)}/run`, {
     method: 'POST',
@@ -60,6 +84,16 @@ export async function fetchThemeReports(theme: string) {
 
 export async function fetchPreviewStatus(theme: string) {
   return apiJson<PreviewStatus>(`/api/themes/${encodeURIComponent(theme)}/preview`);
+}
+
+export async function fetchPreviewMatrix() {
+  return apiJson<{ previews: PreviewMatrixEntry[] }>('/api/themes/previews');
+}
+
+export async function generatePreviewSnapshots(theme: string) {
+  return apiJson<{ success: boolean; preview: any }>(`/api/themes/${encodeURIComponent(theme)}/preview`, {
+    method: 'POST',
+  });
 }
 
 export async function uploadThemeBundle(file: File, themeName?: string) {

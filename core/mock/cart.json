@@ -1,0 +1,19 @@
+{
+  "cart": {
+    "items": [
+      {
+        "id": 101,
+        "name": "Signature Canvas Backpack",
+        "price": 329,
+        "quantity": 1,
+        "media": "https://cdn.deemind.local/images/backpack-101-1.jpg",
+        "options": {
+          "color": "Desert Tan",
+          "size": "Weekender"
+        }
+      }
+    ],
+    "total": 329,
+    "currency": "SAR"
+  }
+}

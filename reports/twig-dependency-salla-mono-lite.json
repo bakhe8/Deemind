@@ -1,0 +1,9 @@
+{
+  "graph": {
+    "pages/index.twig": ["layout/default.twig"],
+    "layout/default.twig": []
+  },
+  "topo": ["pages/index.twig", "layout/default.twig"],
+  "cycles": [],
+  "fileCount": 2
+}

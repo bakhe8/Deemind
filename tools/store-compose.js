@@ -105,6 +105,52 @@ export async function listStoreDemos() {
   return demos;
 }
 
+export async function listStorePartials() {
+  const results = [];
+
+  async function walk(currentDir) {
+    const entries = await fs.readdir(currentDir, { withFileTypes: true }).catch(() => []);
+    for (const entry of entries) {
+      const fullPath = path.join(currentDir, entry.name);
+      if (entry.isDirectory()) {
+        await walk(fullPath);
+        continue;
+      }
+      if (!entry.isFile() || !entry.name.endsWith('.json')) continue;
+      const relativePath = path
+        .relative(PARTIALS_DIR, fullPath)
+        .replace(/\\/g, '/');
+      const withoutExt = relativePath.replace(/\.json$/i, '');
+      let normalized;
+      try {
+        normalized = normalizePartial(withoutExt);
+      } catch {
+        continue;
+      }
+      const pathSegments = withoutExt.split('/');
+      const category = pathSegments.length > 1 ? pathSegments.slice(0, -1).join('/') : null;
+      let label = pathSegments[pathSegments.length - 1];
+      try {
+        const payload = await readJsonSafe(fullPath);
+        label = payload?.meta?.name || payload?.name || payload?.title || label;
+      } catch {
+        // ignore read errors for label enrichment
+      }
+      results.push({
+        id: normalized.id,
+        version: normalized.version || null,
+        key: normalized.key,
+        label,
+        category,
+        path: withoutExt,
+      });
+    }
+  }
+
+  await walk(PARTIALS_DIR);
+  return results.sort((a, b) => a.key.localeCompare(b.key));
+}
+
 export async function composeStore(demoId = 'electronics', options = {}) {
   const { overrides = {}, includeOnly, writeCache = true } = options;
   const manifest = await loadManifest(demoId);

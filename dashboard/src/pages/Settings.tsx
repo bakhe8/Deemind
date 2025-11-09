@@ -12,9 +12,13 @@ import {
   fetchTwilightStatus,
   updateTwilightStatus,
 } from '../api/system';
-import { fetchThemes, type ThemeSummary } from '../api/themes';
+import { fetchThemes, fetchThemePreset, type ThemeSummary } from '../api/themes';
+import { startBuild } from '../api/build';
 import ThemeStubList from '../components/ThemeStubList';
 import { useRuntimeStub } from '../hooks/useRuntimeStub';
+import { fetchBrands, applyBrand, type BrandPreset } from '../api/brands';
+import { useBrandWatcher } from '../hooks/useBrandWatcher';
+import { usePreviewMatrix } from '../hooks/usePreviewMatrix';
 
 type SettingsPayload = {
   inputDir: string;
@@ -40,6 +44,7 @@ export default function Settings() {
   const [partialFilter, setPartialFilter] = useState('');
   const [storeOverrides, setStoreOverrides] = useState('');
   const [storePresetMessage, setStorePresetMessage] = useState('');
+  const [bannerMessage, setBannerMessage] = useState<string | null>(null);
   const [storePresetLoading, setStorePresetLoading] = useState(false);
   const [twilightEnabled, setTwilightEnabled] = useState(true);
   const [twilightStatusLoading, setTwilightStatusLoading] = useState(true);
@@ -47,6 +52,13 @@ export default function Settings() {
   const [storeDiff, setStoreDiff] = useState<any | null>(null);
   const [storeDiffLoading, setStoreDiffLoading] = useState(false);
   const [storeDiffError, setStoreDiffError] = useState('');
+  const [brands, setBrands] = useState<BrandPreset[]>([]);
+  const [brandLoading, setBrandLoading] = useState(false);
+  const [brandError, setBrandError] = useState('');
+  const [brandAction, setBrandAction] = useState<{ slug: string; status: 'pending' | 'success' | 'error'; message?: string } | null>(null);
+  const [activeThemePreset, setActiveThemePreset] = useState<Record<string, any> | null>(null);
+  const [activePresetLoading, setActivePresetLoading] = useState(false);
+  const [sseStatus, setSseStatus] = useState<'connecting' | 'connected' | 'error'>('connecting');
   const partialDemoRef = useRef<string | null>(null);
   const {
     status: stubStatus,
@@ -57,6 +69,15 @@ export default function Settings() {
     stopStub: haltStub,
     refresh: refreshStubStatus,
   } = useRuntimeStub({ pollMs: 8000, theme: activeStubTheme || undefined });
+  const {
+    map: previewMap,
+    loading: previewMatrixLoading,
+    refresh: refreshPreviewMatrix,
+  } = usePreviewMatrix({ pollMs: 25000 });
+
+  const refreshStubsAndCoverage = useCallback(async () => {
+    await Promise.all([refreshStubStatus(), refreshPreviewMatrix()]);
+  }, [refreshPreviewMatrix, refreshStubStatus]);
 
   useEffect(() => {
     fetchSettings().then((data) => {
@@ -83,6 +104,37 @@ export default function Settings() {
       .then((res) => setThemes(res.themes || []))
       .catch(() => undefined);
   }, []);
+
+  const refreshBrands = useCallback(async () => {
+    setBrandLoading(true);
+    setBrandError('');
+    try {
+      const data = await fetchBrands();
+      setBrands(data.brands || []);
+    } catch (error) {
+      setBrandError(error instanceof Error ? error.message : 'Failed to load brand presets.');
+    } finally {
+      setBrandLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshBrands();
+  }, [refreshBrands]);
+
+  useBrandWatcher(refreshBrands, setSseStatus);
+
+  useEffect(() => {
+    if (!activeStubTheme) {
+      setActiveThemePreset(null);
+      return;
+    }
+    setActivePresetLoading(true);
+    fetchThemePreset(activeStubTheme)
+      .then((preset) => setActiveThemePreset(preset || null))
+      .catch(() => setActiveThemePreset(null))
+      .finally(() => setActivePresetLoading(false));
+  }, [activeStubTheme]);
 
   useEffect(() => {
     if (activeStubTheme) return;
@@ -152,14 +204,14 @@ export default function Settings() {
     await launchStub(themeToLaunch);
     setActiveStubTheme(themeToLaunch);
     setNewStubTheme(themeToLaunch);
-    await refreshStubStatus();
+    await refreshStubsAndCoverage();
     await refreshLogs(themeToLaunch);
   };
 
   const handleStopStub = async () => {
     const targetTheme = activeStubTheme || undefined;
     await haltStub(targetTheme);
-    await refreshStubStatus();
+    await refreshStubsAndCoverage();
     if (targetTheme) {
       await refreshLogs(targetTheme);
     } else {
@@ -168,7 +220,7 @@ export default function Settings() {
   };
 
   const handleManualRefresh = async () => {
-    await refreshStubStatus();
+    await refreshStubsAndCoverage();
     await refreshLogs(activeStubTheme);
   };
 
@@ -178,7 +230,7 @@ export default function Settings() {
     await launchStub(trimmed);
     setActiveStubTheme(trimmed);
     setNewStubTheme(trimmed);
-    await refreshStubStatus();
+    await refreshStubsAndCoverage();
     await refreshLogs(trimmed);
   };
 
@@ -189,7 +241,7 @@ export default function Settings() {
       setActiveStubTheme('');
       setStubLogs([]);
     }
-    await refreshStubStatus();
+    await refreshStubsAndCoverage();
   };
 
   const handleSelectStubTheme = (themeName: string) => {
@@ -252,7 +304,7 @@ export default function Settings() {
       });
       setStorePresetMessage(`Store preset "${selectedStoreDemo}" applied.`);
       setStoreDiff(null);
-      await refreshStubStatus();
+      await refreshStubsAndCoverage();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to apply store preset.';
       setStorePresetMessage(message);
@@ -262,7 +314,56 @@ export default function Settings() {
     }
   };
 
+  const handleApplyBrandPreset = async (slug: string) => {
+    if (!activeStubTheme) {
+      setBrandError('Select or launch a stub before applying a brand preset.');
+      return false;
+    }
+    setBrandError('');
+    setBrandAction({ slug, status: 'pending' });
+    try {
+      await applyBrand(activeStubTheme, slug);
+      setBrandAction({ slug, status: 'success' });
+      await refreshStubsAndCoverage();
+      return true;
+    } catch (error) {
+      setBrandAction({
+        slug,
+        status: 'error',
+        message: error instanceof Error ? error.message : 'Failed to apply brand preset.',
+      });
+      return false;
+    }
+  };
+
+  const handleApplyBrandPresetAndRebuild = async (slug: string) => {
+    const targetTheme = activeStubTheme;
+    const applied = await handleApplyBrandPreset(slug);
+    if (!applied || !targetTheme) return;
+    try {
+      await startBuild({ theme: targetTheme, diff: false });
+      setBannerMessage(`Brand applied and rebuild queued for ${targetTheme}.`);
+      setTimeout(() => setBannerMessage(null), 4000);
+    } catch (error) {
+      setBrandError(
+        error instanceof Error
+          ? `Brand applied but build failed: ${error.message}`
+          : 'Brand applied but build failed to queue.',
+      );
+    }
+  };
+
   const currentStoreDemo = storeDemos.find((demo) => demo.id === selectedStoreDemo);
+  const activeBrand = (activeThemePreset?.brand || null) as { slug?: string; name?: string; colors?: Record<string, string>; fonts?: string[] } | null;
+  const activeBrandSwatches = Object.entries(activeBrand?.colors || {}).slice(0, 6);
+  const sseStatusText =
+    sseStatus === 'connected'
+      ? 'Live sync: connected'
+      : sseStatus === 'error'
+        ? 'Live sync: offline'
+        : 'Live sync: connecting…';
+  const sseStatusColor =
+    sseStatus === 'connected' ? 'bg-emerald-500' : sseStatus === 'error' ? 'bg-rose-500' : 'bg-amber-500';
   const filteredPartials = useMemo(() => {
     if (!partialFilter.trim()) return storePartials;
     const term = partialFilter.trim().toLowerCase();
@@ -314,7 +415,13 @@ export default function Settings() {
   if (!settings) return <p className="text-sm text-slate-500">Loading settings…</p>;
 
   return (
-    <div className="space-y-6">
+    <>
+      {bannerMessage && (
+        <div className="fixed top-4 right-4 z-40 rounded-xl border border-emerald-200 bg-white shadow-xl shadow-emerald-200/60 px-4 py-2 text-sm text-emerald-700">
+          {bannerMessage}
+        </div>
+      )}
+      <div className="space-y-6">
       <div className="grid md:grid-cols-2 gap-4">
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4">
           <h2 className="text-lg font-semibold mb-2">Paths</h2>
@@ -343,6 +450,18 @@ export default function Settings() {
         <p className="text-sm text-slate-500">
           Active selection: <span className="font-mono">{activeStubTheme || '—'}</span> ·{' '}
           {stubStatusLoading ? 'Checking…' : stubStatus?.running ? `Running on port ${stubStatus.port}` : 'Stopped'}
+          {activeStubTheme ? (
+            activePresetLoading ? (
+              <> · Checking brand…</>
+            ) : activeBrand ? (
+              <>
+                {' '}
+                · <span className="inline-flex items-center gap-1 text-xs text-slate-600">Brand: {activeBrand.name || activeBrand.slug || '—'}</span>
+              </>
+            ) : (
+              <> · No brand preset</>
+            )
+          ) : null}
         </p>
         <div className="flex flex-wrap gap-2 items-center mt-3">
           <input
@@ -398,6 +517,8 @@ export default function Settings() {
         loading={stubStatusLoading}
         actionLoading={stubActionLoading}
         activeTheme={activeStubTheme}
+        previewMap={previewMap}
+        previewLoading={previewMatrixLoading}
         onStart={handleStartStubFromList}
         onStop={handleStopStubFromList}
         onRefresh={handleManualRefresh}
@@ -420,6 +541,139 @@ export default function Settings() {
         <p className="text-xs text-slate-500 mt-2">
           {twilightSaving ? 'Applying…' : 'Applies instantly to the running preview stub.'}
         </p>
+      </div>
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold">Brand Presets</h2>
+            <p className="text-xs text-slate-500">Palettes + font stacks extracted from uploaded prototypes.</p>
+          </div>
+          <div className="flex items-center gap-2 text-[11px] text-slate-500">
+            <span className={`inline-flex h-2 w-2 rounded-full ${sseStatusColor}`} />
+            <span>{sseStatusText}</span>
+          </div>
+          <button className="btn-ghost text-xs" onClick={refreshBrands} disabled={brandLoading}>
+            {brandLoading ? 'Refreshing…' : 'Refresh'}
+          </button>
+        </div>
+        {brandError && <p className="text-xs text-rose-600">{brandError}</p>}
+        <div className="border border-slate-200 rounded-xl p-3 space-y-2">
+          <p className="text-[11px] uppercase tracking-wide text-slate-500">Active theme preset</p>
+          {activeStubTheme ? (
+            activePresetLoading ? (
+              <p className="text-xs text-slate-500">Loading brand preset…</p>
+            ) : activeBrand ? (
+              <>
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-semibold text-slate-700">{activeBrand.name || activeBrand.slug}</p>
+                    <p className="text-[11px] text-slate-500">{activeBrand.slug || '—'}</p>
+                  </div>
+                  <div className="flex gap-1">
+                    {activeBrandSwatches.length ? (
+                      activeBrandSwatches.map(([key, value]) => (
+                        <div key={`active-brand-swatch-${key}`} className="text-[10px] text-slate-500 text-center">
+                          <div className="h-6 w-6 rounded-md border border-slate-200" style={{ background: value }} />
+                          <span className="block truncate max-w-[3rem]">{key.replace(/^--/, '')}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <span className="text-xs text-slate-500">No tokens</span>
+                    )}
+                  </div>
+                </div>
+                <p className="text-xs text-slate-500">
+                  Fonts: {activeBrand.fonts?.length ? activeBrand.fonts.slice(0, 4).join(', ') : '—'}
+                </p>
+              </>
+            ) : (
+              <p className="text-xs text-slate-500">No brand preset applied to {activeStubTheme}.</p>
+            )
+          ) : (
+            <p className="text-xs text-slate-500">Select a stub theme to view its applied brand preset.</p>
+          )}
+        </div>
+        {brandLoading ? (
+          <p className="text-xs text-slate-500">Loading brand presets…</p>
+        ) : brands.length ? (
+          <div className="grid md:grid-cols-2 gap-3">
+            {brands.map((brand) => {
+              const colors = Object.entries(brand.colors || {}).slice(0, 5);
+              const isApplying = brandAction?.slug === brand.slug && brandAction?.status === 'pending';
+              const isApplied = activeBrand?.slug === brand.slug;
+              const buttonLabel = isApplied
+                ? 'Applied'
+                : isApplying
+                  ? 'Applying…'
+                  : activeStubTheme
+                    ? `Apply to ${activeStubTheme}`
+                    : 'Select a theme';
+              const statusMessage =
+                brandAction?.slug === brand.slug && brandAction?.status === 'error'
+                  ? brandAction.message || 'Failed to apply preset.'
+                  : brandAction?.slug === brand.slug && brandAction?.status === 'success'
+                    ? 'Preset applied'
+                    : isApplied
+                      ? 'Currently applied'
+                      : null;
+              return (
+                <div
+                  key={brand.slug}
+                  className={`border rounded-xl p-3 space-y-2 ${
+                    isApplied ? 'border-emerald-300 bg-emerald-50/60' : 'border-slate-200'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-semibold text-slate-700">{brand.name}</p>
+                      <p className="text-[11px] text-slate-500">{brand.slug}</p>
+                    </div>
+                    <div className="flex gap-1">
+                      {colors.map(([key, value]) => (
+                        <div key={`${brand.slug}-${key}`} className="text-[10px] text-slate-500 text-center">
+                          <div className="h-6 w-6 rounded-md border border-slate-200" style={{ background: value }} />
+                          <span className="block truncate max-w-[2.5rem]">{key.replace(/^--/, '')}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-500">
+                    Fonts: {brand.fonts.length ? brand.fonts.slice(0, 3).join(', ') : '—'}
+                  </p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <button
+                      className="btn-secondary text-xs"
+                      onClick={() => handleApplyBrandPreset(brand.slug)}
+                      disabled={!activeStubTheme || isApplying || isApplied}
+                    >
+                      {buttonLabel}
+                    </button>
+                    <button
+                      className="btn-ghost text-xs"
+                      onClick={() => handleApplyBrandPresetAndRebuild(brand.slug)}
+                      disabled={!activeStubTheme || isApplying}
+                    >
+                      Apply + Rebuild
+                    </button>
+                    {statusMessage && (
+                      <span
+                        className={`text-[11px] ${
+                          brandAction?.status === 'error' ? 'text-rose-600' : 'text-emerald-600'
+                        }`}
+                      >
+                        {statusMessage}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-xs text-slate-500">
+            No brand presets yet. Drop a design HTML and run <code className="font-mono">npm run brand:extract</code>.
+          </p>
+        )}
       </div>
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 space-y-3">
         <h2 className="text-lg font-semibold mb-1">Store Presets</h2>
@@ -576,5 +830,6 @@ export default function Settings() {
         <p className="text-sm text-slate-500">Baseline logs and metrics are written to /logs/baseline and /reports/baseline-metrics.md for easy pickup by CI pipelines.</p>
       </div>
     </div>
+    </>
   );
 }

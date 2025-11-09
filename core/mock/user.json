@@ -1,0 +1,21 @@
+{
+  "user": {
+    "id": 42,
+    "name": "Rahaf Al-Mutairi",
+    "email": "rahaf@deemind.local",
+    "phone": "+966500000007",
+    "avatar": "https://cdn.deemind.local/avatars/rahaf.png",
+    "loyalty": {
+      "tier": "Gold",
+      "points": 1280
+    },
+    "addresses": [
+      {
+        "id": 1,
+        "label": "Home",
+        "city": "Riyadh",
+        "country": "Saudi Arabia"
+      }
+    ]
+  }
+}

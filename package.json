@@ -74,7 +74,15 @@
     "deemind:preview": "nodemon server/preview.js demo",
     "preview:stub": "node server/runtime-stub.js demo",
     "preview:launch": "node tools/preview-launcher.js demo",
-    "runtime:scenario": "node tools/runtime-scenario.js"
+    "runtime:scenario": "node tools/runtime-scenario.js",
+    "runtime:smoke": "node tools/runtime-smoke.js",
+    "salla:sync": "tsx tools/salla-sync.ts",
+    "validate:theme": "tsx tools/validate-theme.ts",
+    "mock:context": "node tools/mock-layer/context-builder.js",
+    "mock:data": "node tools/mock-layer/mock-data-builder.js",
+    "test:mock": "node tests/mock-layer.test.mjs",
+    "brand:extract": "tsx tools/brand-extract.ts",
+    "brand:apply": "tsx tools/brand-apply.ts"
   },
   "dependencies": {
     "ajv": "^8.12.0",

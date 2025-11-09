@@ -1,12 +1,16 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import FileDropZone from '../components/FileDropZone';
 import ThemeInfoForm from '../components/ThemeInfoForm';
 import StatsCard from '../components/StatsCard';
+import ThemeStubList from '../components/ThemeStubList';
 import {
   fetchThemes,
   fetchThemeStructure,
   fetchThemeMetadata,
   saveThemeMetadata,
+  fetchThemePreset,
+  saveThemePreset,
+  generateThemeDefaults,
   runThemeBuild,
   fetchThemeReports,
   fetchPreviewStatus,
@@ -18,6 +22,51 @@ import {
 } from '../api/themes';
 import PipelineProgress from '../components/PipelineProgress';
 import { useRuntimeStub } from '../hooks/useRuntimeStub';
+import { usePreviewMatrix } from '../hooks/usePreviewMatrix';
+
+type DiffGroupProps = {
+  title: string;
+  accent: 'emerald' | 'rose' | 'amber';
+  files: string[];
+};
+
+function DiffGroup({ title, accent, files }: DiffGroupProps) {
+  const colorClass =
+    accent === 'emerald'
+      ? 'text-emerald-600'
+      : accent === 'rose'
+        ? 'text-rose-600'
+        : 'text-amber-600';
+  return (
+    <div>
+      <div className={`font-semibold ${colorClass}`}>
+        {title} ({files.length})
+      </div>
+      {files.length ? (
+        <details className="mt-1 group">
+          <summary className="cursor-pointer text-slate-500 group-open:text-slate-700">
+            {files.slice(0, 3).map((file, idx) => (
+              <span key={`${title}-${file}`} className="block">
+                {file}
+                {idx === 2 && files.length > 3 ? '…' : ''}
+              </span>
+            ))}
+            {files.length > 3 ? <span className="block">Show all ({files.length})</span> : null}
+          </summary>
+          {files.length > 3 && (
+            <ul className="mt-2 list-disc list-inside text-slate-600">
+              {files.map((file) => (
+                <li key={`${title}-expanded-${file}`}>{file}</li>
+              ))}
+            </ul>
+          )}
+        </details>
+      ) : (
+        <p className="text-slate-400 text-xs">None</p>
+      )}
+    </div>
+  );
+}
 
 const baselineOptions = ['theme-raed', 'custom-raed', 'none'];
 
@@ -34,13 +83,62 @@ export default function UploadTheme() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [uploadDiff, setUploadDiff] = useState<{ added: string[]; removed: string[]; changed: string[] } | null>(null);
+  const [lastUploadedTheme, setLastUploadedTheme] = useState<string | null>(null);
+  const [presetRaw, setPresetRaw] = useState('{}');
+  const [presetMessage, setPresetMessage] = useState<string | null>(null);
+  const [presetError, setPresetError] = useState<string | null>(null);
+  const [presetSaving, setPresetSaving] = useState(false);
+  const [defaultsApplied, setDefaultsApplied] = useState<string[]>([]);
+  const [defaultsMessage, setDefaultsMessage] = useState<string | null>(null);
+  const [defaultsLoading, setDefaultsLoading] = useState(false);
+  const checklist = useMemo(() => {
+    if (!structure) return [];
+    return [
+      {
+        id: 'layouts',
+        label: 'Layouts',
+        ok: structure.layouts.length > 0,
+        count: structure.layouts.length,
+        tip: 'Add layout/*.twig files.',
+      },
+      {
+        id: 'pages',
+        label: 'Pages',
+        ok: structure.pages.length > 0,
+        count: structure.pages.length,
+        tip: 'Add pages/*.twig entries.',
+      },
+      {
+        id: 'components',
+        label: 'Partials',
+        ok: structure.components.length > 0,
+        count: structure.components.length,
+        tip: 'Add partials/*.twig snippets.',
+      },
+      {
+        id: 'locales',
+        label: 'Locales',
+        ok: structure.locales.length > 0,
+        count: structure.locales.length,
+        tip: 'Add locales/*.json translations.',
+      },
+    ];
+  }, [structure]);
   const {
     status: stubStatus,
+    stubs: stubList,
     loading: stubStatusLoading,
     actionLoading: stubActionLoading,
     startStub: launchStub,
     stopStub: haltStub,
-  } = useRuntimeStub({ pollMs: 6000 });
+    refresh: refreshStubStatus,
+  } = useRuntimeStub({ pollMs: 6000, theme: selectedTheme || undefined });
+  const {
+    map: previewMap,
+    loading: previewMatrixLoading,
+    refresh: refreshPreviewMatrix,
+  } = usePreviewMatrix({ pollMs: 25000 });
 
   useEffect(() => {
     fetchThemes().then((res) => setThemes(res.themes || [])).catch(() => undefined);
@@ -59,21 +157,77 @@ export default function UploadTheme() {
       .finally(() => setPreviewLoading(false));
   }, [selectedTheme]);
 
+  useEffect(() => {
+    if (!selectedTheme) {
+      setUploadDiff(null);
+      return;
+    }
+    if (lastUploadedTheme && selectedTheme === lastUploadedTheme) return;
+    setUploadDiff(null);
+  }, [selectedTheme, lastUploadedTheme]);
+
+  useEffect(() => {
+    if (!selectedTheme) {
+      setPresetRaw('{}');
+      setPresetError(null);
+      return;
+    }
+    setPresetMessage(null);
+    fetchThemePreset(selectedTheme)
+      .then((data) => {
+        const raw = JSON.stringify(data || {}, null, 2);
+        setPresetRaw(raw);
+        setPresetError(null);
+      })
+      .catch(() => {
+        setPresetRaw('{}');
+        setPresetError('Failed to load preset metadata.');
+      });
+  }, [selectedTheme]);
+
+  const stubMap = useMemo(() => {
+    const map = new Map<string, (typeof stubList)[number]>();
+    stubList.forEach((stub) => map.set(stub.theme, stub));
+    return map;
+  }, [stubList]);
+
+  const selectedStub = selectedTheme ? stubMap.get(selectedTheme) : null;
+
   const readinessText = useMemo(() => {
     if (!structure) return 'Select a theme to inspect its completeness.';
     return structure.completeness >= 90 ? 'Ready for parser' : 'Needs more layouts/pages/locales';
   }, [structure]);
 
-  const stubMatchesSelection = Boolean(selectedTheme && stubStatus?.running && stubStatus.theme === selectedTheme);
-  const canOpenPreview = Boolean(
-    (preview && (preview.url || preview.port)) || (stubMatchesSelection && stubStatus?.port),
-  );
+  const stubMatchesSelection = Boolean(selectedStub?.running);
+  const canOpenPreview = Boolean(selectedStub?.port || (preview && (preview.url || preview.port)));
 
   const handleSave = async () => {
     if (!selectedTheme) return;
     await saveThemeMetadata(selectedTheme, metadata);
     setMessage('Metadata saved.');
     setTimeout(() => setMessage(null), 2000);
+  };
+
+  const handleSavePreset = async () => {
+    if (!selectedTheme) return;
+    let parsed: Record<string, any>;
+    try {
+      parsed = presetRaw.trim() ? JSON.parse(presetRaw) : {};
+    } catch (err) {
+      setPresetError('Preset JSON is invalid.');
+      return;
+    }
+    setPresetSaving(true);
+    setPresetError(null);
+    try {
+      await saveThemePreset(selectedTheme, parsed);
+      setPresetMessage('Preset saved.');
+      setTimeout(() => setPresetMessage(null), 3000);
+    } catch (error) {
+      setPresetError(error instanceof Error ? error.message : 'Failed to save preset.');
+    } finally {
+      setPresetSaving(false);
+    }
   };
 
   const handleRun = async (withDiff = false) => {
@@ -97,6 +251,13 @@ export default function UploadTheme() {
       const refreshed = await fetchThemes();
       setThemes(refreshed.themes || []);
       setSelectedTheme(response.theme);
+      setLastUploadedTheme(response.theme);
+      setUploadDiff(response.diff || null);
+      if (response.preset) {
+        setMetadata((prev: any) => ({ ...prev, ...response.preset }));
+        setPresetRaw(JSON.stringify(response.preset, null, 2));
+      }
+      setDefaultsApplied(response.defaultsApplied || []);
       setMessage(`Uploaded ${file.name} → ${response.theme}`);
     } catch (err) {
       const reason = err instanceof Error ? err.message : 'Upload failed';
@@ -107,8 +268,8 @@ export default function UploadTheme() {
   };
 
   const handleOpenPreview = () => {
-    if (stubMatchesSelection && stubStatus?.port) {
-      window.open(`http://localhost:${stubStatus.port}/page/index`, '_blank', 'noopener,noreferrer');
+    if (selectedStub?.port) {
+      window.open(`http://localhost:${selectedStub.port}/page/index`, '_blank', 'noopener,noreferrer');
       return;
     }
     const url = preview?.url || (preview?.port ? `http://localhost:${preview.port}/` : null);
@@ -119,8 +280,8 @@ export default function UploadTheme() {
 
   const handleToggleStub = async () => {
     if (!selectedTheme) return;
-    if (stubMatchesSelection) {
-      await haltStub();
+    if (selectedStub?.running) {
+      await haltStub(selectedTheme);
       setMessage(`Stopped stub for ${selectedTheme}.`);
     } else {
       await launchStub(selectedTheme);
@@ -128,6 +289,22 @@ export default function UploadTheme() {
     }
     setTimeout(() => setMessage(null), 2000);
   };
+
+  const handleOpenStubPreview = (themeName: string) => {
+    const stub = stubMap.get(themeName);
+    if (!stub?.port) return;
+    window.open(`http://localhost:${stub.port}/page/index`, '_blank', 'noopener,noreferrer');
+  };
+
+  const refreshStubsAndPreviews = useCallback(async () => {
+    await Promise.all([refreshStubStatus(), refreshPreviewMatrix()]);
+  }, [refreshPreviewMatrix, refreshStubStatus]);
+
+  const handleManualRefresh = async () => {
+    await refreshStubsAndPreviews();
+  };
+
+  const selectedSnapshot = selectedTheme ? previewMap[selectedTheme] : undefined;
 
   return (
     <div className="space-y-6">
@@ -138,11 +315,14 @@ export default function UploadTheme() {
             <div className="flex items-center justify-between mb-3">
               <div>
                 <p className="text-sm text-slate-500">Available Themes</p>
-                <select
-                  className="mt-2 border border-slate-200 rounded-lg px-3 py-2 text-sm"
-                  value={selectedTheme}
-                  onChange={(e) => setSelectedTheme(e.target.value)}
-                >
+          <select
+            className="mt-2 border border-slate-200 rounded-lg px-3 py-2 text-sm"
+            value={selectedTheme}
+            onChange={(e) => {
+              setLastUploadedTheme(null);
+              setSelectedTheme(e.target.value);
+            }}
+          >
                   <option value="">Select theme</option>
                   {themes.map((t) => (
                     <option key={t.name} value={t.name}>
@@ -154,15 +334,15 @@ export default function UploadTheme() {
                   <p className="mt-2 text-xs text-slate-500 flex items-center gap-2">
                     <span
                       className={`inline-flex h-2 w-2 rounded-full ${
-                        stubMatchesSelection ? 'bg-emerald-500' : stubStatus?.running ? 'bg-amber-400' : 'bg-slate-300'
+                        stubMatchesSelection ? 'bg-emerald-500' : stubList.length ? 'bg-amber-400' : 'bg-slate-300'
                       }`}
                     />
                     {stubStatusLoading
                       ? 'Checking runtime stub…'
                       : stubMatchesSelection
-                        ? `Stub running locally on :${stubStatus?.port || '—'}`
-                        : stubStatus?.running
-                          ? `Stub currently attached to ${stubStatus.theme || 'unknown'}`
+                        ? `Stub running locally on :${selectedStub?.port || '—'}`
+                        : stubList.length
+                          ? `Other stubs active: ${stubList.map((s) => s.theme).join(', ')}`
                           : 'Stub idle.'}
                   </p>
                 ) : null}
@@ -184,10 +364,88 @@ export default function UploadTheme() {
               </button>
             </div>
             {message && <p className="text-xs text-emerald-600 mt-2">{message}</p>}
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-2 mt-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold text-slate-600">Preset Metadata (.deemind.json)</p>
+                {presetMessage && <span className="text-xs text-emerald-600">{presetMessage}</span>}
+              </div>
+              <textarea
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 font-mono text-xs"
+                rows={6}
+                value={presetRaw}
+                onChange={(e) => setPresetRaw(e.target.value)}
+                spellCheck={false}
+              />
+              {presetError && <p className="text-xs text-rose-600">{presetError}</p>}
+              <button className="btn-secondary text-xs" onClick={handleSavePreset} disabled={!selectedTheme || presetSaving}>
+                {presetSaving ? 'Saving…' : 'Save Preset'}
+              </button>
+              <p className="text-[11px] text-slate-500">Values saved here prefill metadata automatically on future uploads.</p>
+            </div>
+            <ThemeStubList
+              themes={themes}
+              stubs={stubList}
+              actionLoading={stubActionLoading}
+              loading={stubStatusLoading}
+              activeTheme={selectedTheme}
+              previewMap={previewMap}
+              previewLoading={previewMatrixLoading}
+              onStart={(themeName) => launchStub(themeName)}
+              onStop={(themeName) => haltStub(themeName)}
+              onRefresh={handleManualRefresh}
+              onSelectTheme={setSelectedTheme}
+              onOpenPreview={handleOpenStubPreview}
+            />
           </div>
         </div>
         <div className="space-y-4">
           <StatsCard title="Input Completeness" value={`${structure?.completeness ?? 0}%`} subtitle={readinessText} accent="green" />
+          {structure ? (
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-3">
+              <p className="text-sm font-semibold text-slate-600">Theme Checklist</p>
+              <ul className="space-y-2 text-sm">
+                {checklist.map((item) => (
+                  <li key={item.id} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`inline-flex h-2.5 w-2.5 rounded-full ${
+                          item.ok ? 'bg-emerald-500' : 'bg-rose-500'
+                        }`}
+                      />
+                      <span>{item.label}</span>
+                      <span className="text-xs text-slate-500">({item.count})</span>
+                    </div>
+                    {!item.ok && <span className="text-xs text-amber-600">{item.tip}</span>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+              <p className="text-xs text-slate-500">Upload a theme to see the checklist.</p>
+            </div>
+          )}
+          {uploadDiff ? (
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-4">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <p className="text-sm font-semibold text-slate-600">Latest Upload Diff</p>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-emerald-600">Added</span>
+                  <span className="text-amber-600">Changed</span>
+                  <span className="text-rose-600">Removed</span>
+                </div>
+              </div>
+              {uploadDiff.added.length + uploadDiff.removed.length + uploadDiff.changed.length === 0 ? (
+                <p className="text-xs text-slate-500">No file changes detected compared to the last upload.</p>
+              ) : (
+                <div className="space-y-3 text-xs text-slate-600">
+                  <DiffGroup title="Added" accent="emerald" files={uploadDiff.added} />
+                  <DiffGroup title="Changed" accent="amber" files={uploadDiff.changed} />
+                  <DiffGroup title="Removed" accent="rose" files={uploadDiff.removed} />
+                </div>
+              )}
+            </div>
+          ) : null}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-3">
             <p className="text-sm font-semibold text-slate-600">Baseline Merge Settings</p>
             <select className="border border-slate-200 rounded-lg px-3 py-2 text-sm w-full" value={baseline} onChange={(e) => setBaseline(e.target.value)}>
@@ -254,6 +512,13 @@ export default function UploadTheme() {
                     ? `Stub running for ${stubStatus.theme || 'unknown'} on :${stubStatus.port}`
                     : 'Stub idle. Launch to preview with mock APIs.'}
             </p>
+            <p className="text-xs text-slate-500">
+              {previewMatrixLoading
+                ? 'Syncing snapshot coverage…'
+                : selectedSnapshot
+                  ? `Snapshot coverage: ${selectedSnapshot.pages.length} page${selectedSnapshot.pages.length === 1 ? '' : 's'} • ${selectedSnapshot.status}`
+                  : 'Snapshot coverage: no snapshots detected across preview matrix.'}
+            </p>
           </div>
         </div>
       </div>
@@ -307,3 +572,4 @@ export default function UploadTheme() {
     </div>
   );
 }
+

@@ -1,0 +1,51 @@
+{
+  "products": [
+    {
+      "id": 101,
+      "name": "Signature Canvas Backpack",
+      "slug": "signature-canvas-backpack",
+      "sku": "BAG-101",
+      "price": 329,
+      "badge": "New arrival",
+      "rating": 4.7,
+      "reviews": 182,
+      "media": [
+        "https://cdn.deemind.local/images/backpack-101-1.jpg",
+        "https://cdn.deemind.local/images/backpack-101-2.jpg"
+      ],
+      "options": {
+        "color": ["Desert Tan", "Midnight Black"],
+        "size": ["Compact", "Weekender"]
+      }
+    },
+    {
+      "id": 102,
+      "name": "Midnight Wireless Earbuds",
+      "slug": "midnight-wireless-earbuds",
+      "sku": "EAR-204",
+      "price": 199,
+      "badge": "Top rated",
+      "rating": 4.9,
+      "reviews": 241,
+      "media": ["https://cdn.deemind.local/images/earbuds-204-1.jpg"],
+      "options": {
+        "finish": ["Matte", "Glossy"]
+      }
+    },
+    {
+      "id": 103,
+      "name": "Smart Watch X2",
+      "slug": "smart-watch-x2",
+      "sku": "WATCH-302",
+      "price": 249,
+      "badge": "Limited",
+      "rating": 4.5,
+      "reviews": 96,
+      "media": ["https://cdn.deemind.local/images/watch-302-1.jpg"],
+      "options": {
+        "strap": ["Leather", "Silicone"],
+        "size": ["40mm", "44mm"]
+      }
+    }
+  ]
+}

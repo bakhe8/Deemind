@@ -31,6 +31,23 @@ docs/              # Architecture, roadmap, runbook, Salla references
 
 > Tip: run `npm run salla:sync` whenever you need the latest Salla schema/filter/partial definitions. The snapshots land in `core/salla/*` with metadata recorded in `core/salla/meta.json`.
 
+## 🔌 Service API ↔ Dashboard (Runtime 1.1)
+
+The dashboard drives everything through the local service (`http://localhost:5757`). Core touchpoints:
+
+| Feature            | Endpoint(s)                                                                                                                    | Notes                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| Build Orchestrator | `POST /api/build/start` · `GET /api/build/sessions` · `GET /api/build/stream`                                                  | Queue builds (with or without diff), stream live sessions + logs over SSE.                     |
+| CLI Runner         | `POST /api/run` · `GET /api/run/jobs`                                                                                          | Fire doctor/validate workflows and inspect history without leaving the UI.                     |
+| Runner Status      | `GET /api/status`                                                                                                              | Returns `{ current, queue }` from the TaskRunner; shown in the new Runner Status card.         |
+| Preview Manager    | `GET/POST /api/themes/:theme/preview`                                                                                          | Fetch metadata (port/url/pages) or regenerate snapshots per theme.                             |
+| Theme Reports      | `GET /api/themes/:theme/reports`                                                                                               | Adapter/Baseline + Validation pages load manifests, extended reports, and baseline diffs here. |
+| Multi-stub Runtime | `GET /api/preview/stubs` · `GET/POST/DELETE /api/preview/stub` · `POST /api/preview/stub/reset` · `GET /api/preview/stub/logs` | Launch, inspect, and stop multiple runtime stubs simultaneously.                               |
+| Store Presets      | `GET /api/store/demos` · `GET /api/store/partials` · `POST /api/store/preset` · `GET /api/store/diff`                          | Compose demo data, apply overrides, and preview diff results before applying.                  |
+| Runtime APIs       | `GET /api/runtime/state` · `POST /api/runtime/context` · `POST /api/runtime/locale` · …                                        | Runtime Inspector + Scenario Runner mutate cart/auth/locale state via these endpoints.         |
+
+Every dashboard page (Upload, Parser, Adapter, Validation, Build Orchestrator, Preview Manager, Settings, Runtime Inspector) binds to this contract so you can operate the entire pipeline without touching the CLI.
+
 ### Local Service, Dashboard & Preview
 
 Deemind now ships with an always-on local service + dashboard bundle:
@@ -292,4 +309,6 @@ You can now rename your local folder to deemind, run the CLI as-is, and you’ll
 - Adapter & Baseline → diff viewer plus stats from `baseline-summary.json` & logs.
 - Validation & QA → displays `report-extended.json` errors/warnings with quick filters.
 - Reports & Metrics → renders `reports/baseline-metrics.md`, `/logs/baseline/*.json`, plus live runtime analytics pulled from `logs/runtime-analytics.jsonl`.
-- Settings → show effective paths, baseline chains, runtime stub controls, and store preset/diff tooling.
+- Build Orchestrator → multi-theme build launcher with live session logs, validator metrics, and CLI task runner controls.
+- Preview Manager → generate static snapshots per theme and compare any two previews/page lists side-by-side.
+- Settings → show effective paths, baseline chains, runtime stub controls (now multi-stub aware), and store preset/diff tooling.

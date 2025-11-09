@@ -5,6 +5,7 @@ import { globSync } from 'glob';
 
 const DEFAULT_THEME = 'demo';
 const STORE_DATA_ROOT = path.resolve('mockups', 'store');
+const CONTEXT_CACHE_DIR = path.resolve('mockups', 'store', 'cache', 'context');
 const STATIC_PAGES = [
   'index',
   'landing-page',
@@ -27,6 +28,10 @@ function loadJson(themeRoot, fallbackRoot, filename, fallbackValue) {
 }
 
 function loadStoreData(theme) {
+  const cacheFile = path.join(CONTEXT_CACHE_DIR, `${theme}.json`);
+  if (fs.existsSync(cacheFile)) {
+    return fs.readJsonSync(cacheFile);
+  }
   const themeRoot = path.join(STORE_DATA_ROOT, theme);
   const fallbackRoot = path.join(STORE_DATA_ROOT, DEFAULT_THEME);
   return {
@@ -37,7 +42,8 @@ function loadStoreData(theme) {
     cart: loadJson(themeRoot, fallbackRoot, 'cart.json', { items: [], summary: {} }),
     brands: loadJson(themeRoot, fallbackRoot, 'brands.json', []),
     blog: loadJson(themeRoot, fallbackRoot, 'blog.json', []),
-    orders: loadJson(themeRoot, fallbackRoot, 'orders.json', [])
+    orders: loadJson(themeRoot, fallbackRoot, 'orders.json', []),
+    meta: { legacy: true }
   };
 }
 
@@ -150,8 +156,9 @@ function starsTemplate(rating) {
 
 function sectionLanding(data) {
   const hero = data.hero || {};
-  const testimonials = hero.testimonials || [];
-  const stats = hero.stats || [];
+  const testimonials = Array.isArray(hero.testimonials) ? hero.testimonials : [];
+  const stats = Array.isArray(hero.stats) ? hero.stats : [];
+  const products = Array.isArray(data.products) ? data.products : [];
   return `
     <section class="hero">
       <span class="eyebrow">Twilight-ready Mock Store</span>
@@ -176,7 +183,7 @@ function sectionLanding(data) {
       </div>
     </section>
     <section class="grid">
-      ${data.products
+      ${products
         .slice(0, 3)
         .map(
           (p) => `

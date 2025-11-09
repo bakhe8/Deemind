@@ -1,0 +1,22 @@
+{
+  "categories": [
+    {
+      "id": 1,
+      "name": "New arrivals",
+      "slug": "new-arrivals",
+      "description": "Weekly drops curated for high-converting hero sections."
+    },
+    {
+      "id": 2,
+      "name": "Gadgets",
+      "slug": "gadgets",
+      "description": "Smart accessories and personal electronics."
+    },
+    {
+      "id": 3,
+      "name": "Soft goods",
+      "slug": "soft-goods",
+      "description": "Textiles, small leather goods, and lifestyle accents."
+    }
+  ]
+}

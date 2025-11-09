@@ -1,0 +1,18 @@
+{
+  "version": "fallback-1.0",
+  "description": "Minimal Salla schema fallback used when remote sync is unavailable.",
+  "theme": {
+    "required": ["name", "slug"],
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "slug": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "input": {
+    "folder": "needsboxes",
+    "assets": [
+      "https://cdn.assets.salla.network",
+      "https://cdn.salla.network",
+      "https://cdn.salla.sa/mQbARj/QagE1pVy8IxT0LXuPUZW7RSUxudroWseVvmkJ8yX.png",
+      "https://needsboxes.com",
+      "https://cdn.assets.salla.network/themes/1247874246/1.266.0/app.css",
+      "https://cdn.salla.network/fonts/sallaicons.css?v=2.0.5",
+      "https://cdn.assets.salla.network/themes/1247874246/1.266.0/product-card.js",
+      "https://cdn.assets.salla.network/themes/1247874246/1.266.0/main-menu.js",
+      "https://cdn.salla.network/js/twilight/2.14.284/twilight.esm.js",
+      "https://cdn.assets.salla.network/themes/1247874246/1.266.0/app.js",
+      "https://cdn.assets.salla.network/themes/1247874246/1.266.0/home.js",
+      "/cdn-cgi/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js",
+      "https://cdn.salla.sa/cdn-cgi/image/fit=scale-down,width=400,height=400,onerror=redirect,format=auto/mQbARj/QagE1pVy8IxT0LXuPUZW7RSUxudroWseVvmkJ8yX.png",
+      "https://cdn.assets.salla.network/prod/stores/themes/default/assets/images/avatar_female.png",
+      "https://cdn.assets.salla.network/prod/stores/themes/default/assets/images/avatar_male.png",
+      "https://cdn.salla.sa/form-builder/Ky1LyyM2gp4XamtvZfSW6vsnZiIC7bNf54Pcy3Xi.webp",
+      "https://cdn.salla.sa/form-builder/H4DUrfJA3dckB5FHkWT8dwkcT98COZo6rN3xwDd7.webp",
+      "https://cdn.salla.sa/form-builder/Hyba8IsYEVtVY6kJiqggLfbeEHFzXbOwnop3VkCz.webp",
+      "https://cdn.salla.sa/form-builder/vSrRZnJY2cUKaaXzzbSZHGwLAdsKN4cHwYhRWLQi.webp"
+    ]
+  },
+  "parsed": {
+    "sections": [
+      {
+        "page": "index.html",
+        "componentCount": 5,
+        "sharedComponents": [],
+        "unchanged": false
+      }
+    ],
+    "components": [
+      {
+        "id": "dcef8ad9",
+        "selector": "section",
+        "signature": "s-block.s-block--full-bg.s-block--slider-with-bg",
+        "page": "index.html",
+        "shared": false,
+        "order": 0,
+        "classes": "s-block s-block--slider-with-bg s-block--full-bg"
+      },
+      {
+        "id": "45d23f76",
+        "selector": "section",
+        "signature": "container.overflow-hidden.s-block.s-block--best-offers",
+        "page": "index.html",
+        "shared": false,
+        "order": 1,
+        "classes": "s-block s-block--best-offers container overflow-hidden"
+      },
+      {
+        "id": "61cdfc4f",
+        "selector": "section",
+        "signature": "container.s-block.s-block--features",
+        "page": "index.html",
+        "shared": false,
+        "order": 2,
+        "classes": "s-block s-block--features container"
+      },
+      {
+        "id": "9a959780",
+        "selector": "section",
+        "signature": "container.overflow-hidden.s-block.s-block--custom-testimonials.s-block--testimonials",
+        "page": "index.html",
+        "shared": false,
+        "order": 3,
+        "classes": "s-block s-block--testimonials s-block--custom-testimonials container overflow-hidden"
+      },
+      {
+        "id": "524de131",
+        "selector": "section",
+        "signature": "container.s-block.s-block--banners",
+        "page": "index.html",
+        "shared": false,
+        "order": 4,
+        "classes": "s-block s-block--banners container"
+      }
+    ],
+    "conflicts": [],
+    "assets": [
+      "https://cdn.assets.salla.network",
+      "https://cdn.salla.network",
+      "https://cdn.salla.sa/mQbARj/QagE1pVy8IxT0LXuPUZW7RSUxudroWseVvmkJ8yX.png",
+      "https://needsboxes.com",
+      "https://cdn.assets.salla.network/themes/1247874246/1.266.0/app.css",
+      "https://cdn.salla.network/fonts/sallaicons.css?v=2.0.5",
+      "https://cdn.assets.salla.network/themes/1247874246/1.266.0/product-card.js",
+      "https://cdn.assets.salla.network/themes/1247874246/1.266.0/main-menu.js",
+      "https://cdn.salla.network/js/twilight/2.14.284/twilight.esm.js",
+      "https://cdn.assets.salla.network/themes/1247874246/1.266.0/app.js",
+      "https://cdn.assets.salla.network/themes/1247874246/1.266.0/home.js",
+      "/cdn-cgi/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js",
+      "https://cdn.salla.sa/cdn-cgi/image/fit=scale-down,width=400,height=400,onerror=redirect,format=auto/mQbARj/QagE1pVy8IxT0LXuPUZW7RSUxudroWseVvmkJ8yX.png",
+      "https://cdn.assets.salla.network/prod/stores/themes/default/assets/images/avatar_female.png",
+      "https://cdn.assets.salla.network/prod/stores/themes/default/assets/images/avatar_male.png",
+      "https://cdn.salla.sa/form-builder/Ky1LyyM2gp4XamtvZfSW6vsnZiIC7bNf54Pcy3Xi.webp",
+      "https://cdn.salla.sa/form-builder/H4DUrfJA3dckB5FHkWT8dwkcT98COZo6rN3xwDd7.webp",
+      "https://cdn.salla.sa/form-builder/Hyba8IsYEVtVY6kJiqggLfbeEHFzXbOwnop3VkCz.webp",
+      "https://cdn.salla.sa/form-builder/vSrRZnJY2cUKaaXzzbSZHGwLAdsKN4cHwYhRWLQi.webp"
+    ],
+    "cssMapSample": {
+      "index.html": {
+        ".loader-init": {
+          "position": "fixed",
+          "display": "flex"
+        },
+        ".wa-s-n": {
+          "position": "fixed",
+          "display": "inline-flex"
+        },
+        ".wa-s-n svg": {
+          "display": "block"
+        }
+      }
+    },
+    "templateHints": [
+      {
+        "page": "index.html",
+        "hints": ["product", "footer", "header"]
+      }
+    ],
+    "confidence": 1,
+    "semanticStats": {
+      "placeholdersApplied": 0,
+      "bareTokensApplied": 0,
+      "i18nNodesWrapped": 0,
+      "i18nAttributesWrapped": 0,
+      "sanitizedInlineHandlers": 0,
+      "blockedExternalScripts": 0
+    }
+  },
+  "adapted": {
+    "twig": [],
+    "metadata": {}
+  },
+  "validated": {
+    "status": "pass",
+    "warnings": [
+      "raw-baseline | output\\needsboxes\\partials\\home\\products-slider.twig | | raw preserved from baseline fallback. Override input to customize.",
+      "raw-baseline | output\\needsboxes\\partials\\footer\\footer.twig | | raw preserved from baseline fallback. Override input to customize.",
+      "raw-baseline | output\\needsboxes\\pages\\thank-you.twig | | raw preserved from baseline fallback. Override input to customize.",
+      "raw-baseline | output\\needsboxes\\pages\\page-single.twig | | raw preserved from baseline fallback. Override input to customize.",
+      "raw-baseline | output\\needsboxes\\pages\\landing-page.twig | | raw preserved from baseline fallback. Override input to customize.",
+      "raw-baseline | output\\needsboxes\\pages\\cart.twig | | raw preserved from baseline fallback. Override input to customize.",
+      "raw-baseline | output\\needsboxes\\pages\\product\\single.twig | | raw preserved from baseline fallback. Override input to customize.",
+      "raw-baseline | output\\needsboxes\\pages\\product\\index.twig | | raw preserved from baseline fallback. Override input to customize.",
+      "raw-baseline | output\\needsboxes\\pages\\customer\\orders\\single.twig | | raw preserved from baseline fallback. Override input to customize.",
+      "raw-baseline | output\\needsboxes\\pages\\brands\\single.twig | | raw preserved from baseline fallback. Override input to customize.",
+      "raw-baseline | output\\needsboxes\\pages\\blog\\single.twig | | raw preserved from baseline fallback. Override input to customize.",
+      "filter-unknown | partials/home/youtube.twig | Twig filter \"variable\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/youtube.twig | Twig filter \"type\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/youtube.twig | Twig filter \"description\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/youtube.twig | Twig filter \"youtube_id\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/youtube.twig | Twig filter \"string\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/youtube.twig | Twig filter \"position\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/youtube.twig | Twig filter \"int\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/youtube.twig | Twig filter \"sorting\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/testimonials.twig | Twig filter \"variable\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/testimonials.twig | Twig filter \"type\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/testimonials.twig | Twig filter \"description\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/testimonials.twig | Twig filter \"limit\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/testimonials.twig | Twig filter \"string\" not found in synced Salla filters.",
+      "filter-unknown | partials/home/testimonials.twig | Twig filter \"maximum\" not found in synced Salla filters."
+    ],
+    "errors": [],
+    "counts": {
+      "warnings": 657,
+      "errors": 0
+    }
+  }
+}

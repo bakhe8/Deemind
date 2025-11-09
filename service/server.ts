@@ -8,6 +8,7 @@ import extract from 'extract-zip';
 import { v4 as uuid } from 'uuid';
 import dotenv from 'dotenv';
 import { globSync } from 'glob';
+import chokidar from 'chokidar';
 import { execSync, execFileSync, spawn, ChildProcess } from 'child_process';
 import { Readable } from 'stream';
 import crypto from 'crypto';
@@ -17,6 +18,9 @@ import { ServiceLogger } from './logger.js';
 import { DEFAULT_JSON_TEMPLATES, mergeJsonWithTemplate, ensureJsonFile } from './default-schemas.js';
 import type { RunRequest } from '../core/contracts/api.contract.ts';
 import { registerRunRoutes } from './routes/run.js';
+import { PRESET_METADATA_FILENAME } from '../core/brand/constants.js';
+import { applyBrandPreset } from '../core/brand/apply-brand.js';
+import { listBrandPresets } from '../core/brand/presets.js';
 
 dotenv.config();
 
@@ -24,7 +28,6 @@ const CONFIG_PATH = path.join(process.cwd(), 'service', 'config.json');
 const composerModulePromise = import('../tools/store-compose.js');
 const mockLayerModulePromise = import('../tools/mock-layer/mock-data-builder.js');
 const INPUT_MANIFEST_FILENAME = '.deemind-manifest.json';
-const PRESET_METADATA_FILENAME = '.deemind.json';
 const MANIFEST_IGNORE = new Set([INPUT_MANIFEST_FILENAME, PRESET_METADATA_FILENAME]);
 const MOCK_CONTEXT_DIR = path.join(process.cwd(), 'mockups', 'store', 'cache', 'context');
 
@@ -56,6 +59,7 @@ type BuildSession = {
 const buildSessions: BuildSession[] = [];
 const buildStreamClients = new Set<express.Response>();
 const logStreamClients = new Set<express.Response>();
+const sseClients = new Set<express.Response>();
 let activeBuildId: string | null = null;
 const MAX_BUILD_SESSIONS = 15;
 const MAX_BUILD_LOGS = 400;
@@ -83,6 +87,7 @@ type ScenarioSession = {
 const scenarioSessions: ScenarioSession[] = [];
 const scenarioStreamClients = new Set<express.Response>();
 const MAX_SCENARIO_SESSIONS = 20;
+let brandWatcher: chokidar.FSWatcher | null = null;
 const scenarioFlows = [
   { id: 'add-to-cart', label: 'Add to Cart' },
   { id: 'checkout', label: 'Checkout Flow' },
@@ -352,6 +357,14 @@ function updateScenarioSession(sessionId: string, patch: Partial<ScenarioSession
   return scenarioSessions[idx];
 }
 
+function broadcastSse(event: string, payload: any) {
+  if (!sseClients.size) return;
+  const message = `event: ${event}\ndata: ${JSON.stringify(payload)}\n\n`;
+  for (const client of sseClients) {
+    client.write(message);
+  }
+}
+
 function sanitizeScenarioId(raw?: string) {
   if (!raw) return '';
   return raw.toLowerCase().replace(/[^a-z0-9-_]/gi, '');
@@ -456,6 +469,33 @@ async function listThemes(inputDir, outputDir) {
   return themes;
 }
 
+async function readPreviewSnapshot(themeName: string, outputDir: string) {
+  const basePath = path.join(outputDir, themeName);
+  if (!(await fs.pathExists(basePath))) {
+    return null;
+  }
+  const previewFile = path.join(basePath, '.preview.json');
+  const htmlPages = globSync('pages/**/*.html', { cwd: basePath, nodir: true });
+  const twigPages = globSync('pages/**/*.twig', { cwd: basePath, nodir: true });
+  const pageList = Array.from(
+    new Set(
+      [...htmlPages, ...twigPages].map((p) =>
+        p
+          .replace(/\\/g, '/')
+          .replace(/\.html$|\.twig$/i, ''),
+      ),
+    ),
+  );
+  const previewMeta = (await safeReadJson(previewFile)) || {};
+  return {
+    status: previewMeta.status || (pageList.length ? 'ready' : 'missing-pages'),
+    url: previewMeta.url || null,
+    port: previewMeta.port || null,
+    pages: previewMeta.pages || pageList,
+    timestamp: previewMeta.timestamp || null,
+  };
+}
+
 async function readThemeStructure(themeName, inputDir) {
   const themePath = path.join(inputDir, themeName);
   if (!(await fs.pathExists(themePath))) {
@@ -553,6 +593,8 @@ async function main() {
   const twilightConfigFile = path.join(rootDir, 'runtime', 'twilight', 'config.json');
   const analyticsLogPath = path.join(rootDir, 'logs', 'runtime-analytics.jsonl');
   const scenarioLogDir = path.join(logsDir, 'runtime-scenarios');
+  const brandPresetDir = path.join(rootDir, 'core', 'brands', 'presets');
+  await fs.ensureDir(brandPresetDir);
   function listStubStates() {
     return Array.from(stubPool.values()).map((state) => ({
       theme: state.theme,
@@ -584,6 +626,16 @@ async function main() {
     stubPool.delete(theme);
     recordStubLog(theme, 'stub stopped');
   }
+
+  const emitBrandEvent = (event: string, filePath: string) => {
+    const slug = path.parse(filePath).name;
+    broadcastSse(event, { slug, file: path.relative(rootDir, filePath) });
+  };
+
+  brandWatcher = chokidar.watch(path.join(brandPresetDir, '*.json'), { ignoreInitial: true });
+  brandWatcher.on('add', (filePath) => emitBrandEvent('brand-added', filePath));
+  brandWatcher.on('change', (filePath) => emitBrandEvent('brand-updated', filePath));
+  brandWatcher.on('unlink', (filePath) => emitBrandEvent('brand-removed', filePath));
 const logger = new ServiceLogger(rootDir);
 const runner = new TaskRunner();
 const token = process.env.DEEMIND_SERVICE_TOKEN || config.token || '';
@@ -671,7 +723,7 @@ const auth = makeAuthMiddleware(token);
       return callback(new Error('Origin not allowed'), false);
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Deemind-Token'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Deemind-Token', 'X-Deemind-Mode'],
   };
   app.use(cors(corsOptions));
   app.use(express.json({ limit: '10mb' }));
@@ -811,6 +863,29 @@ const auth = makeAuthMiddleware(token);
     await fs.ensureDir(themeDir);
     await fs.writeJson(file, req.body || {}, { spaces: 2 });
     res.json({ saved: true });
+  });
+
+  app.get('/api/brands', auth, async (_req, res) => {
+    const brands = await listBrandPresets(brandPresetDir);
+    res.json({ brands });
+  });
+
+  app.post('/api/theme/apply-brand', auth, async (req, res) => {
+    const theme = sanitizeThemeName(String(req.body?.theme || ''));
+    const brandSlug = String(req.body?.brand || '');
+    if (!theme) {
+      return res.status(400).json({ error: 'theme is required' });
+    }
+    if (!brandSlug) {
+      return res.status(400).json({ error: 'brand is required' });
+    }
+    try {
+      const preset = await applyBrandPreset(theme, brandSlug, { rootDir, presetDir: brandPresetDir });
+      broadcastSse('brand-applied', { theme, brand: preset.slug });
+      res.json({ ok: true, preset });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Failed to apply brand preset.' });
+    }
   });
 
   app.post('/api/themes/:theme/defaults', auth, async (req, res) => {
@@ -1351,26 +1426,30 @@ const auth = makeAuthMiddleware(token);
 
   app.get('/api/themes/:theme/preview', auth, async (req, res) => {
     const theme = req.params.theme;
-    const basePath = path.join(outputDir, theme);
-    if (!(await fs.pathExists(basePath))) {
+    const snapshot = await readPreviewSnapshot(theme, outputDir);
+    if (!snapshot) {
       return res.status(404).json({ error: 'theme not found in output' });
     }
-    const previewFile = path.join(basePath, '.preview.json');
-    const htmlPages = globSync('pages/**/*.html', { cwd: basePath, nodir: true });
-    const twigPages = globSync('pages/**/*.twig', { cwd: basePath, nodir: true });
-    const pageList = Array.from(
-      new Set(
-        [...htmlPages, ...twigPages].map((p) => p.replace(/\\/g, '/').replace(/\.html$|\.twig$/i, '')),
-      ),
+    res.json(snapshot);
+  });
+
+  app.get('/api/themes/previews', auth, async (_req, res) => {
+    const themes = await listThemes(inputDir, outputDir);
+    const previews = await Promise.all(
+      themes.map(async (theme) => {
+        const snapshot = await readPreviewSnapshot(theme.name, outputDir);
+        return {
+          theme: theme.name,
+          status: snapshot?.status || 'missing',
+          url: snapshot?.url || null,
+          port: snapshot?.port || null,
+          pages: snapshot?.pages || [],
+          timestamp: snapshot?.timestamp || null,
+          missing: !snapshot,
+        };
+      }),
     );
-    const previewMeta = (await safeReadJson(previewFile)) || {};
-    res.json({
-      status: previewMeta.status || (pageList.length ? 'ready' : 'missing-pages'),
-      url: previewMeta.url || null,
-      port: previewMeta.port || null,
-      pages: previewMeta.pages || pageList,
-      timestamp: previewMeta.timestamp || null,
-    });
+    res.json({ previews });
   });
 
   app.post('/api/themes/:theme/preview', auth, async (req, res) => {
@@ -1489,12 +1568,24 @@ const auth = makeAuthMiddleware(token);
     });
   });
 
+  app.get('/api/sse', auth, (req, res) => {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders?.();
+    sseClients.add(res);
+    req.on('close', () => {
+      sseClients.delete(res);
+    });
+  });
+
   app.use('/reports', auth, express.static(reportsDir));
   app.use('/output', auth, express.static(outputDir));
   app.use('/logs', auth, express.static(logsDir));
 
   const shutdown = () => {
     stopStubProcess();
+    brandWatcher?.close().catch(() => void 0);
     process.exit(0);
   };
   process.on('SIGINT', shutdown);

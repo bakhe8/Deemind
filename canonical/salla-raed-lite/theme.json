@@ -1,0 +1,65 @@
+{
+  "input": {
+    "folder": "salla-raed-lite",
+    "assets": ["assets/style.css", "assets/app.js"]
+  },
+  "parsed": {
+    "sections": [
+      {
+        "page": "index.html",
+        "componentCount": 2,
+        "sharedComponents": [],
+        "unchanged": false
+      }
+    ],
+    "components": [
+      {
+        "id": "dcef8ad9",
+        "selector": "section",
+        "signature": "hero",
+        "page": "index.html",
+        "shared": false,
+        "order": 0,
+        "classes": "hero"
+      },
+      {
+        "id": "45d23f76",
+        "selector": "section",
+        "signature": "product-grid",
+        "page": "index.html",
+        "shared": false,
+        "order": 1,
+        "classes": "product-grid"
+      }
+    ],
+    "conflicts": [],
+    "assets": ["assets/style.css", "assets/app.js"],
+    "cssMapSample": {
+      "index.html": {}
+    },
+    "templateHints": [
+      {
+        "page": "index.html",
+        "hints": ["product", "hero", "footer", "header"]
+      }
+    ],
+    "confidence": 1,
+    "semanticStats": {
+      "placeholdersApplied": 0,
+      "bareTokensApplied": 0,
+      "i18nNodesWrapped": 10,
+      "i18nAttributesWrapped": 0,
+      "sanitizedInlineHandlers": 0,
+      "blockedExternalScripts": 0
+    }
+  },
+  "adapted": {
+    "twig": [],
+    "metadata": {}
+  },
+  "validated": {
+    "status": "pending",
+    "warnings": [],
+    "errors": []
+  }
+}

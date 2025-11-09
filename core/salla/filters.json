@@ -1,0 +1,19 @@
+{
+  "filters": [
+    {
+      "name": "money_format",
+      "description": "Formats a number into the active store currency.",
+      "signature": "money_format(value, currencyCode = 'SAR')"
+    },
+    {
+      "name": "t",
+      "description": "Translation helper.",
+      "signature": "t(key)"
+    },
+    {
+      "name": "escape",
+      "description": "Escapes HTML output.",
+      "signature": "escape(value)"
+    }
+  ]
+}

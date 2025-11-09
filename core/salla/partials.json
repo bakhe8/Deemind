@@ -1,0 +1,20 @@
+{
+  "webComponents": [
+    "salla-product-card",
+    "salla-product-grid",
+    "salla-quick-order",
+    "salla-cart-widget",
+    "salla-login-modal",
+    "salla-offer-modal"
+  ],
+  "layouts": {
+    "layout.master": {
+      "description": "Base layout reference.",
+      "slots": ["head", "content", "scripts"]
+    },
+    "layout.customer": {
+      "description": "Customer area layout.",
+      "slots": ["head", "content", "scripts"]
+    }
+  }
+}

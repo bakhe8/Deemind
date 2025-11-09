@@ -1,0 +1,32 @@
+{
+  "syncedAt": "2025-11-09T05:21:05.581Z",
+  "resources": [
+    {
+      "id": "schema",
+      "target": "core\\salla\\schema.json",
+      "url": "https://docs.salla.dev/api/schema.json",
+      "source": "fallback",
+      "hash": "de978cb2a072dde0cabb634b73a6d992d99e2b96cf16e292883eec91cdda49a1",
+      "syncedAt": "2025-11-09T05:21:06.775Z",
+      "error": "Request failed with status 404"
+    },
+    {
+      "id": "filters",
+      "target": "core\\salla\\filters.json",
+      "url": "https://docs.salla.dev/api/filters.json",
+      "source": "fallback",
+      "hash": "88f2ca67d3d588f1ebae1fac2f8a9de386a1239bbadc27d4ceceed6fd3b51a40",
+      "syncedAt": "2025-11-09T05:21:07.647Z",
+      "error": "Request failed with status 404"
+    },
+    {
+      "id": "partials",
+      "target": "core\\salla\\partials.json",
+      "url": "https://docs.salla.dev/api/partials.json",
+      "source": "fallback",
+      "hash": "816e9af48f45f5bbc9bb5bf4af4418f60b49a2ef3c79f286d7fe438be9add137",
+      "syncedAt": "2025-11-09T05:21:08.024Z",
+      "error": "Request failed with status 404"
+    }
+  ]
+}

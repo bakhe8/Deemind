@@ -7,6 +7,9 @@ import AdapterBaseline from './pages/AdapterBaseline';
 import ValidationQA from './pages/ValidationQA';
 import ReportsMetrics from './pages/ReportsMetrics';
 import Settings from './pages/Settings';
+import BuildOrchestrator from './pages/BuildOrchestrator';
+import RuntimeInspector from './pages/RuntimeInspector';
+import PreviewManager from './pages/PreviewManager';
 
 export default function App() {
   return (
@@ -16,6 +19,9 @@ export default function App() {
         <TopBar />
         <main className="flex-1 overflow-y-auto p-6 space-y-6">
           <Routes>
+            <Route path="/build" element={<BuildOrchestrator />} />
+            <Route path="/runtime" element={<RuntimeInspector />} />
+            <Route path="/preview" element={<PreviewManager />} />
             <Route path="/upload" element={<UploadTheme />} />
             <Route path="/parser" element={<ParserMapper />} />
             <Route path="/adapter" element={<AdapterBaseline />} />

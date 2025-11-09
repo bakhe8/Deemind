@@ -7,7 +7,7 @@ start "Deemind Service" cmd /k "cd /d %PROJECT_ROOT% && npm run service:start"
 TIMEOUT /T 3 >NUL
 
 echo 🖥  Starting Deemind dashboard...
-start "Deemind Dashboard" cmd /k "cd /d %DASHBOARD_DIR% && npm run dev"
+start "Deemind Dashboard" cmd /k "cd /d %DASHBOARD_DIR% && npm run dev -- --host 127.0.0.1 --port 5758 --strictPort"
 TIMEOUT /T 5 >NUL
 
 echo 🌐 Opening dashboard UI...

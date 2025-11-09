@@ -112,7 +112,10 @@ All main dashboard pages now show and control the runtime:
 | ----------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | Upload & Theme Intake         | Displays stub status for the selected theme, offers Launch/Stop/Open, and a “Reset State” button.                     |
 | Parser / Adapter / Validation | Embed the same StubStatusCard so engineers can open or reset the runtime while inspecting logs, diffs, or QA results. |
-| Settings                      | Global stub controls plus log tail, useful for debugging.                                                             |
+| Build Orchestrator            | Shows live build sessions/logs with validator metrics, runner queue status, and task-runner controls.                 |
+| Preview Manager               | Generates snapshots per theme and compares any two previews/page inventories side-by-side.                            |
+| Settings                      | Global stub controls plus log tail, useful for debugging; multi-stub aware ThemeStubList + store presets.             |
+| Runtime Inspector             | Inspect cart/session/context per theme, with quick links to whichever stub is running.                                |
 | Top bar                       | Live badge indicating whether the stub is running and on which port/theme.                                            |
 
 ### Typical workflow

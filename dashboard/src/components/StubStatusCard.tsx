@@ -85,7 +85,7 @@ export default function StubStatusCard({
           <button className="btn-primary text-xs" onClick={() => startStub(themeInput)} disabled={disabled || actionLoading}>
             Start
           </button>
-          <button className="btn-secondary text-xs" onClick={stopStub} disabled={actionLoading || !status?.running}>
+          <button className="btn-secondary text-xs" onClick={() => stopStub()} disabled={actionLoading || !status?.running}>
             Stop
           </button>
           <button className="btn-ghost text-xs" onClick={handleReset} disabled={resetting || (!themeInput && !status?.theme)}>

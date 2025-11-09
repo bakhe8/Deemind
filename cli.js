@@ -16,6 +16,7 @@ import { fileURLToPath } from "url";
 
 import { runHybridParser } from "./src/deemind-parser/hybrid-runner.js";
 import { mapSemantics } from "./src/deemind-parser/semantic-mapper.js";
+import { persistCanonicalModel, updateCanonicalModel } from "./src/deemind-parser/canonical-writer.js";
 import { adaptToSalla } from "./src/adapter.js";
 import { validateTheme, generateBuildManifest } from "./src/validator.js";
 import { validateExtended } from "./tools/validator-extended.js";
@@ -26,6 +27,9 @@ import { ensureBaselineCompleteness } from "./tools/ensure-baseline-theme.js";
 import { preparePreview } from "./tools/preview-prep.js";
 import { runPreviewServer } from "./tools/preview-server.js";
 import { generateStaticPreview } from "./tools/preview-static.js";
+import { validateFile } from "./src/utils/schema-validator.js";
+import { buildTwigDependencyGraph, writeTwigDependencyReport } from "./tools/twig-dependency-graph.js";
+import { buildMockContext as buildDemoMockContext, writeMockContext as writeDemoMockContext } from "./tools/mock-layer/mock-data-builder.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CONFIG_PATH = path.join(__dirname, "configs", "deemind.config.json");
@@ -36,6 +40,9 @@ const PREVIEW_DEFAULTS = {
   multiTheme: false,
   livereload: true,
 };
+const CORE_DIR = path.join(__dirname, "core");
+const SALLA_THEME_SCHEMA = path.join(CORE_DIR, "salla", "schema.json");
+const THEME_CONTRACT_SCHEMA = path.join(CORE_DIR, "contracts", "theme-contract.json");
 
 /**
  * Orchestrates the full Deemind pipeline.
@@ -108,21 +115,69 @@ async function run() {
     const t0 = Date.now();
     const inputChecksum = await hashInputDir(inputPath);
 
+    console.log(chalk.yellow("🧾 Validating theme metadata..."));
+    const themeMetaPath = path.join(inputPath, "theme.json");
+    if (await fs.pathExists(themeMetaPath)) {
+      await validateFile(SALLA_THEME_SCHEMA, themeMetaPath, "Salla theme schema");
+      console.log(chalk.green("   ↳ theme.json passed Salla schema validation."));
+    } else {
+      console.log(chalk.gray("   ↳ theme.json not found; skipping Salla schema validation."));
+    }
+
     console.log(chalk.yellow("🔍 Parsing HTML structure (hybrid)..."));
     const tParse0 = Date.now();
     const parsed = await runHybridParser(inputPath, { inputChecksum });
     const tParse1 = Date.now();
+    console.log(chalk.green(`   ↳ completed in ${(tParse1 - tParse0) / 1000}s (confidence ${parsed.confidence})`));
+
+    console.log(chalk.yellow("🗂️  Persisting canonical model..."));
+    const canonicalStart = Date.now();
+    const { filePath: canonicalPath } = await persistCanonicalModel(themeName, parsed);
+    console.log(chalk.green(`   ↳ canonical saved to ${path.relative(process.cwd(), canonicalPath)} in ${(Date.now() - canonicalStart) / 1000}s`));
+    await validateFile(THEME_CONTRACT_SCHEMA, canonicalPath, "ThemeContract canonical model");
+    console.log(chalk.green("   ↳ canonical ThemeContract validation passed."));
 
     console.log(chalk.yellow("🧠 Mapping semantics and Twig variables..."));
     const tMap0 = Date.now();
     const mapped = await mapSemantics(parsed, { i18n, client, sanitize });
     const tMap1 = Date.now();
+    if (mapped?.stats) {
+      await updateCanonicalModel(themeName, (existing) => ({
+        ...existing,
+        parsed: {
+          ...(existing.parsed || {}),
+          semanticStats: mapped.stats,
+        },
+      }));
+    }
 
     const lockDefault = process.env.CI && !lockUnchanged ? true : lockUnchanged;
     console.log(chalk.yellow("🪄 Adapting to Salla theme format..."));
     const tAdapt0 = Date.now();
     const adaptRes = await adaptToSalla(mapped, outputPath, { lockUnchanged: lockDefault, partialize, baseline: baselineOverride });
     const tAdapt1 = Date.now();
+
+    console.log(chalk.yellow("🧰 Preparing mock data context..."));
+    try {
+      const mockContext = await buildDemoMockContext(themeName);
+      await writeDemoMockContext(themeName, mockContext);
+      console.log(chalk.green(`   ↳ mock context ready (preset: ${mockContext.meta?.demo || 'electronics'})`));
+    } catch (mockErr) {
+      console.warn(chalk.yellow(`   ↳ mock context skipped: ${mockErr instanceof Error ? mockErr.message : mockErr}`));
+    }
+
+    console.log(chalk.yellow('🕸️ Analyzing Twig dependency graph...'));
+    try {
+      const depInfo = await buildTwigDependencyGraph(outputPath);
+      const depPaths = await writeTwigDependencyReport(themeName, depInfo);
+      if (depInfo.cycles.length) {
+        console.warn(chalk.red(`   ↳ ${depInfo.cycles.length} cycle(s) detected — see ${path.relative(process.cwd(), depPaths.mdPath)}`));
+      } else {
+        console.log(chalk.green(`   ↳ graph stored at ${path.relative(process.cwd(), depPaths.jsonPath)}`));
+      }
+    } catch (err) {
+      console.warn(chalk.yellow(`   ↳ dependency graph skipped: ${err.message}`));
+    }
 
     console.log(chalk.yellow("🧱 Ensuring baseline completeness..."));
     const baselineRes = await ensureBaselineCompleteness(outputPath, {
@@ -218,6 +273,20 @@ async function run() {
     console.log(chalk.yellow("🔬 Running extended QA..."));
     let extReport = await validateExtended(outputPath);
     const tVal1 = Date.now();
+    const canonicalStatus =
+      extReport?.summary?.passed === false || (extReport?.errors?.length ?? 0) > 0 ? "fail" : "pass";
+    await updateCanonicalModel(themeName, (existing) => ({
+      ...existing,
+      validated: {
+        status: canonicalStatus,
+        warnings: formatIssues(extReport?.warnings || []),
+        errors: formatIssues(extReport?.errors || []),
+        counts: {
+          warnings: extReport?.warnings?.length ?? 0,
+          errors: extReport?.errors?.length ?? 0,
+        },
+      },
+    }));
 
     // Optional auto-fix cycle for common issues
     if (autofix) {
@@ -354,6 +423,12 @@ async function run() {
 
   } catch (err) {
     console.error(chalk.redBright("\n❌ Deemind build failed:\n"), err.message || err);
+    if (process.env.DEEMIND_DEBUG) {
+      console.error(err);
+      if (err && err.stack) {
+        console.error(chalk.gray(err.stack));
+      }
+    }
     process.exit(1);
   }
 }
@@ -392,4 +467,19 @@ async function appendBaselineMetrics(themeName, baselineInfo, extReport) {
   const warnings = extReport?.warnings?.length ?? 0;
   const row = `| ${themeName} | ${added} | ${skipped} | ${duration} | ${errors} | ${warnings} |\n`;
   await fs.appendFile(metricsPath, row, "utf8");
+}
+
+function formatIssues(list, limit = 25) {
+  return (list || [])
+    .slice(0, limit)
+    .map((issue) => {
+      if (!issue) return "";
+      if (typeof issue === "string") return issue;
+      const parts = [];
+      if (issue.type) parts.push(String(issue.type));
+      if (issue.file) parts.push(String(issue.file));
+      if (issue.message) parts.push(String(issue.message));
+      return parts.join(" | ");
+    })
+    .filter(Boolean);
 }

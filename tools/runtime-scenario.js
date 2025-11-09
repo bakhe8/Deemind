@@ -11,6 +11,7 @@ const rootDir = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
 const theme = args[0] || 'demo';
 const chainFlag = args.find((arg) => arg.startsWith('--chain='));
+const outputFlag = args.find((arg) => arg.startsWith('--output='));
 let scenarioChain = [];
 if (chainFlag) {
   scenarioChain = chainFlag
@@ -30,6 +31,12 @@ if (!scenarioChain.length) {
 const port = Number(process.env.RUNTIME_PORT || process.env.PREVIEW_PORT || 4100);
 
 const scenarioDir = path.join(rootDir, 'logs', 'runtime-scenarios');
+const rawLogPath = outputFlag ? outputFlag.split('=').slice(1).join('=').trim() : process.env.SCENARIO_LOG_FILE;
+const resolvedLogPath = rawLogPath
+  ? path.isAbsolute(rawLogPath)
+    ? rawLogPath
+    : path.join(rootDir, rawLogPath)
+  : null;
 
 const flows = {
   'add-to-cart': async (ctx) => {
@@ -200,9 +207,11 @@ async function runScenario() {
     console.error(`❌ Scenario chain failed: ${session.error}`);
   } finally {
     session.finishedAt = new Date().toISOString();
-    const fileName = `${theme}-${scenarioChain.join('_')}-${Date.now()}.json`;
-    await fs.writeJson(path.join(scenarioDir, fileName), session, { spaces: 2 });
-    console.log(`📝 Scenario log written to logs/runtime-scenarios/${fileName}`);
+    const defaultFileName = `${theme}-${scenarioChain.join('_')}-${Date.now()}.json`;
+    const targetPath = resolvedLogPath || path.join(scenarioDir, defaultFileName);
+    await fs.ensureDir(path.dirname(targetPath));
+    await fs.writeJson(targetPath, session, { spaces: 2 });
+    console.log(`📝 Scenario log written to ${path.relative(rootDir, targetPath)}`);
     if (controller.process) {
       controller.process.kill('SIGTERM');
     }

@@ -26,14 +26,31 @@ export async function mapSemantics(parsed, { i18n = false, client, sanitize = fa
   let settings = { i18nSelectors: [], i18nAttrAllowlist: [] };
   try { settings = await fs.readJson(path.resolve('configs', 'settings.json')); } catch (e) { void e; }
 
+  const stats = {
+    placeholdersApplied: 0,
+    bareTokensApplied: 0,
+    i18nNodesWrapped: 0,
+    i18nAttributesWrapped: 0,
+    sanitizedInlineHandlers: 0,
+    blockedExternalScripts: 0,
+  };
+
   const pages = parsed.pages.map(p => {
     let html = p.html;
     for (const [key, value] of Object.entries(placeholders)) {
-      const re = new RegExp(`\\{\\{\\s*${key}\\s*\\}\\}`, 'g');
-      html = html.replace(re, value);
-      // Also replace bare tokens in text nodes (e.g., PRODUCT_NAME)
-      const bare = new RegExp(`\\b${key}\\b`, 'g');
-      html = html.replace(bare, value);
+      const safeKey = escapeRegExp(key);
+      const re = new RegExp(`\\{\\{\\s*${safeKey}\\s*\\}\\}`, 'g');
+      const bare = new RegExp(`\\b${safeKey}\\b`, 'g');
+      const placeholderHits = html.match(re);
+      if (placeholderHits?.length) {
+        stats.placeholdersApplied += placeholderHits.length;
+        html = html.replace(re, value);
+      }
+      const bareHits = html.match(bare);
+      if (bareHits?.length) {
+        stats.bareTokensApplied += bareHits.length;
+        html = html.replace(bare, value);
+      }
     }
     // Remove common sample placeholder strings to satisfy extended validator
     html = html.replace(/\bSample\b/gi, '{{ site.name }}');
@@ -71,6 +88,7 @@ export async function mapSemantics(parsed, { i18n = false, client, sanitize = fa
           const wrapped = `{% trans %}${txt}{% endtrans %}`;
           $(el).text('');
           $(el).append(wrapped);
+          stats.i18nNodesWrapped += 1;
         });
       }
       // Wrap selected attributes as {{ 'text'|t }}
@@ -81,18 +99,30 @@ export async function mapSemantics(parsed, { i18n = false, client, sanitize = fa
           if (/[{}%]/.test(v)) continue; // skip existing twig
           const safe = v.replace(/'/g, "\\'");
           $(el).attr(a, `{{ '${safe}' | t }}`);
+          stats.i18nAttributesWrapped += 1;
         }
       });
       html = $.html();
     }
     if (sanitize) {
-      html = html.replace(/\son[a-z]+\s*=\s*"[^"]*"/gi, '')
-                 .replace(/\son[a-z]+\s*=\s*'[^']*'/gi, '');
-      html = html.replace(/<script[^>]+src=["']http:\/\/[^>]*><\/script>/gi, '');
+      const inlineDouble = html.match(/\son[a-z]+\s*=\s*"[^"]*"/gi) || [];
+      const inlineSingle = html.match(/\son[a-z]+\s*=\s*'[^']*'/gi) || [];
+      const externalScripts = html.match(/<script[^>]+src=["']http:\/\/[^>]*><\/script>/gi) || [];
+      stats.sanitizedInlineHandlers += inlineDouble.length + inlineSingle.length;
+      stats.blockedExternalScripts += externalScripts.length;
+      if (inlineDouble.length) {
+        html = html.replace(/\son[a-z]+\s*=\s*"[^"]*"/gi, '');
+      }
+      if (inlineSingle.length) {
+        html = html.replace(/\son[a-z]+\s*=\s*'[^']*'/gi, '');
+      }
+      if (externalScripts.length) {
+        html = html.replace(/<script[^>]+src=["']http:\/\/[^>]*><\/script>/gi, '');
+      }
     }
     return { ...p, html };
   });
-  return { ...parsed, pages };
+  return { ...parsed, pages, stats };
 }
 function escapeRegExp(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 /**

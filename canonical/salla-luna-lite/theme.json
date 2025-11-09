@@ -1,0 +1,65 @@
+{
+  "input": {
+    "folder": "salla-luna-lite",
+    "assets": ["assets/style.css", "assets/app.js"]
+  },
+  "parsed": {
+    "sections": [
+      {
+        "page": "index.html",
+        "componentCount": 2,
+        "sharedComponents": [],
+        "unchanged": false
+      }
+    ],
+    "components": [
+      {
+        "id": "dcef8ad9",
+        "selector": "section",
+        "signature": "hero",
+        "page": "index.html",
+        "shared": false,
+        "order": 0,
+        "classes": "hero"
+      },
+      {
+        "id": "45d23f76",
+        "selector": "section",
+        "signature": "features",
+        "page": "index.html",
+        "shared": false,
+        "order": 1,
+        "classes": "features"
+      }
+    ],
+    "conflicts": [],
+    "assets": ["assets/style.css", "assets/app.js"],
+    "cssMapSample": {
+      "index.html": {}
+    },
+    "templateHints": [
+      {
+        "page": "index.html",
+        "hints": ["hero", "footer", "header"]
+      }
+    ],
+    "confidence": 1,
+    "semanticStats": {
+      "placeholdersApplied": 0,
+      "bareTokensApplied": 0,
+      "i18nNodesWrapped": 3,
+      "i18nAttributesWrapped": 0,
+      "sanitizedInlineHandlers": 0,
+      "blockedExternalScripts": 0
+    }
+  },
+  "adapted": {
+    "twig": [],
+    "metadata": {}
+  },
+  "validated": {
+    "status": "pending",
+    "warnings": [],
+    "errors": []
+  }
+}
