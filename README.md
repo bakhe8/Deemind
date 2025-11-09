@@ -242,5 +242,5 @@ You can now rename your local folder to deemind, run the CLI as-is, and you’ll
 - Parser & Mapper → live SSE log stream, report table, and queue info pulled from `/api/status`.
 - Adapter & Baseline → diff viewer plus stats from `baseline-summary.json` & logs.
 - Validation & QA → displays `report-extended.json` errors/warnings with quick filters.
-- Reports & Metrics → renders `reports/baseline-metrics.md` and `/logs/baseline/*.json` in charts/table form.
+- Reports & Metrics → renders `reports/baseline-metrics.md`, `/logs/baseline/*.json`, plus live runtime analytics pulled from `logs/runtime-analytics.jsonl`.
 - Settings → show effective paths, baseline chains, runtime stub controls, and store preset/diff tooling.

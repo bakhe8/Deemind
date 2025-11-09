@@ -2,6 +2,7 @@
 import BaselineBarChart from '../components/charts/BaselineBarChart';
 import { fetchBaselineLogs, fetchBaselineMetrics } from '../api/system';
 import RuntimeEventFeed from '../components/RuntimeEventFeed';
+import RuntimeAnalyticsTable from '../components/RuntimeAnalyticsTable';
 
 export default function ReportsMetrics() {
   const [metrics, setMetrics] = useState<any[]>([]);
@@ -14,6 +15,7 @@ export default function ReportsMetrics() {
 
   return (
     <div className="space-y-6">
+      <RuntimeAnalyticsTable />
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4">
         <h2 className="text-lg font-semibold mb-3">Baseline Metrics</h2>
         <BaselineBarChart data={metrics.slice(-8)} />

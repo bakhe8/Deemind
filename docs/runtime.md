@@ -116,6 +116,7 @@ npm run preview:stub demo
 | `data/mock-store.json`                        | Default store/products/cart seed (copy to `mock-store-<theme>.json` for theme-specific data). |
 | `dashboard/src/components/StubStatusCard.tsx` | Shared UI component for Start/Stop/Open/Reset controls.                                       |
 | `runtime/twilight/twilight-shim.js`           | Lightweight Twilight bridge loaded when the shim is enabled.                                  |
+| `logs/runtime-analytics.jsonl`                | Streaming JSONL log of stub API calls (used by dashboard reports).                            |
 
 ### Twilight / NEXUS shim
 

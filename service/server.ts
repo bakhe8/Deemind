@@ -78,6 +78,22 @@ function diffPartials(current: string[] = [], next: string[] = []) {
   return { current, next, added, removed };
 }
 
+async function readRuntimeAnalytics(logPath: string, limit = 50) {
+  if (!(await fs.pathExists(logPath))) return [];
+  const content = await fs.readFile(logPath, 'utf8');
+  const lines = content.split(/\r?\n/).filter(Boolean);
+  return lines
+    .slice(-limit)
+    .map((line) => {
+      try {
+        return JSON.parse(line);
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean);
+}
+
 function computeCompleteness(structure) {
   const expected = 4; // layouts, pages, components, locales
   const present = ['layouts', 'pages', 'components', 'locales'].reduce((acc, key) => (structure[key]?.length ? acc + 1 : acc), 0);
@@ -507,6 +523,12 @@ async function main() {
       }
     }
     res.json(desired);
+  });
+
+  app.get('/api/runtime/analytics', auth, async (req, res) => {
+    const limit = Number(req.query.limit) || 50;
+    const entries = await readRuntimeAnalytics(analyticsLogPath, limit);
+    res.json({ entries });
   });
 
   app.get('/api/store/diff', auth, async (req, res) => {

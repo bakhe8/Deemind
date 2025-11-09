@@ -5,7 +5,20 @@ import fs from 'fs-extra';
 import { composeStore, listStoreDemos, deepMerge as mergeStoreData } from '../tools/store-compose.js';
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '2mb' }));
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    if (!req.path.startsWith('/api/')) return;
+    logAnalytics({
+      method: req.method,
+      path: req.path,
+      status: res.statusCode,
+      duration: Date.now() - start,
+    });
+  });
+  next();
+});
 
 const theme = process.argv[2] || 'demo';
 const PORT = Number(process.env.PREVIEW_PORT || 4100);
@@ -20,6 +33,7 @@ const themeStatePath = path.join(stateRoot, `${theme}.json`);
 const localeOverrides = {};
 const twilightDir = path.resolve('runtime', 'twilight');
 const twilightConfigPath = path.join(twilightDir, 'config.json');
+const analyticsLogPath = path.resolve('logs', 'runtime-analytics.jsonl');
 
 if (!fs.existsSync(staticDir)) {
   console.error(`❌ Static preview not found for theme "${theme}". Run "npm run preview:seed" first.`);
@@ -105,6 +119,8 @@ if (fs.existsSync(twilightConfigPath)) {
   fs.ensureDirSync(path.dirname(twilightConfigPath));
   fs.writeJsonSync(twilightConfigPath, { enabled: twilightEnabled }, { spaces: 2 });
 }
+
+fs.ensureDirSync(path.dirname(analyticsLogPath));
 
 const localeCode = storeState.language || 'en';
 
@@ -453,6 +469,16 @@ function injectRuntime(html) {
   `;
   const twilightTag = twilightScriptTag();
   return html.replace('</body>', `${script}${twilightTag ? `\n${twilightTag}` : ''}\n</body>`);
+}
+
+function logAnalytics(entry) {
+  const payload = {
+    ts: new Date().toISOString(),
+    preset: presetState?.demo || null,
+    ...entry,
+  };
+  fs.appendFile(analyticsLogPath, `${JSON.stringify(payload)}\n`).catch(() => undefined);
+  broadcast('analytics', payload);
 }
 
 function sendPage(res, slug) {

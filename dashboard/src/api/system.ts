@@ -103,3 +103,7 @@ export async function updateTwilightStatus(enabled: boolean) {
     body: JSON.stringify({ enabled }),
   });
 }
+
+export async function fetchRuntimeAnalytics(limit = 40) {
+  return apiJson<{ entries: any[] }>(`/api/runtime/analytics?limit=${limit}`);
+}
