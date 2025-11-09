@@ -31,6 +31,7 @@
     "deemind:doctor": "npm run deemind:validate && npm run deemind:fix && npm run deemind:validate",
     "test": "node tests/run-fixtures.js && node tests/snapshot.js && node tests/css-assets.test.js && node tests/pending/verify-exports.js && node tests/salla-demo-fixture/run.js",
     "doctor": "node tools/doctor.js",
+    "doctor:fix-raw": "node tools/fix-raw.js",
     "test:snapshots": "node tests/snapshots/run-snapshots.js",
     "test:flaky": "node tests/flaky-detector.js",
     "lint": "eslint . --ext .js",
@@ -82,7 +83,9 @@
     "mock:data": "node tools/mock-layer/mock-data-builder.js",
     "test:mock": "node tests/mock-layer.test.mjs",
     "brand:extract": "tsx tools/brand-extract.ts",
-    "brand:apply": "tsx tools/brand-apply.ts"
+    "brand:apply": "tsx tools/brand-apply.ts",
+    "brand:sync": "node tools/brand-sync.js",
+    "codex:check-duplicates": "node tools/check-duplicates.js"
   },
   "dependencies": {
     "ajv": "^8.12.0",

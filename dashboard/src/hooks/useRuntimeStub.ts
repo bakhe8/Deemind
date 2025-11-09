@@ -11,12 +11,11 @@ import type { RuntimeStubInfo } from '../api/system';
 export type StubStatus = { running: boolean; theme: string | null; port: number };
 
 type Options = {
-  pollMs?: number;
   theme?: string;
 };
 
 export function useRuntimeStub(options: Options = {}) {
-  const { pollMs = 6000, theme } = options;
+  const { theme } = options;
   const [status, setStatus] = useState<StubStatus | null>(null);
   const [stubs, setStubs] = useState<RuntimeStubInfo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,10 +37,7 @@ export function useRuntimeStub(options: Options = {}) {
 
   useEffect(() => {
     refresh();
-    if (!pollMs) return undefined;
-    const interval = setInterval(refresh, pollMs);
-    return () => clearInterval(interval);
-  }, [pollMs, refresh]);
+  }, [refresh]);
 
   const startStub = useCallback(
     async (theme: string) => {

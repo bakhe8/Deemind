@@ -3,13 +3,11 @@
   "tasks": [
     {
       "label": "Run Deemind Build",
-      "type": "shell",
-      "command": "npm run deemind:build demo",
+      "type": "process",
+      "command": "node",
+      "args": ["cli.js", "demo", "--auto"],
       "options": {
-        "shell": {
-          "executable": "bash",
-          "args": ["-lc"]
-        }
+        "cwd": "${workspaceFolder}"
       },
       "problemMatcher": []
     },
@@ -24,8 +22,7 @@
         }
       },
       "problemMatcher": []
-    }
-    ,
+    },
     {
       "label": "Watch New Themes",
       "type": "shell",

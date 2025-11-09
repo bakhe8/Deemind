@@ -336,21 +336,77 @@ function injectRuntime(html) {
           const bundles = window.__SALLA_STUB__.locales || {};
           return bundles[key] || key;
         };
-        window.salla.cart = {
-          addItem: (id, quantity = 1) => invoke('/api/cart/add', { id, quantity }),
-          removeItem: (id) => invoke('/api/cart/remove', { id }),
-          updateItem: (id, quantity) => invoke('/api/cart/update', { id, quantity }),
-          clear: () => invoke('/api/cart/clear'),
-          get: async () => (await fetch('/api/cart')).json(),
+        window.salla.cart = window.salla.cart || {};
+        window.salla.cart.event = window.salla.cart.event || cartEventApi;
+        window.salla.cart.addItem = async (id, quantity = 1) => {
+          try {
+            const result = await invoke('/api/cart/add', { id, quantity });
+            cartEvents.emit('item:updated', result);
+            cartEvents.emit('updated', result);
+            globalEvents.emit('cart:updated', result);
+            window.salla.event.cart?.onUpdated?.((fn) => fn?.(result));
+            return result;
+          } catch (error) {
+            cartEvents.emit('item:failed', { id, quantity, error });
+            throw error;
+          }
         };
-        window.salla.wishlist = {
-          add: (id) => invoke('/api/wishlist/add', { id }),
-          remove: (id) => invoke('/api/wishlist/remove', { id }),
-          toggle: (id) => invoke('/api/wishlist/toggle', { id }),
-          clear: () => invoke('/api/wishlist/clear'),
-          get: async () => (await fetch('/api/wishlist')).json(),
+        window.salla.cart.removeItem = async (id) => {
+          const result = await invoke('/api/cart/remove', { id });
+          cartEvents.emit('item:updated', result);
+          cartEvents.emit('updated', result);
+          globalEvents.emit('cart:updated', result);
+          return result;
         };
-        window.salla.auth = {
+        window.salla.cart.updateItem = async (id, quantity) => {
+          try {
+            const result = await invoke('/api/cart/update', { id, quantity });
+            cartEvents.emit('item:updated', result);
+            cartEvents.emit('updated', result);
+            globalEvents.emit('cart:updated', result);
+            return result;
+          } catch (error) {
+            cartEvents.emit('item:failed', { id, quantity, error });
+            throw error;
+          }
+        };
+        window.salla.cart.clear = async () => {
+          const result = await invoke('/api/cart/clear');
+          cartEvents.emit('updated', result);
+          globalEvents.emit('cart:updated', result);
+          return result;
+        };
+        window.salla.cart.get = async () => (await fetch('/api/cart')).json();
+        window.salla.cart.submit = async () => {
+          const id = window.salla.api.cart.getCurrentCartId();
+          orderEvents.emit('invoice', { id });
+          return { success: true, id };
+        };
+        window.salla.wishlist = window.salla.wishlist || {};
+        window.salla.wishlist.add = async (id) => {
+          const result = await invoke('/api/wishlist/add', { id });
+          wishlistEvents.emit('added', result);
+          globalEvents.emit('wishlist:updated', result);
+          return result;
+        };
+        window.salla.wishlist.remove = async (id) => {
+          const result = await invoke('/api/wishlist/remove', { id });
+          wishlistEvents.emit('removed', result);
+          globalEvents.emit('wishlist:updated', result);
+          return result;
+        };
+        window.salla.wishlist.toggle = async (id) => {
+          const result = await invoke('/api/wishlist/toggle', { id });
+          globalEvents.emit('wishlist:updated', result);
+          return result;
+        };
+        window.salla.wishlist.clear = async () => {
+          const result = await invoke('/api/wishlist/clear');
+          globalEvents.emit('wishlist:updated', result);
+          return result;
+        };
+        window.salla.wishlist.get = async () => (await fetch('/api/wishlist')).json();
+        window.salla.auth = window.salla.auth || {
           login: (payload) => invoke('/api/auth/login', payload),
           logout: () => invoke('/api/auth/logout'),
           me: async () => (await fetch('/api/auth/me')).json(),
@@ -358,6 +414,246 @@ function injectRuntime(html) {
         window.salla.locale = {
           set: (language) => invoke('/api/store/locale', { language }),
         };
+
+        const createEmitter = () => {
+          const listeners = new Map();
+          return {
+            on(event, handler) {
+              if (!event || typeof handler !== 'function') return () => {};
+              if (!listeners.has(event)) listeners.set(event, new Set());
+              listeners.get(event).add(handler);
+              return () => listeners.get(event)?.delete(handler);
+            },
+            off(event, handler) {
+              if (!listeners.has(event)) return;
+              if (!handler) {
+                listeners.delete(event);
+                return;
+              }
+              listeners.get(event)?.delete(handler);
+            },
+            emit(event, payload) {
+              if (!listeners.has(event)) return;
+              listeners.get(event).forEach((handler) => {
+                try {
+                  handler(payload);
+                } catch (error) {
+                  console.warn('[salla:event]', event, error);
+                }
+              });
+            },
+          };
+        };
+
+        const globalEvents = createEmitter();
+        const cartEvents = createEmitter();
+        const wishlistEvents = createEmitter();
+        const orderEvents = createEmitter();
+        const commentEvents = createEmitter();
+        const documentEvents = createEmitter();
+        let customNotifier = null;
+
+        const cartEventApi = {
+          onUpdated: (handler) => cartEvents.on('updated', handler),
+          onItemUpdated: (handler) => cartEvents.on('item:updated', handler),
+          onItemUpdatedFailed: (handler) => cartEvents.on('item:failed', handler),
+        };
+        const wishlistEventApi = {
+          onAdded: (handler) => wishlistEvents.on('added', handler),
+          onRemoved: (handler) => wishlistEvents.on('removed', handler),
+        };
+        const orderEventApi = {
+          onInvoiceSent: (handler) => orderEvents.on('invoice', handler),
+        };
+        const commentEventApi = {
+          onAdded: (handler) => commentEvents.on('added', handler),
+        };
+
+        window.salla.event = window.salla.event || {};
+        window.salla.event.dispatch = (name, payload) => globalEvents.emit(name, payload);
+        window.salla.event.on = (name, handler) => globalEvents.on(name, handler);
+        window.salla.event.off = (name, handler) => globalEvents.off(name, handler);
+        window.salla.event.document = window.salla.event.document || {};
+        window.salla.event.document.onClick = (handler) => documentEvents.on('click', handler);
+        window.salla.event.cart = window.salla.event.cart || cartEventApi;
+        window.salla.wishlist = window.salla.wishlist || {};
+        window.salla.wishlist.event = window.salla.wishlist.event || wishlistEventApi;
+        window.salla.order = window.salla.order || {};
+        window.salla.order.event = window.salla.order.event || orderEventApi;
+        window.salla.comment = window.salla.comment || {};
+        window.salla.comment.event = window.salla.comment.event || commentEventApi;
+        window.salla.onReady = window.salla.onReady || ((handler) => {
+          if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            queueMicrotask(handler);
+          } else {
+            document.addEventListener('DOMContentLoaded', handler, { once: true });
+          }
+        });
+        window.salla.lang = window.salla.lang || {};
+        window.salla.lang.onLoaded = (handler) => {
+          if (typeof handler === 'function') handler(window.__SALLA_STUB__.locales || {});
+        };
+        window.salla.logger = window.salla.logger || {
+          warn: (...args) => console.warn('[salla]', ...args),
+          error: (...args) => console.error('[salla]', ...args),
+        };
+        window.salla.log = (...args) => console.log('[salla]', ...args);
+        window.salla.notify = window.salla.notify || {
+          error: (message) => {
+            if (typeof customNotifier === 'function') {
+              customNotifier({ type: 'error', message });
+            } else {
+              console.error('[salla.notify]', message);
+              alert(typeof message === 'string' ? message : 'An error occurred');
+            }
+          },
+          setNotifier: (fn) => {
+            customNotifier = typeof fn === 'function' ? fn : null;
+          },
+        };
+        window.salla.helpers = window.salla.helpers || {};
+        window.salla.helpers.addParamToUrl = (url, key, value) => {
+          try {
+            const parsed = new URL(url, window.location.origin);
+            parsed.searchParams.set(key, value);
+            return parsed.toString();
+          } catch {
+            return url;
+          }
+        };
+        window.salla.helpers.number = (value) => Number(value) || 0;
+        window.salla.helpers.inputDigitsOnly = (value = '') => String(value).replace(/\D+/g, '');
+        window.salla.form = window.salla.form || {};
+        window.salla.form.onChange = (_action, event) => {
+          if (event?.preventDefault) event.preventDefault();
+          return Promise.resolve();
+        };
+        window.salla.storage = window.salla.storage || {
+          get: (key) => {
+            try {
+              return window.localStorage.getItem(key);
+            } catch {
+              return null;
+            }
+          },
+        };
+        window.salla.config = window.salla.config || {
+          isGuest: () => !window.__SALLA_STUB__.session?.user,
+        };
+        window.salla.url = window.salla.url || {
+          asset: (path) => {
+            if (typeof path === 'string' && path.indexOf('http') === 0) return path;
+            const baseOrigin = (window.location && window.location.origin) || '';
+            const normalizedBase = baseOrigin.endsWith('/') ? baseOrigin.slice(0, -1) : baseOrigin;
+            const cleanPath = path ? String(path).replace(/^\/+/, '') : '';
+            return normalizedBase + '/' + cleanPath;
+          },
+          is_placeholder: (url) => !url || url === '#' || url.startsWith('javascript:'),
+          is_page: (url) => typeof url === 'string' && /^https?:\/\//i.test(url) === false,
+        };
+        window.salla.money = window.salla.money || {
+          format: (amount, currency = window.__SALLA_STUB__.store?.currency || 'SAR') =>
+            new Intl.NumberFormat(window.__SALLA_STUB__.store?.language || 'en', {
+              style: 'currency',
+              currency,
+            }).format(Number(amount) || 0),
+        };
+        window.salla.api = window.salla.api || {};
+        window.salla.api.request = async (endpoint, options = {}) => {
+          const response = await fetch(endpoint, {
+            method: options.method || 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(options.body || {}),
+          });
+          return response.json();
+        };
+        window.salla.api.component = window.salla.api.component || {
+          getMenus: async () => window.__SALLA_STUB__.navigation || [],
+        };
+        window.salla.api.cart = window.salla.api.cart || {};
+        window.salla.api.cart.getCurrentCartId = () => window.__SALLA_STUB__.cart?.id || 'deemind-cart';
+        window.salla.api.cart.get = async () => window.__SALLA_STUB__.cart || {};
+        window.salla.products = window.salla.products || {};
+        window.salla.products.featured = async (options = {}) => {
+          const list = Array.isArray(window.__SALLA_STUB__.products) ? window.__SALLA_STUB__.products : [];
+          const limit = Number(options.limit);
+          return Number.isFinite(limit) && limit > 0 ? list.slice(0, limit) : list;
+        };
+        document.addEventListener('click', (event) => documentEvents.emit('click', event));
+
+        const registerSallaPlaceholders = () => {
+          if (!window.customElements) return;
+          const tags = [
+            'salla-reviews',
+            'salla-products-slider',
+            'salla-slider',
+            'salla-products-list',
+            'salla-button',
+            'salla-rating-stars',
+            'salla-menu',
+            'salla-localization-modal',
+            'salla-search',
+            'salla-contacts',
+            'salla-user-menu',
+            'salla-cart-summary',
+            'salla-scopes',
+            'salla-social',
+            'salla-modal',
+            'salla-apps-icons',
+            'salla-payments',
+            'salla-breadcrumb',
+            'salla-comments',
+            'salla-loyalty',
+            'salla-count-down',
+            'salla-mini-checkout-widget',
+            'salla-conditional-offer',
+            'salla-cart-item-offers',
+            'salla-quantity-input',
+            'salla-offer',
+            'salla-gifting',
+            'salla-tiered-offer',
+            'salla-social-share',
+            'salla-installment',
+            'salla-metadata',
+            'salla-add-product-button',
+            'salla-filters',
+            'salla-product-options',
+            'salla-multiple-bundle-product',
+            'salla-product-size-guide',
+            'salla-file-upload',
+            'salla-wallet',
+            'salla-datetime-picker',
+            'salla-tel-input',
+            'salla-verify',
+            'salla-user-settings',
+            'salla-notifications',
+            'salla-order-details',
+            'salla-order-totals-card',
+            'salla-rating-modal',
+            'salla-orders',
+            'salla-infinite-scroll'
+          ];
+          tags.forEach((tag) => {
+            if (window.customElements.get(tag)) return;
+            window.customElements.define(
+              tag,
+              class extends HTMLElement {
+                connectedCallback() {
+                  if (this.dataset.placeholderInitialized) return;
+                  this.dataset.placeholderInitialized = '1';
+                  if (!this.innerHTML.trim()) {
+                    const markup =
+                      '<div style="padding:0.75rem;border:1px dashed rgba(148,163,184,.4);border-radius:0.5rem;font-size:0.8rem;color:#475569;">' +
+                      tag +
+                      ' placeholder</div>';
+                    this.innerHTML = markup;
+                  }
+                }
+              }
+            );
+          });
+        };
+        registerSallaPlaceholders();
 
         const updateCartBadge = (cart) => {
           const badge = document.querySelector('[data-cart-count]');

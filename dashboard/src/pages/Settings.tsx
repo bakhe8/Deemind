@@ -68,12 +68,12 @@ export default function Settings() {
     startStub: launchStub,
     stopStub: haltStub,
     refresh: refreshStubStatus,
-  } = useRuntimeStub({ pollMs: 8000, theme: activeStubTheme || undefined });
+  } = useRuntimeStub({ theme: activeStubTheme || undefined });
   const {
     map: previewMap,
     loading: previewMatrixLoading,
     refresh: refreshPreviewMatrix,
-  } = usePreviewMatrix({ pollMs: 25000 });
+  } = usePreviewMatrix();
 
   const refreshStubsAndCoverage = useCallback(async () => {
     await Promise.all([refreshStubStatus(), refreshPreviewMatrix()]);
@@ -177,8 +177,6 @@ export default function Settings() {
 
   useEffect(() => {
     refreshLogs();
-    const interval = setInterval(refreshLogs, 10000);
-    return () => clearInterval(interval);
   }, [refreshLogs]);
 
   useEffect(() => {

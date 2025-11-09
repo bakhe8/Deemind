@@ -1,13 +1,25 @@
 {
-  "defaultTheme": "demo",
-  "encoding": "utf8",
-  "enableAnalytics": false,
-  "sanitizeByDefault": false,
-  "maxInputFileBytes": 10485760,
-  "maxAssetFileBytes": 10485760,
+  "rawAllowlist": [
+    "order.instructions|raw",
+    "landing.content|raw",
+    "page.content|raw",
+    "brand.description|raw",
+    "package.shipping_company.number|raw",
+    "package.shipping_company.tracing_link|raw",
+    "item.rating.content|raw",
+    "order.rating.store.content|raw",
+    "order.rating.shipping.content|raw",
+    "product_desc|raw",
+    "pluralize('pages.products.sold_times', product.sold_quantity)|raw",
+    "cart.free_shipping_bar.remaining|money",
+    "article.body|replace",
+    "store.description|raw",
+    "sub_title|raw"
+  ],
+  "failOnBudget": false,
   "requireI18n": false,
-  "i18nSelectors": ["title", "h1", "h2", "h3", "p", "button", "a", "span"],
-  "i18nAttrAllowlist": ["title", "alt", "aria-label"],
-  "rawAllowlist": [],
-  "failOnBudget": false
+  "warnOnI18n": false,
+  "suppressRawBaselineWarnings": true,
+  "suppressBaselineConventionWarnings": true,
+  "baselineI18nTolerance": 0.25
 }

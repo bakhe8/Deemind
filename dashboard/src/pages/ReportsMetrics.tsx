@@ -13,7 +13,7 @@ export default function ReportsMetrics() {
     entries: previewEntries,
     loading: previewMatrixLoading,
     refresh: refreshPreviewMatrix,
-  } = usePreviewMatrix({ pollMs: 30000 });
+  } = usePreviewMatrix();
 
   useEffect(() => {
     fetchBaselineMetrics().then((res) => setMetrics(res.metrics)).catch(() => undefined);

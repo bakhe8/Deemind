@@ -73,6 +73,7 @@ async function run() {
   const outputRoot = path.join(__dirname, "output");
   const inputPath = path.join(inputRoot, themeName);
   const outputPath = path.join(outputRoot, themeName);
+  const manifestPath = path.join(outputPath, 'manifest.json');
 
   if (!fs.existsSync(inputPath)) {
     console.error(chalk.red(`❌ Input folder not found: ${inputPath}`));
@@ -261,7 +262,7 @@ async function run() {
     // Write a preliminary manifest so extended validator can read it
     try {
       const preManifest = await generateBuildManifest(outputPath, { coreReport, elapsedSec: 0, layoutMap: parsed.layoutMap, inputChecksum });
-      await fs.writeJson(path.join(outputPath, "manifest.json"), preManifest, { spaces: 2 });
+      await fs.writeJson(manifestPath, preManifest, { spaces: 2 });
     } catch (_) { /* non-blocking */ }
     // Fail gate on criticals unless --force
     const hasCritical = (coreReport.issues || []).some(i => i.level === 'critical');
@@ -327,7 +328,7 @@ async function run() {
       totalMs: Date.now() - t0
     };
     const manifest = await generateBuildManifest(outputPath, { coreReport, elapsedSec: elapsed, layoutMap: parsed.layoutMap, inputChecksum, performance: timings });
-    await fs.writeJson(path.join(outputPath, "manifest.json"), manifest, { spaces: 2 });
+    await fs.writeJson(manifestPath, manifest, { spaces: 2 });
 
     // Write Salla-compatible theme.json for tooling interoperability
     const themeJson = {
@@ -405,16 +406,24 @@ async function run() {
       outputPath: outputRoot,
       port: previewConfig.port || PREVIEW_DEFAULTS.port,
     });
+    let previewServerResult = null;
     if (previewConfig.enabled) {
       if (previewMeta.status === 'ready') {
-        const previewResult = await runPreviewServer(themeName, previewConfig);
-        if (previewResult?.url) {
-          console.log(chalk.green(`🟢 Preview server ready → ${previewResult.url}`));
+        previewServerResult = await runPreviewServer(themeName, previewConfig);
+        if (previewServerResult?.url) {
+          console.log(chalk.green(`🟢 Preview server ready → ${previewServerResult.url}`));
         }
       } else {
         console.log(chalk.yellow('⚠️ Preview skipped: no pages were generated.'));
       }
     }
+    await enrichBuildManifest({
+      manifestPath,
+      themeName,
+      outputPath,
+      previewMeta,
+      previewResult: previewServerResult,
+    });
 
     await appendBaselineMetrics(themeName, baselineRes, extReport);
 
@@ -467,6 +476,53 @@ async function appendBaselineMetrics(themeName, baselineInfo, extReport) {
   const warnings = extReport?.warnings?.length ?? 0;
   const row = `| ${themeName} | ${added} | ${skipped} | ${duration} | ${errors} | ${warnings} |\n`;
   await fs.appendFile(metricsPath, row, "utf8");
+}
+
+async function enrichBuildManifest({ manifestPath, themeName, outputPath, previewMeta, previewResult }) {
+  const base = (await fs.readJson(manifestPath).catch(() => null)) || { theme: themeName };
+  const previewPages = Array.isArray(previewMeta?.pages) ? previewMeta.pages : [];
+  const previewRoutes = Array.from(new Set(previewPages.map(formatPreviewRoute).filter(Boolean)));
+  const previewPort = previewResult?.port ?? previewMeta?.port ?? null;
+  const previewUrl =
+    previewResult?.url || previewMeta?.url || (previewPort ? `http://localhost:${previewPort}/` : null);
+  const rel = (file) => toPosixPath(path.relative(process.cwd(), path.join(outputPath, file)));
+  const packageFile = path.join(outputPath, `${themeName}.zip`);
+  const packageExists = await fs.pathExists(packageFile).catch(() => false);
+
+  const manifest = {
+    ...base,
+    theme: base.theme || themeName,
+    buildTime: new Date().toISOString(),
+    preview: {
+      port: previewPort,
+      url: previewUrl,
+      routes: previewRoutes.length ? previewRoutes : ['/'],
+    },
+    reports: {
+      extended: rel('report-extended.json'),
+      core: rel('report.json'),
+    },
+    delivery: {
+      package: rel(`${themeName}.zip`),
+      packageExists,
+    },
+  };
+
+  await fs.writeJson(manifestPath, manifest, { spaces: 2 });
+}
+
+function formatPreviewRoute(entry) {
+  if (!entry) return '/';
+  const normalized = String(entry)
+    .replace(/^pages?\//i, '')
+    .replace(/index$/i, '')
+    .replace(/^\//, '')
+    .replace(/\\/g, '/');
+  return normalized ? `/${normalized}` : '/';
+}
+
+function toPosixPath(relPath) {
+  return relPath.split(path.sep).join('/');
 }
 
 function formatIssues(list, limit = 25) {

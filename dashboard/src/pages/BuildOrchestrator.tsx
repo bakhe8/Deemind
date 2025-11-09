@@ -52,13 +52,13 @@ export default function BuildOrchestrator() {
   const [inputFolder, setInputFolder] = useState('');
   const [jobLoading, setJobLoading] = useState(false);
   const { sessions, getLogs } = useBuildStream();
-  const { jobs, loading: jobsLoading, error: jobsError, refresh: refreshJobs } = useJobHistory({ pollMs: 7000 });
-  const { status: runnerStatus, loading: runnerLoading, error: runnerError, refresh: refreshRunner } = useRunnerStatus(6000);
+  const { jobs, loading: jobsLoading, error: jobsError, refresh: refreshJobs } = useJobHistory();
+  const { status: runnerStatus, loading: runnerLoading, error: runnerError, refresh: refreshRunner } = useRunnerStatus();
   const {
     map: previewMap,
     loading: previewMatrixLoading,
     refresh: refreshPreviewMatrix,
-  } = usePreviewMatrix({ pollMs: 25000 });
+  } = usePreviewMatrix();
   const themeOptions = useMemo(() => {
     const set = new Set<string>();
     themes.forEach((theme) => set.add(theme.name));

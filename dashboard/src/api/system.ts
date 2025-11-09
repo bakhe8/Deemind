@@ -1,6 +1,7 @@
 import { apiFetch, apiJson } from './client';
 import type { StatusResponse } from '../store/useDashboardStore';
 import type { JobStatus, OutputEntry, ReportSummary, RunRequest } from '../lib/contracts';
+import type { ServiceLogEntry } from '../lib/serviceLogs';
 
 export type StoreDemo = { id: string; name: string; meta: Record<string, any>; partials: string[] };
 export type StorePartial = { id: string; version?: string | null; key: string; label: string; category?: string | null; path: string };
@@ -39,7 +40,7 @@ export async function updateBaselineList(baselines: string[]) {
 }
 
 export async function fetchLogHistory() {
-  return apiJson<string[]>('/api/log/history');
+  return apiJson<ServiceLogEntry[]>('/api/log/history');
 }
 
 export async function fetchStubStatus(theme?: string) {

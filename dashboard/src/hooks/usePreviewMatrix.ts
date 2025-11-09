@@ -8,7 +8,7 @@ type Options = {
 type PreviewMap = Record<string, PreviewMatrixEntry | undefined>;
 
 export function usePreviewMatrix(options: Options = {}) {
-  const { pollMs = 20000 } = options;
+  const { pollMs = null } = options;
   const [entries, setEntries] = useState<PreviewMatrixEntry[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,12 +30,8 @@ export function usePreviewMatrix(options: Options = {}) {
 
   useEffect(() => {
     void refresh();
-    if (!pollMs) return undefined;
-    const id = setInterval(() => {
-      void refresh();
-    }, pollMs);
-    return () => clearInterval(id);
-  }, [pollMs, refresh]);
+    return undefined;
+  }, [refresh]);
 
   const map: PreviewMap = useMemo(() => {
     const next: PreviewMap = {};

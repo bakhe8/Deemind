@@ -1,0 +1,13 @@
+{
+  "fs": ["ensureDirSync", "readJson", "writeJson", "appendFileSync"],
+  "logger": ["brandLog", "buildLog", "runtimeLog"],
+  "brands": [
+    "applyBrandPreset",
+    "listBrandPresets",
+    "readBrandPreset",
+    "saveBrandPreset"
+  ],
+  "api": ["listThemes", "fetchBrands", "applyBrand", "triggerBuild"],
+  "validator": ["validateTheme", "validateExtended"],
+  "tasks": ["enqueueBuild", "enqueueScenario", "runCommand"]
+}

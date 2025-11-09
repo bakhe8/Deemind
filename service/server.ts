@@ -18,9 +18,9 @@ import { ServiceLogger } from './logger.js';
 import { DEFAULT_JSON_TEMPLATES, mergeJsonWithTemplate, ensureJsonFile } from './default-schemas.js';
 import type { RunRequest } from '../core/contracts/api.contract.ts';
 import { registerRunRoutes } from './routes/run.js';
+import brandsRouter from './routes/brands.js';
 import { PRESET_METADATA_FILENAME } from '../core/brand/constants.js';
-import { applyBrandPreset } from '../core/brand/apply-brand.js';
-import { listBrandPresets } from '../core/brand/presets.js';
+import { sanitizeThemeName } from './lib/sanitize.js';
 
 dotenv.config();
 
@@ -463,6 +463,7 @@ async function listThemes(inputDir, outputDir) {
         name,
         status,
         updated: manifest?.timestamp || null,
+        manifest: manifest || null,
       };
     }),
   );
@@ -561,11 +562,6 @@ function buildRunCommand(themeName, extraArgs = []) {
 
 const upload = multer({ dest: path.join(os.tmpdir(), 'deemind_uploads') });
 
-function sanitizeThemeName(raw?: string) {
-  if (!raw) return '';
-  return raw.toLowerCase().replace(/[^a-z0-9-_]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
-}
-
 async function maybeFlattenTheme(dir: string) {
   const entries = (await fs.readdir(dir)).filter((name) => !name.startsWith('__MACOSX'));
   if (entries.length !== 1) return;
@@ -593,7 +589,7 @@ async function main() {
   const twilightConfigFile = path.join(rootDir, 'runtime', 'twilight', 'config.json');
   const analyticsLogPath = path.join(rootDir, 'logs', 'runtime-analytics.jsonl');
   const scenarioLogDir = path.join(logsDir, 'runtime-scenarios');
-  const brandPresetDir = path.join(rootDir, 'core', 'brands', 'presets');
+  const brandPresetDir = path.join(rootDir, 'core', 'brands');
   await fs.ensureDir(brandPresetDir);
   function listStubStates() {
     return Array.from(stubPool.values()).map((state) => ({
@@ -727,6 +723,7 @@ const auth = makeAuthMiddleware(token);
   };
   app.use(cors(corsOptions));
   app.use(express.json({ limit: '10mb' }));
+  app.use('/api/brands', auth, brandsRouter);
 
   registerRunRoutes({ app, auth, config, runner, rootDir, logger });
 
@@ -865,29 +862,6 @@ const auth = makeAuthMiddleware(token);
     res.json({ saved: true });
   });
 
-  app.get('/api/brands', auth, async (_req, res) => {
-    const brands = await listBrandPresets(brandPresetDir);
-    res.json({ brands });
-  });
-
-  app.post('/api/theme/apply-brand', auth, async (req, res) => {
-    const theme = sanitizeThemeName(String(req.body?.theme || ''));
-    const brandSlug = String(req.body?.brand || '');
-    if (!theme) {
-      return res.status(400).json({ error: 'theme is required' });
-    }
-    if (!brandSlug) {
-      return res.status(400).json({ error: 'brand is required' });
-    }
-    try {
-      const preset = await applyBrandPreset(theme, brandSlug, { rootDir, presetDir: brandPresetDir });
-      broadcastSse('brand-applied', { theme, brand: preset.slug });
-      res.json({ ok: true, preset });
-    } catch (error) {
-      res.status(500).json({ error: error instanceof Error ? error.message : 'Failed to apply brand preset.' });
-    }
-  });
-
   app.post('/api/themes/:theme/defaults', auth, async (req, res) => {
     const themeDir = path.join(inputDir, req.params.theme);
     if (!(await fs.pathExists(themeDir))) {
@@ -920,6 +894,19 @@ const auth = makeAuthMiddleware(token);
     const diffPath = path.join(basePath, 'reports', 'baseline-diff.md');
     const diff = (await fs.pathExists(diffPath)) ? await fs.readFile(diffPath, 'utf8') : null;
     res.json({ manifest, extended, baseline, diff });
+  });
+
+  app.get('/api/reports/:theme/extended', auth, async (req, res) => {
+    const theme = sanitizeThemeName(req.params.theme);
+    if (!theme) {
+      return res.status(400).json({ error: 'theme is required' });
+    }
+    const filePath = path.join(outputDir, theme, 'report-extended.json');
+    const payload = await safeReadJson(filePath);
+    if (!payload) {
+      return res.status(404).json({ error: 'report not found' });
+    }
+    res.json(payload);
   });
 
   app.get('/api/preview/stub', auth, (req, res) => {

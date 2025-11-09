@@ -9,11 +9,11 @@ export default function TopBar() {
   const setToken = useDashboardStore((state) => state.setToken);
   const status = useDashboardStore((state) => state.status);
   const setStatus = useDashboardStore((state) => state.setStatus);
-  const { status: stubStatus, loading: stubLoading } = useRuntimeStub({ pollMs: 7000 });
+  const { status: stubStatus, loading: stubLoading } = useRuntimeStub();
 
   useEffect(() => {
     fetchStatus().then(setStatus).catch(() => undefined);
-    const interval = setInterval(() => fetchStatus().then(setStatus).catch(() => undefined), 8000);
+    const interval = setInterval(() => fetchStatus().then(setStatus).catch(() => undefined), 15000);
     return () => clearInterval(interval);
   }, [setStatus]);
 

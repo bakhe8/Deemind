@@ -29,7 +29,7 @@ type RuntimeState = {
 type ContextInfo = { source: string; context: any | null };
 
 export default function RuntimeInspector() {
-  const { stubs, resetState, refresh: refreshStubs } = useRuntimeStub({ pollMs: 6000 });
+  const { stubs, resetState, refresh: refreshStubs } = useRuntimeStub();
   const [theme, setTheme] = useState('');
   const [state, setState] = useState<RuntimeState | null>(null);
   const [loading, setLoading] = useState(false);

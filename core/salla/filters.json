@@ -14,6 +14,22 @@
       "name": "escape",
       "description": "Escapes HTML output.",
       "signature": "escape(value)"
-    }
+    },
+    "asset",
+    "cdn",
+    "date",
+    "first",
+    "is_placeholder",
+    "join",
+    "map",
+    "money",
+    "number",
+    "replace",
+    "slice",
+    "report",
+    "function",
+    "sizemap",
+    "a",
+    "trim"
   ]
 }

@@ -1,0 +1,1038 @@
+{
+  "input": {
+    "folder": "animal",
+    "assets": [
+      "https://fonts.googleapis.com",
+      "https://fonts.gstatic.com",
+      "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&amp;display=swap",
+      "https://cdn.tailwindcss.com",
+      "https://cdn.jsdelivr.net/npm/chart.js",
+      "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap",
+      "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;family=Noto+Sans+Arabic:wght@300;500&amp;display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+      "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&amp;family=Noto+Sans+Arabic:wght@300;500&amp;display=swap",
+      "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&amp;display=swap"
+    ]
+  },
+  "parsed": {
+    "sections": [
+      {
+        "page": "index.html",
+        "componentCount": 3,
+        "sharedComponents": ["dcef8ad9", "45d23f76", "61cdfc4f"],
+        "unchanged": false
+      },
+      {
+        "page": "2.html",
+        "componentCount": 4,
+        "sharedComponents": ["6877ba15", "1ffc62dd", "04d21c9f"],
+        "unchanged": false
+      },
+      {
+        "page": "3.html",
+        "componentCount": 5,
+        "sharedComponents": [
+          "b73b5410",
+          "ca8e72dd",
+          "37396029",
+          "9b67c90b",
+          "8f80be8a"
+        ],
+        "unchanged": false
+      },
+      {
+        "page": "5.html",
+        "componentCount": 5,
+        "sharedComponents": [
+          "3a1d89b9",
+          "49c71a4f",
+          "eefd058e",
+          "114b52f3",
+          "878f667f"
+        ],
+        "unchanged": false
+      },
+      {
+        "page": "4.html",
+        "componentCount": 4,
+        "sharedComponents": ["d236f56b", "36e308f6", "312b6156"],
+        "unchanged": false
+      },
+      {
+        "page": "1.html",
+        "componentCount": 3,
+        "sharedComponents": ["4498f463", "4ff6cb98", "9c7f0fd7"],
+        "unchanged": false
+      },
+      {
+        "page": "sub\\index.html",
+        "componentCount": 11,
+        "sharedComponents": [
+          "fba8ce07",
+          "90a77dfa",
+          "a021ba78",
+          "47b80e4b",
+          "e1b22771",
+          "64045ee6",
+          "1ef20115",
+          "2ca2bd62",
+          "8a88bb99",
+          "5b5e5b12",
+          "d4b0c2ec"
+        ],
+        "unchanged": false
+      },
+      {
+        "page": "6.html",
+        "componentCount": 7,
+        "sharedComponents": [
+          "a59fe73c",
+          "0c2945ec",
+          "8a94502e",
+          "5c2b65fa",
+          "80f40611",
+          "3b0c8a01",
+          "7b448b22"
+        ],
+        "unchanged": false
+      },
+      {
+        "page": "sub\\first.html",
+        "componentCount": 6,
+        "sharedComponents": [
+          "4443a072",
+          "99b7acb4",
+          "d1a2103a",
+          "11b78bd8",
+          "301127e1",
+          "b736cc59"
+        ],
+        "unchanged": false
+      },
+      {
+        "page": "sub\\carectars.html",
+        "componentCount": 3,
+        "sharedComponents": [],
+        "unchanged": false
+      },
+      {
+        "page": "sub\\book.html",
+        "componentCount": 0,
+        "sharedComponents": [],
+        "unchanged": false
+      },
+      {
+        "page": "sub\\boxing.html",
+        "componentCount": 0,
+        "sharedComponents": [],
+        "unchanged": false
+      },
+      {
+        "page": "sub\\1.html",
+        "componentCount": 4,
+        "sharedComponents": ["088c5deb", "b67b488a", "343d43c1", "557f4ca1"],
+        "unchanged": false
+      },
+      {
+        "page": "sub\\cards.html",
+        "componentCount": 0,
+        "sharedComponents": [],
+        "unchanged": false
+      },
+      {
+        "page": "sub\\cat\\index.html",
+        "componentCount": 11,
+        "sharedComponents": [
+          "1cd1da82",
+          "5e46b5c7",
+          "95d262e0",
+          "499de91e",
+          "d726643a",
+          "98247fa2",
+          "ff495b46",
+          "e007e543",
+          "db9a507a",
+          "ac4fecc1",
+          "4b18c446"
+        ],
+        "unchanged": false
+      }
+    ],
+    "components": [
+      {
+        "id": "dcef8ad9",
+        "selector": "section",
+        "signature": "",
+        "page": "index.html",
+        "shared": true,
+        "order": 0,
+        "classes": ""
+      },
+      {
+        "id": "45d23f76",
+        "selector": "section",
+        "signature": "hidden",
+        "page": "index.html",
+        "shared": true,
+        "order": 1,
+        "classes": "hidden"
+      },
+      {
+        "id": "61cdfc4f",
+        "selector": "section",
+        "signature": "hidden",
+        "page": "index.html",
+        "shared": true,
+        "order": 2,
+        "classes": "hidden"
+      },
+      {
+        "id": "d223a1f4",
+        "selector": "section",
+        "signature": "py-16.text-center",
+        "page": "2.html",
+        "shared": false,
+        "order": 0,
+        "classes": "text-center py-16"
+      },
+      {
+        "id": "6877ba15",
+        "selector": "section",
+        "signature": "py-16",
+        "page": "2.html",
+        "shared": true,
+        "order": 1,
+        "classes": "py-16"
+      },
+      {
+        "id": "1ffc62dd",
+        "selector": "section",
+        "signature": "bg-white.py-16.rounded-2xl.shadow-lg",
+        "page": "2.html",
+        "shared": true,
+        "order": 2,
+        "classes": "py-16 bg-white rounded-2xl shadow-lg"
+      },
+      {
+        "id": "04d21c9f",
+        "selector": "section",
+        "signature": "py-16",
+        "page": "2.html",
+        "shared": true,
+        "order": 3,
+        "classes": "py-16"
+      },
+      {
+        "id": "b73b5410",
+        "selector": "section",
+        "signature": "py-20.text-center",
+        "page": "3.html",
+        "shared": true,
+        "order": 0,
+        "classes": "text-center py-20"
+      },
+      {
+        "id": "ca8e72dd",
+        "selector": "section",
+        "signature": "py-16",
+        "page": "3.html",
+        "shared": true,
+        "order": 1,
+        "classes": "py-16"
+      },
+      {
+        "id": "37396029",
+        "selector": "section",
+        "signature": "bg-white.py-16.rounded-2xl.shadow-lg",
+        "page": "3.html",
+        "shared": true,
+        "order": 2,
+        "classes": "py-16 bg-white rounded-2xl shadow-lg"
+      },
+      {
+        "id": "9b67c90b",
+        "selector": "section",
+        "signature": "py-16",
+        "page": "3.html",
+        "shared": true,
+        "order": 3,
+        "classes": "py-16"
+      },
+      {
+        "id": "8f80be8a",
+        "selector": "section",
+        "signature": "bg-gray-800.py-16.rounded-2xl.shadow-lg.text-white",
+        "page": "3.html",
+        "shared": true,
+        "order": 4,
+        "classes": "py-16 bg-gray-800 text-white rounded-2xl shadow-lg"
+      },
+      {
+        "id": "3a1d89b9",
+        "selector": "section",
+        "signature": "py-20.text-center",
+        "page": "5.html",
+        "shared": true,
+        "order": 0,
+        "classes": "text-center py-20"
+      },
+      {
+        "id": "49c71a4f",
+        "selector": "section",
+        "signature": "py-16",
+        "page": "5.html",
+        "shared": true,
+        "order": 1,
+        "classes": "py-16"
+      },
+      {
+        "id": "eefd058e",
+        "selector": "section",
+        "signature": "bg-white.py-16.rounded-2xl.shadow-lg",
+        "page": "5.html",
+        "shared": true,
+        "order": 2,
+        "classes": "py-16 bg-white rounded-2xl shadow-lg"
+      },
+      {
+        "id": "114b52f3",
+        "selector": "section",
+        "signature": "py-16",
+        "page": "5.html",
+        "shared": true,
+        "order": 3,
+        "classes": "py-16"
+      },
+      {
+        "id": "878f667f",
+        "selector": "section",
+        "signature": "bg-gray-800.py-16.rounded-2xl.shadow-lg.text-white",
+        "page": "5.html",
+        "shared": true,
+        "order": 4,
+        "classes": "py-16 bg-gray-800 text-white rounded-2xl shadow-lg"
+      },
+      {
+        "id": "d236f56b",
+        "selector": "section",
+        "signature": "py-20.text-center",
+        "page": "4.html",
+        "shared": true,
+        "order": 0,
+        "classes": "text-center py-20"
+      },
+      {
+        "id": "36e308f6",
+        "selector": "section",
+        "signature": "py-16",
+        "page": "4.html",
+        "shared": true,
+        "order": 1,
+        "classes": "py-16"
+      },
+      {
+        "id": "03e9c3b1",
+        "selector": "section",
+        "signature": "bg-white.mt-12.py-16.rounded-2xl.shadow-lg",
+        "page": "4.html",
+        "shared": false,
+        "order": 2,
+        "classes": "py-16 bg-white rounded-2xl shadow-lg mt-12"
+      },
+      {
+        "id": "312b6156",
+        "selector": "section",
+        "signature": "py-16",
+        "page": "4.html",
+        "shared": true,
+        "order": 3,
+        "classes": "py-16"
+      },
+      {
+        "id": "4498f463",
+        "selector": "section",
+        "signature": "",
+        "page": "1.html",
+        "shared": true,
+        "order": 0,
+        "classes": ""
+      },
+      {
+        "id": "4ff6cb98",
+        "selector": "section",
+        "signature": "hidden",
+        "page": "1.html",
+        "shared": true,
+        "order": 1,
+        "classes": "hidden"
+      },
+      {
+        "id": "9c7f0fd7",
+        "selector": "section",
+        "signature": "hidden",
+        "page": "1.html",
+        "shared": true,
+        "order": 2,
+        "classes": "hidden"
+      },
+      {
+        "id": "fba8ce07",
+        "selector": "section",
+        "signature": "active.content-section.md:p-8.p-6",
+        "page": "sub\\index.html",
+        "shared": true,
+        "order": 0,
+        "classes": "content-section active p-6 md:p-8"
+      },
+      {
+        "id": "90a77dfa",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "sub\\index.html",
+        "shared": true,
+        "order": 1,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "a021ba78",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "sub\\index.html",
+        "shared": true,
+        "order": 2,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "47b80e4b",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "sub\\index.html",
+        "shared": true,
+        "order": 3,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "e1b22771",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "sub\\index.html",
+        "shared": true,
+        "order": 4,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "64045ee6",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "sub\\index.html",
+        "shared": true,
+        "order": 5,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "1ef20115",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "sub\\index.html",
+        "shared": true,
+        "order": 6,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "2ca2bd62",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "sub\\index.html",
+        "shared": true,
+        "order": 7,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "8a88bb99",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "sub\\index.html",
+        "shared": true,
+        "order": 8,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "5b5e5b12",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "sub\\index.html",
+        "shared": true,
+        "order": 9,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "d4b0c2ec",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "sub\\index.html",
+        "shared": true,
+        "order": 10,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "a59fe73c",
+        "selector": "section",
+        "signature": "active.content-section.md:p-8.p-6",
+        "page": "6.html",
+        "shared": true,
+        "order": 0,
+        "classes": "content-section active p-6 md:p-8"
+      },
+      {
+        "id": "0c2945ec",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "6.html",
+        "shared": true,
+        "order": 1,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "8a94502e",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "6.html",
+        "shared": true,
+        "order": 2,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "5c2b65fa",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "6.html",
+        "shared": true,
+        "order": 3,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "80f40611",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "6.html",
+        "shared": true,
+        "order": 4,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "3b0c8a01",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "6.html",
+        "shared": true,
+        "order": 5,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "7b448b22",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "6.html",
+        "shared": true,
+        "order": 6,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "4443a072",
+        "selector": "section",
+        "signature": "active.section-content",
+        "page": "sub\\first.html",
+        "shared": true,
+        "order": 0,
+        "classes": "section-content active"
+      },
+      {
+        "id": "99b7acb4",
+        "selector": "section",
+        "signature": "section-content",
+        "page": "sub\\first.html",
+        "shared": true,
+        "order": 1,
+        "classes": "section-content"
+      },
+      {
+        "id": "d1a2103a",
+        "selector": "section",
+        "signature": "section-content",
+        "page": "sub\\first.html",
+        "shared": true,
+        "order": 2,
+        "classes": "section-content"
+      },
+      {
+        "id": "11b78bd8",
+        "selector": "section",
+        "signature": "section-content",
+        "page": "sub\\first.html",
+        "shared": true,
+        "order": 3,
+        "classes": "section-content"
+      },
+      {
+        "id": "301127e1",
+        "selector": "section",
+        "signature": "section-content",
+        "page": "sub\\first.html",
+        "shared": true,
+        "order": 4,
+        "classes": "section-content"
+      },
+      {
+        "id": "b736cc59",
+        "selector": "section",
+        "signature": "section-content",
+        "page": "sub\\first.html",
+        "shared": true,
+        "order": 5,
+        "classes": "section-content"
+      },
+      {
+        "id": "80fa58e7",
+        "selector": "section",
+        "signature": "max-w-5xl.mb-16.mx-auto",
+        "page": "sub\\carectars.html",
+        "shared": false,
+        "order": 0,
+        "classes": "max-w-5xl mx-auto mb-16"
+      },
+      {
+        "id": "10059ef9",
+        "selector": "section",
+        "signature": "max-w-6xl.mb-16.mx-auto",
+        "page": "sub\\carectars.html",
+        "shared": false,
+        "order": 1,
+        "classes": "max-w-6xl mx-auto mb-16"
+      },
+      {
+        "id": "7ccbb302",
+        "selector": "section",
+        "signature": "max-w-7xl.mb-16.mx-auto.p-4.w-full",
+        "page": "sub\\carectars.html",
+        "shared": false,
+        "order": 2,
+        "classes": "w-full max-w-7xl mx-auto p-4 mb-16"
+      },
+      {
+        "id": "088c5deb",
+        "selector": "section",
+        "signature": "active.section-content",
+        "page": "sub\\1.html",
+        "shared": true,
+        "order": 0,
+        "classes": "section-content active"
+      },
+      {
+        "id": "b67b488a",
+        "selector": "section",
+        "signature": "section-content",
+        "page": "sub\\1.html",
+        "shared": true,
+        "order": 1,
+        "classes": "section-content"
+      },
+      {
+        "id": "343d43c1",
+        "selector": "section",
+        "signature": "section-content",
+        "page": "sub\\1.html",
+        "shared": true,
+        "order": 2,
+        "classes": "section-content"
+      },
+      {
+        "id": "557f4ca1",
+        "selector": "section",
+        "signature": "section-content",
+        "page": "sub\\1.html",
+        "shared": true,
+        "order": 3,
+        "classes": "section-content"
+      },
+      {
+        "id": "1cd1da82",
+        "selector": "section",
+        "signature": "active.content-section.md:p-8.p-6",
+        "page": "sub\\cat\\index.html",
+        "shared": true,
+        "order": 0,
+        "classes": "content-section active p-6 md:p-8"
+      },
+      {
+        "id": "5e46b5c7",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "sub\\cat\\index.html",
+        "shared": true,
+        "order": 1,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "95d262e0",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "sub\\cat\\index.html",
+        "shared": true,
+        "order": 2,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "499de91e",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "sub\\cat\\index.html",
+        "shared": true,
+        "order": 3,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "d726643a",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "sub\\cat\\index.html",
+        "shared": true,
+        "order": 4,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "98247fa2",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "sub\\cat\\index.html",
+        "shared": true,
+        "order": 5,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "ff495b46",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "sub\\cat\\index.html",
+        "shared": true,
+        "order": 6,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "e007e543",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "sub\\cat\\index.html",
+        "shared": true,
+        "order": 7,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "db9a507a",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "sub\\cat\\index.html",
+        "shared": true,
+        "order": 8,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "ac4fecc1",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "sub\\cat\\index.html",
+        "shared": true,
+        "order": 9,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "4b18c446",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "sub\\cat\\index.html",
+        "shared": true,
+        "order": 10,
+        "classes": "content-section p-6 md:p-8"
+      }
+    ],
+    "conflicts": [
+      {
+        "type": "duplicate-basename",
+        "files": ["index.html", "sub\\index.html"]
+      },
+      {
+        "type": "duplicate-basename",
+        "files": ["1.html", "sub\\1.html"]
+      },
+      {
+        "type": "duplicate-basename",
+        "files": ["index.html", "sub\\cat\\index.html"]
+      }
+    ],
+    "assets": [
+      "https://fonts.googleapis.com",
+      "https://fonts.gstatic.com",
+      "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&amp;display=swap",
+      "https://cdn.tailwindcss.com",
+      "https://cdn.jsdelivr.net/npm/chart.js",
+      "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap",
+      "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;family=Noto+Sans+Arabic:wght@300;500&amp;display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+      "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&amp;family=Noto+Sans+Arabic:wght@300;500&amp;display=swap",
+      "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&amp;display=swap"
+    ],
+    "cssMapSample": {
+      "index.html": {
+        ".chart-container": {
+          "position": "relative"
+        }
+      },
+      "2.html": {},
+      "3.html": {
+        ".chart-container": {
+          "position": "relative"
+        }
+      },
+      "5.html": {
+        ".chart-container": {
+          "position": "relative"
+        }
+      },
+      "4.html": {},
+      "1.html": {
+        ".chart-container": {
+          "position": "relative"
+        }
+      },
+      "sub\\index.html": {
+        ".content-section": {
+          "display": "none"
+        },
+        ".content-section.active": {
+          "display": "block"
+        },
+        ".chart-container": {
+          "position": "relative"
+        },
+        ".timeline": {
+          "position": "relative"
+        },
+        ".timeline::before": {
+          "position": "absolute"
+        },
+        ".timeline-item": {
+          "position": "relative"
+        },
+        ".timeline-item::before": {
+          "position": "absolute"
+        }
+      },
+      "6.html": {
+        ".content-section": {
+          "display": "none"
+        },
+        ".content-section.active": {
+          "display": "block"
+        },
+        ".chart-container": {
+          "position": "relative"
+        },
+        ".timeline": {
+          "position": "relative"
+        },
+        ".timeline::before": {
+          "position": "absolute"
+        },
+        ".timeline-item": {
+          "position": "relative"
+        },
+        ".timeline-item::before": {
+          "position": "absolute"
+        }
+      },
+      "sub\\first.html": {
+        ".section-content": {
+          "display": "none"
+        },
+        ".section-content.active": {
+          "display": "block"
+        },
+        ".chart-container": {
+          "position": "relative"
+        },
+        ".modal-overlay": {
+          "position": "fixed",
+          "display": "none"
+        },
+        ".prod-card-inner": {
+          "position": "relative"
+        },
+        ".prod-card-front, .prod-card-back": {
+          "position": "absolute"
+        }
+      },
+      "sub\\carectars.html": {
+        ".figure-art": {
+          "display": "flex",
+          "position": "relative"
+        },
+        ".modal-overlay": {
+          "position": "fixed",
+          "display": "none"
+        },
+        ".scene-container": {
+          "position": "relative"
+        },
+        ".character": {
+          "position": "absolute"
+        },
+        ".character-art": {
+          "position": "relative"
+        },
+        ".info-box": {
+          "position": "absolute",
+          "display": "none"
+        },
+        ".color-chip": {
+          "display": "inline-block"
+        }
+      },
+      "sub\\book.html": {},
+      "sub\\boxing.html": {
+        ".box-face": {
+          "position": "absolute",
+          "display": "flex"
+        },
+        ".front-face": {
+          "flex-direction": "column"
+        },
+        ".back-face": {
+          "flex-direction": "column"
+        }
+      },
+      "sub\\1.html": {
+        ".section-content": {
+          "display": "none"
+        },
+        ".section-content.active": {
+          "display": "block"
+        },
+        ".chart-container": {
+          "position": "relative"
+        }
+      },
+      "sub\\cards.html": {
+        ".modal-overlay": {
+          "position": "fixed",
+          "display": "none"
+        }
+      },
+      "sub\\cat\\index.html": {
+        ".content-section": {
+          "display": "none"
+        },
+        ".content-section.active": {
+          "display": "block"
+        },
+        ".chart-container": {
+          "position": "relative"
+        },
+        ".timeline": {
+          "position": "relative"
+        },
+        ".timeline::before": {
+          "position": "absolute"
+        },
+        ".timeline-item": {
+          "position": "relative"
+        },
+        ".timeline-item::before": {
+          "position": "absolute"
+        }
+      }
+    },
+    "templateHints": [
+      {
+        "page": "index.html",
+        "hints": ["product", "header"]
+      },
+      {
+        "page": "2.html",
+        "hints": ["product", "footer", "header"]
+      },
+      {
+        "page": "3.html",
+        "hints": ["product", "hero", "footer", "header"]
+      },
+      {
+        "page": "5.html",
+        "hints": ["product", "hero", "footer", "header"]
+      },
+      {
+        "page": "4.html",
+        "hints": ["hero", "footer", "header"]
+      },
+      {
+        "page": "1.html",
+        "hints": ["product", "header"]
+      },
+      {
+        "page": "sub\\index.html",
+        "hints": ["product"]
+      },
+      {
+        "page": "6.html",
+        "hints": ["product", "header"]
+      },
+      {
+        "page": "sub\\first.html",
+        "hints": ["product", "header"]
+      },
+      {
+        "page": "sub\\carectars.html",
+        "hints": ["header"]
+      },
+      {
+        "page": "sub\\book.html",
+        "hints": ["header"]
+      },
+      {
+        "page": "sub\\boxing.html",
+        "hints": ["header"]
+      },
+      {
+        "page": "sub\\1.html",
+        "hints": ["product", "header"]
+      },
+      {
+        "page": "sub\\cards.html",
+        "hints": ["header"]
+      },
+      {
+        "page": "sub\\cat\\index.html",
+        "hints": ["product"]
+      }
+    ],
+    "confidence": 1,
+    "semanticStats": {
+      "placeholdersApplied": 0,
+      "bareTokensApplied": 0,
+      "i18nNodesWrapped": 0,
+      "i18nAttributesWrapped": 0,
+      "sanitizedInlineHandlers": 0,
+      "blockedExternalScripts": 0
+    }
+  },
+  "adapted": {
+    "twig": [],
+    "metadata": {}
+  },
+  "validated": {
+    "status": "pass",
+    "warnings": [],
+    "errors": [],
+    "counts": {
+      "warnings": 0,
+      "errors": 0
+    }
+  }
+}

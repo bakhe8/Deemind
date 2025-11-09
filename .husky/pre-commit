@@ -12,6 +12,7 @@ if command -v uname >/dev/null 2>&1 && uname | grep -qi 'mingw\|msys\|cygwin'; t
   fi
 fi
 node tools/check-conflicts.js || exit 1
+node tools/check-duplicates.js || exit 1
 npx lint-staged || exit 1
 npm run -s deemind:new || true
 npm run deemind:test || exit 1

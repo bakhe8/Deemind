@@ -16,7 +16,7 @@ export default function StubStatusCard({
   description = 'Launch the local mock runtime to preview the latest theme output.',
   pollMs = 0,
 }: Props) {
-  const { status, loading, actionLoading, resetting, startStub, stopStub, resetState, refresh } = useRuntimeStub({ pollMs });
+  const { status, loading, actionLoading, resetting, startStub, stopStub, resetState, refresh } = useRuntimeStub();
   const [themeInput, setThemeInput] = useState(defaultTheme);
   const runningTheme = status?.theme ?? '';
 

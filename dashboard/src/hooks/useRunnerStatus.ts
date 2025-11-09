@@ -7,7 +7,7 @@ export type RunnerStatus = {
   queue: QueueItem[];
 };
 
-export function useRunnerStatus(pollMs = 6000) {
+export function useRunnerStatus(pollMs = 15000) {
   const [status, setStatus] = useState<RunnerStatus>({ current: null, queue: [] });
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,4 +38,3 @@ export function useRunnerStatus(pollMs = 6000) {
 
   return { status, loading, error, refresh };
 }
-

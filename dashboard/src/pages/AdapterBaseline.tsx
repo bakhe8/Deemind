@@ -18,12 +18,12 @@ export default function AdapterBaseline() {
     startStub: startStubInstance,
     stopStub: stopStubInstance,
     refresh: refreshStubStatus,
-  } = useRuntimeStub({ pollMs: 6000, theme: selectedTheme || undefined });
+  } = useRuntimeStub({ theme: selectedTheme || undefined });
   const {
     map: previewMap,
     loading: previewMatrixLoading,
     refresh: refreshPreviewMatrix,
-  } = usePreviewMatrix({ pollMs: 25000 });
+  } = usePreviewMatrix();
 
   const refreshStubsAndCoverage = useCallback(async () => {
     await Promise.all([refreshStubStatus(), refreshPreviewMatrix()]);

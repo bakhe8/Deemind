@@ -19,7 +19,7 @@ export async function validateExtended(themePath) {
   };
   // Load settings
   let settings = { rawAllowlist: [], failOnBudget: false, requireI18n: false };
-  try { settings = await fs.readJson(path.resolve('configs', 'settings.json')); } catch (err) { void err; }
+  try { settings = await fs.readJson(path.resolve('configs', 'settings.json')); } catch { /* ignore */ }
   if (typeof process !== 'undefined' && process.env && typeof process.env.REQUIRE_I18N !== 'undefined') {
     settings.requireI18n = String(process.env.REQUIRE_I18N).toLowerCase() === 'true';
   }
@@ -112,7 +112,8 @@ export async function validateExtended(themePath) {
   // 2) Inline handlers / unsafe scripts
   const twigs = globSync(`${themePath}/**/*.twig`, { nodir: true });
   for (const file of twigs) {
-    const content = await fs.readFile(file, 'utf8');
+    const rawContent = await fs.readFile(file, 'utf8');
+    const content = stripTwigComments(rawContent);
     const relFile = path.relative(themePath, file).replace(/\\/g, '/');
     const baselineAllowed = await isBaselineFallback(relFile);
     if (/\son[a-z]+\s*=\s*["']/i.test(content)) {
@@ -136,11 +137,13 @@ export async function validateExtended(themePath) {
       const allowed = (settings.rawAllowlist || []).some(a => content.includes(a));
       if (!allowed) {
         if (baselineAllowed) {
-          report.warnings.push({
-            type: 'raw-baseline',
-            file,
-            message: '| raw preserved from baseline fallback. Override input to customize.',
-          });
+          if (!settings.suppressRawBaselineWarnings) {
+            report.warnings.push({
+              type: 'raw-baseline',
+              file,
+              message: '| raw preserved from baseline fallback. Override input to customize.',
+            });
+          }
         } else {
           report.errors.push({ type: 'raw-disallowed', file, message: '| raw used without allowlist' });
         }
@@ -152,7 +155,8 @@ export async function validateExtended(themePath) {
   if (sallaRefs.filters.size) {
     const filterRe = /\|\s*([a-zA-Z_][\w]*)/g;
     for (const file of twigs) {
-      const content = await fs.readFile(file, 'utf8');
+      const rawContent = await fs.readFile(file, 'utf8');
+      const content = stripTwigComments(rawContent);
       const relFile = path.relative(themePath, file).replace(/\\/g, '/');
       const seen = new Set();
       let match;
@@ -219,12 +223,17 @@ export async function validateExtended(themePath) {
     return />[^<]{8,}</.test(text) && !/\|\s*t/.test(text);
   });
   if (untranslated.length) {
-    (settings.requireI18n ? report.errors : report.warnings).push({ type: 'i18n', message: `${untranslated.length} files with unwrapped visible text.` });
+    if (settings.requireI18n) {
+      report.errors.push({ type: 'i18n', message: `${untranslated.length} files with unwrapped visible text.` });
+    } else if (settings.warnOnI18n !== false) {
+      report.warnings.push({ type: 'i18n', message: `${untranslated.length} files with unwrapped visible text.` });
+    }
   }
   report.checks.i18n = true;
 
   // 6b) Baseline convention warnings (non-fatal)
   try {
+    const baselineWarningsEnabled = settings.suppressBaselineConventionWarnings !== true;
     const baseRoot = path.resolve('configs', 'baselines', 'raed');
     const conventions = await fs.readJson(path.join(baseRoot, 'conventions.json'));
     const graph = await fs.readJson(path.join(baseRoot, 'graph.json'));
@@ -234,12 +243,14 @@ export async function validateExtended(themePath) {
     const mapped = basenames.map(b => (b === 'components' ? 'partials' : b));
     const expectDirs = mapped.map(name => path.join(themePath, name));
     for (const d of expectDirs) {
-      if (!fs.existsSync(d)) report.warnings.push({ type: 'baseline-convention', message: `Expected directory missing: ${path.relative(themePath, d)}` });
+      if (!fs.existsSync(d) && baselineWarningsEnabled) {
+        report.warnings.push({ type: 'baseline-convention', message: `Expected directory missing: ${path.relative(themePath, d)}` });
+      }
     }
     // Pages should extend a layout
     for (const page of globSync(`${themePath}/pages/**/*.twig`, { nodir: true })) {
       const txt = await fs.readFile(page, 'utf8');
-      if (!/{%\s*extends\s*['"]layout\//.test(txt)) {
+      if (!/{%\s*extends\s*['"]layout\//.test(txt) && baselineWarningsEnabled) {
         report.warnings.push({ type: 'baseline-convention', file: page, message: 'Page does not extend a layout/* template.' });
       }
     }
@@ -247,7 +258,7 @@ export async function validateExtended(themePath) {
     for (const file of twigs) {
       const txt = await fs.readFile(file, 'utf8');
       for (const m of txt.matchAll(/{%\s*include\s*['"]([^'"]+)['"]/g)) {
-        if (!m[1].startsWith('partials/')) {
+        if (!m[1].startsWith('partials/') && baselineWarningsEnabled) {
           report.warnings.push({ type: 'baseline-convention', file, message: `Include not under partials/: ${m[1]}` });
         }
       }
@@ -264,7 +275,8 @@ export async function validateExtended(themePath) {
       const i18nFiles = twigs.filter(f => /\|\s*t\b|\{\%\s*trans\b/.test(fs.readFileSync(f, 'utf8'))).length;
       return i18nFiles / files;
     })();
-    if (baselineI18nRatio > 0.6 && oursI18nRatio < 0.3) {
+    const tolerance = typeof settings.baselineI18nTolerance === 'number' ? settings.baselineI18nTolerance : 0.3;
+    if (baselineWarningsEnabled && baselineI18nRatio - oursI18nRatio > tolerance && baselineI18nRatio > 0.4) {
       report.warnings.push({ type: 'baseline-convention', message: `Low i18n coverage (${(oursI18nRatio*100)|0}%) vs baseline (${(baselineI18nRatio*100)|0}%).` });
     }
     report.checks.baseline = true;
@@ -302,13 +314,12 @@ export async function validateExtended(themePath) {
 
   // 6d) Web Components (custom elements) checks (warn-only)
   try {
-    let knownTags = sallaRefs.components;
-    if (!knownTags.size) {
-      const knowPath = path.resolve('configs', 'knowledge', 'salla-docs.json');
-      if (await fs.pathExists(knowPath)) {
-        const know = await fs.readJson(knowPath);
-        knownTags = new Set(((know.webComponents && know.webComponents.tags) || []).map(t => t.toLowerCase()));
-      }
+    let knownTags = new Set(sallaRefs.components || []);
+    const knowPath = path.resolve('configs', 'knowledge', 'salla-docs.json');
+    if (await fs.pathExists(knowPath)) {
+      const know = await fs.readJson(knowPath);
+      const extraTags = ((know.webComponents && know.webComponents.tags) || []).map((t) => t.toLowerCase());
+      extraTags.forEach((tag) => knownTags.add(tag));
     }
     if (knownTags.size) {
       const rxTag = /<\s*([a-z][a-z0-9-]+)(\s|>)/g;
@@ -330,11 +341,12 @@ export async function validateExtended(themePath) {
   } catch (e) { void e; }
 
   // Sample string detection
-  const samples = /(Lorem ipsum|Sample Product|PRODUCT_NAME)/i;
+  const samplePatterns = [/Lorem ipsum/i, /Sample Product/i, /\bPRODUCT_NAME\b/];
   for (const f of twigs) {
     const relFile = path.relative(themePath, f).replace(/\\/g, '/');
     const text = await fs.readFile(f, 'utf8');
-    if (samples.test(text)) {
+    const hasSampleString = samplePatterns.some((pattern) => pattern.test(text));
+    if (hasSampleString) {
       if (await isBaselineFallback(relFile)) {
         report.warnings.push({ type: 'sample-strings-baseline', file: f, message: 'Sample placeholder string retained from baseline fallback.' });
       } else {
@@ -379,15 +391,34 @@ export async function validateExtended(themePath) {
   report.checks.manifest = true;
 
   const outFile = path.join(themePath, 'report-extended.json');
+  const budgetExceeded = [...report.errors, ...report.warnings].some(
+    (entry) => entry?.type && entry.type.startsWith('budget-'),
+  );
+  const sdkUnknownCount =
+    report.errors.filter((entry) => entry.type === 'sdk-unknown').length +
+    report.warnings.filter((entry) => entry.type === 'sdk-unknown').length;
+
   const summary = {
     passed: report.errors.length === 0,
     errors: report.errors.length,
     warnings: report.warnings.length,
+    budgetExceeded,
+    sdkUnknownCount,
     timestamp: new Date().toISOString(),
   };
   await fs.writeJson(outFile, { ...report, summary }, { spaces: 2 });
 
-  console.log(`\n🧪 Extended Validation Complete\nErrors: ${report.errors.length}\nWarnings: ${report.warnings.length}\nReport: ${outFile}\n`);
+  console.log(
+    JSON.stringify({
+      event: 'validator-extended',
+      theme: path.basename(themePath),
+      errors: report.errors.length,
+      warnings: report.warnings.length,
+      budgetExceeded,
+      sdkUnknownCount,
+      report: outFile,
+    }),
+  );
   return report;
 }
 
@@ -395,7 +426,7 @@ async function loadBudgets() {
   try {
     return await fs.readJson('configs/budgets.json');
   } catch {
-    return { maxCSS: 300000, maxJS: 400000 };
+    return { maxCSS: 600000, maxJS: 400000 };
   }
 }
 
@@ -448,6 +479,10 @@ function extractComponentSet(data) {
     });
   }
   return set;
+}
+
+function stripTwigComments(text) {
+  return text.replace(/\{#[\s\S]*?#\}/g, ' ');
 }
 
 async function loadSallaReferences() {

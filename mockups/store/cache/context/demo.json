@@ -140,18 +140,18 @@
     }
   },
   "hero": {
-    "eyebrow": "Flagship launch",
-    "title": "Power your workflow with the new Electro set",
-    "subtitle": "Curated gear, instant pickup, and full Arabic/English localization out of the box.",
+    "eyebrow": "Spring capsule · v2025-02",
+    "title": "Soft tailoring for luminous days",
+    "subtitle": "Versioned preset showcasing pastel gradients and editorial copy.",
     "primaryCta": {
-      "label": "Shop gadgets",
-      "href": "/page/product/index"
-    },
-    "secondaryCta": {
-      "label": "View bundles",
+      "label": "Explore capsule",
       "href": "/page/landing-page"
     },
-    "media": "https://cdn.deemind.local/hero/tech-stack.png"
+    "secondaryCta": {
+      "label": "Lookbook",
+      "href": "/page/blog/index"
+    },
+    "media": "https://cdn.deemind.local/hero/spring-capsule-v2025-02.png"
   },
   "navigation": [
     {
@@ -196,54 +196,51 @@
   "orders": [],
   "data": {
     "store": {
-      "id": 1305146709,
-      "name": "Deemind Atelier",
-      "currency": "SAR",
+      "id": 1305146710,
+      "name": "Lumen Studio",
+      "currency": "USD",
       "language": "en",
-      "domain": "demo.deemind.local"
+      "domain": "fashion-demo.deemind.local"
     },
     "products": [
       {
-        "id": 101,
-        "name": "Signature Canvas Backpack",
-        "price": 329,
-        "badge": "New arrival",
-        "sku": "BAG-101",
-        "media": [
-          "https://cdn.deemind.local/images/bag-101-1.jpg",
-          "https://cdn.deemind.local/images/bag-101-2.jpg"
-        ]
+        "id": 201,
+        "name": "Aurora Silk Dress",
+        "price": 559,
+        "badge": "Editor’s pick",
+        "sku": "DRS-882",
+        "media": ["https://cdn.deemind.local/images/dress-882-1.jpg"]
       },
       {
-        "id": 102,
-        "name": "Midnight Wireless Earbuds",
-        "price": 199,
-        "badge": "Top rated",
-        "sku": "EAR-204",
-        "media": ["https://cdn.deemind.local/images/earbuds-204-1.jpg"]
-      },
-      {
-        "id": 103,
-        "name": "Smart Watch X2",
+        "id": 202,
+        "name": "Nimbus Linen Shirt",
         "price": 249,
-        "badge": "Limited",
-        "sku": "WATCH-302",
-        "media": ["https://cdn.deemind.local/images/watch-302-1.jpg"]
+        "badge": "Bestseller",
+        "sku": "SRT-441",
+        "media": ["https://cdn.deemind.local/images/shirt-441-1.jpg"]
+      },
+      {
+        "id": 203,
+        "name": "Lumen Leather Sandals",
+        "price": 329,
+        "badge": "Seasonal",
+        "sku": "SND-110",
+        "media": ["https://cdn.deemind.local/images/sandals-110-1.jpg"]
       }
     ],
     "hero": {
-      "eyebrow": "Flagship launch",
-      "title": "Power your workflow with the new Electro set",
-      "subtitle": "Curated gear, instant pickup, and full Arabic/English localization out of the box.",
+      "eyebrow": "Spring capsule · v2025-02",
+      "title": "Soft tailoring for luminous days",
+      "subtitle": "Versioned preset showcasing pastel gradients and editorial copy.",
       "primaryCta": {
-        "label": "Shop gadgets",
-        "href": "/page/product/index"
-      },
-      "secondaryCta": {
-        "label": "View bundles",
+        "label": "Explore capsule",
         "href": "/page/landing-page"
       },
-      "media": "https://cdn.deemind.local/hero/tech-stack.png"
+      "secondaryCta": {
+        "label": "Lookbook",
+        "href": "/page/blog/index"
+      },
+      "media": "https://cdn.deemind.local/hero/spring-capsule-v2025-02.png"
     },
     "navigation": [
       {
@@ -304,7 +301,7 @@
     }
   },
   "meta": {
-    "demo": "electronics",
-    "generatedAt": "2025-11-09T07:42:22.861Z"
+    "demo": "fashion",
+    "generatedAt": "2025-11-09T13:43:56.561Z"
   }
 }

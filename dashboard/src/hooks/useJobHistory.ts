@@ -7,7 +7,7 @@ type UseJobHistoryOptions = {
 };
 
 export function useJobHistory(options: UseJobHistoryOptions = {}) {
-  const { pollMs = 6000 } = options;
+  const { pollMs = null } = options;
   const [jobs, setJobs] = useState<JobStatus[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,9 +28,8 @@ export function useJobHistory(options: UseJobHistoryOptions = {}) {
 
   useEffect(() => {
     refresh();
-    const timer = setInterval(refresh, pollMs);
-    return () => clearInterval(timer);
-  }, [pollMs, refresh]);
+    return undefined;
+  }, [refresh]);
 
   return { jobs, loading, error, refresh };
 }

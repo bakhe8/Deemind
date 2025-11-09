@@ -133,12 +133,12 @@ export default function UploadTheme() {
     startStub: launchStub,
     stopStub: haltStub,
     refresh: refreshStubStatus,
-  } = useRuntimeStub({ pollMs: 6000, theme: selectedTheme || undefined });
+  } = useRuntimeStub({ theme: selectedTheme || undefined });
   const {
     map: previewMap,
     loading: previewMatrixLoading,
     refresh: refreshPreviewMatrix,
-  } = usePreviewMatrix({ pollMs: 25000 });
+  } = usePreviewMatrix();
 
   useEffect(() => {
     fetchThemes().then((res) => setThemes(res.themes || [])).catch(() => undefined);
