@@ -76,6 +76,7 @@ Runtime stub endpoints (when running):
 | `GET /api/cart`, `POST /api/cart/add`, `POST /api/cart/remove`, etc. | Manage cart contents.                                     |
 | `POST /api/auth/login`, `/api/auth/logout`, `/api/auth/me`           | Mock auth lifecycle.                                      |
 | `POST /api/store/locale`                                             | Switch `en`/`ar`; triggers RTL and dictionary changes.    |
+| `GET/POST /api/twilight`                                             | Enable/disable the Twilight/NEXUS shim for previews.      |
 
 ### Dashboard integration
 
@@ -114,6 +115,15 @@ npm run preview:stub demo
 | `runtime/state/.gitkeep`                      | Ensures the per-theme state directory exists without committing user data.                    |
 | `data/mock-store.json`                        | Default store/products/cart seed (copy to `mock-store-<theme>.json` for theme-specific data). |
 | `dashboard/src/components/StubStatusCard.tsx` | Shared UI component for Start/Stop/Open/Reset controls.                                       |
+| `runtime/twilight/twilight-shim.js`           | Lightweight Twilight bridge loaded when the shim is enabled.                                  |
+
+### Twilight / NEXUS shim
+
+Toggle the Twilight shim from the dashboard Settings page (or via `POST /api/twilight`). When enabled:
+
+- The stub serves `/runtime-twilight/twilight-shim.js` and injects it into every preview page.
+- `window.Salla.twilight` becomes available, mirroring the Twilight SDK event API so components that expect `Twilight.init()` can run offline.
+- The preference is persisted in `runtime/twilight/config.json` and synchronized live to the running stub.
 
 ### Future roadmap (v2 ideas)
 

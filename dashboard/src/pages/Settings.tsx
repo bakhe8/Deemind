@@ -1,5 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
-import { fetchSettings, updateBaselineList, fetchStubLogs, fetchStoreDemos, applyStorePreset, type StoreDemo, fetchStoreDiff } from '../api/system';
+import {
+  fetchSettings,
+  updateBaselineList,
+  fetchStubLogs,
+  fetchStoreDemos,
+  applyStorePreset,
+  type StoreDemo,
+  fetchStoreDiff,
+  fetchTwilightStatus,
+  updateTwilightStatus,
+} from '../api/system';
 import { useRuntimeStub } from '../hooks/useRuntimeStub';
 
 type SettingsPayload = {
@@ -22,6 +32,9 @@ export default function Settings() {
   const [storeOverrides, setStoreOverrides] = useState('');
   const [storePresetMessage, setStorePresetMessage] = useState('');
   const [storePresetLoading, setStorePresetLoading] = useState(false);
+  const [twilightEnabled, setTwilightEnabled] = useState(true);
+  const [twilightStatusLoading, setTwilightStatusLoading] = useState(true);
+  const [twilightSaving, setTwilightSaving] = useState(false);
   const [storeDiff, setStoreDiff] = useState<any | null>(null);
   const [storeDiffLoading, setStoreDiffLoading] = useState(false);
   const [storeDiffError, setStoreDiffError] = useState('');
@@ -48,6 +61,10 @@ export default function Settings() {
         }
       })
       .catch(() => undefined);
+    fetchTwilightStatus()
+      .then((data) => setTwilightEnabled(Boolean(data.enabled)))
+      .catch(() => undefined)
+      .finally(() => setTwilightStatusLoading(false));
   }, []);
 
   const handleSave = async () => {
@@ -88,6 +105,16 @@ export default function Settings() {
   const handleManualRefresh = async () => {
     await refreshStubStatus();
     await refreshLogs();
+  };
+
+  const handleToggleTwilight = async (checked: boolean) => {
+    setTwilightSaving(true);
+    try {
+      await updateTwilightStatus(checked);
+      setTwilightEnabled(checked);
+    } finally {
+      setTwilightSaving(false);
+    }
   };
 
   const handleApplyStorePreset = async () => {
@@ -189,6 +216,22 @@ export default function Settings() {
         <div className="mt-4 bg-slate-900 text-slate-100 rounded-xl p-3 text-xs font-mono max-h-48 overflow-y-auto">
           {!stubLogs.length ? <p>No logs yet.</p> : stubLogs.slice(-10).map((line, idx) => (<div key={`${line}-${idx}`}>{line}</div>))}
         </div>
+      </div>
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4">
+        <h2 className="text-lg font-semibold mb-2">Twilight Runtime</h2>
+        <p className="text-sm text-slate-500">Toggle the local Twilight/NEXUS shim to mirror Salla-native components.</p>
+        <label className="flex items-center gap-3 text-sm mt-3">
+          <input
+            type="checkbox"
+            checked={twilightEnabled}
+            disabled={twilightStatusLoading || twilightSaving}
+            onChange={(e) => handleToggleTwilight(e.target.checked)}
+          />
+          {twilightStatusLoading ? 'Checking…' : twilightEnabled ? 'Enabled' : 'Disabled'}
+        </label>
+        <p className="text-xs text-slate-500 mt-2">
+          {twilightSaving ? 'Applying…' : 'Applies instantly to the running preview stub.'}
+        </p>
       </div>
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 space-y-3">
         <h2 className="text-lg font-semibold mb-1">Store Presets</h2>

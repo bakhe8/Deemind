@@ -83,6 +83,7 @@ What it does:
 - Includes mock auth (`/api/auth/login`, `/api/auth/logout`) and wishlist endpoints to exercise those flows.
 - Streams cart badge updates via SSE so navigation counters refresh in real time.
 - Loads translations from `data/locales/<lang>.json` to mimic Twilight’s language behavior.
+- Optional Twilight shim: enable it from Dashboard → Settings to inject `/runtime-twilight/twilight-shim.js` and mirror `window.Salla.twilight`.
 
 Update `data/mock-store.json` if you want different store/products/cart defaults for the stub.
 

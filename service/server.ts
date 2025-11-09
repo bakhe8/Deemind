@@ -198,6 +198,7 @@ async function main() {
   const logsDir = path.join(rootDir, 'logs');
   const baselineLogsDir = path.join(logsDir, 'baseline');
   const stateDir = path.join(rootDir, 'runtime', 'state');
+  const twilightConfigFile = path.join(rootDir, 'runtime', 'twilight', 'config.json');
   const stubState: {
     process: ChildProcess | null;
     theme: string | null;
@@ -336,6 +337,21 @@ async function main() {
     res.json({ logs: stubState.logs });
   });
 
+  async function readTwilightConfig() {
+    if (!(await fs.pathExists(twilightConfigFile))) {
+      await fs.ensureDir(path.dirname(twilightConfigFile));
+      await fs.writeJson(twilightConfigFile, { enabled: true }, { spaces: 2 });
+    }
+    const data = await fs.readJson(twilightConfigFile).catch(() => ({ enabled: true }));
+    return { enabled: Boolean(data?.enabled ?? true) };
+  }
+
+  async function writeTwilightConfig(next: { enabled: boolean }) {
+    await fs.ensureDir(path.dirname(twilightConfigFile));
+    await fs.writeJson(twilightConfigFile, next, { spaces: 2 });
+    return next;
+  }
+
   app.post('/api/preview/stub', auth, async (req, res) => {
     if (stubState.process) {
       return res.status(409).json({ error: 'Stub already running', port: stubState.port, theme: stubState.theme });
@@ -468,6 +484,29 @@ async function main() {
     } catch (error) {
       res.status(400).json({ error: error instanceof Error ? error.message : String(error) });
     }
+  });
+
+  app.get('/api/twilight', auth, async (_req, res) => {
+    const config = await readTwilightConfig();
+    res.json(config);
+  });
+
+  app.post('/api/twilight', auth, async (req, res) => {
+    const desired = { enabled: Boolean(req.body?.enabled ?? true) };
+    await writeTwilightConfig(desired);
+    if (stubState.process) {
+      try {
+        await fetch(`http://localhost:${stubState.port}/api/twilight`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(desired),
+        });
+        recordStubLog(`twilight mode set to ${desired.enabled ? 'enabled' : 'disabled'}`);
+      } catch (error) {
+        recordStubLog(`failed to sync twilight mode: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+    res.json(desired);
   });
 
   app.get('/api/store/diff', auth, async (req, res) => {

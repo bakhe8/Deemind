@@ -18,6 +18,8 @@ const localesDir = path.resolve('data', 'locales');
 const stateRoot = path.resolve('runtime', 'state');
 const themeStatePath = path.join(stateRoot, `${theme}.json`);
 const localeOverrides = {};
+const twilightDir = path.resolve('runtime', 'twilight');
+const twilightConfigPath = path.join(twilightDir, 'config.json');
 
 if (!fs.existsSync(staticDir)) {
   console.error(`❌ Static preview not found for theme "${theme}". Run "npm run preview:seed" first.`);
@@ -90,6 +92,19 @@ let cartState = cloneCart(initialState.cart);
 let wishlistState = cloneWishlist(initialState.wishlist);
 let sessionState = cloneSession(initialState.session);
 let presetState = initialState.preset || null;
+let twilightEnabled = true;
+
+if (fs.existsSync(twilightConfigPath)) {
+  try {
+    const twilightConfig = fs.readJsonSync(twilightConfigPath);
+    twilightEnabled = Boolean(twilightConfig?.enabled ?? true);
+  } catch {
+    twilightEnabled = true;
+  }
+} else {
+  fs.ensureDirSync(path.dirname(twilightConfigPath));
+  fs.writeJsonSync(twilightConfigPath, { enabled: twilightEnabled }, { spaces: 2 });
+}
 
 const localeCode = storeState.language || 'en';
 
@@ -205,6 +220,18 @@ async function applyStorePreset({ demo = 'electronics', overrides = {}, includeO
   const composed = await composeStore(demo, { overrides, includeOnly, writeCache: true });
   const snapshot = await hydrateFromComposedStore(composed);
   return { composed, snapshot };
+}
+
+function persistTwilightConfig() {
+  fs.ensureDirSync(path.dirname(twilightConfigPath));
+  fs.writeJsonSync(twilightConfigPath, { enabled: twilightEnabled }, { spaces: 2 });
+}
+
+function twilightScriptTag() {
+  if (!twilightEnabled || !fs.existsSync(path.join(twilightDir, 'twilight-shim.js'))) {
+    return '';
+  }
+  return `<script defer src="/runtime-twilight/twilight-shim.js" data-twilight="enabled"></script>`;
 }
 
 function sendEvent(client, event, payload) {
@@ -424,7 +451,8 @@ function injectRuntime(html) {
       })();
     </script>
   `;
-  return html.replace('</body>', `${script}\n</body>`);
+  const twilightTag = twilightScriptTag();
+  return html.replace('</body>', `${script}${twilightTag ? `\n${twilightTag}` : ''}\n</body>`);
 }
 
 function sendPage(res, slug) {
@@ -482,6 +510,17 @@ app.post('/api/store/preset', async (req, res) => {
   } catch (error) {
     res.status(400).json({ error: error instanceof Error ? error.message : String(error) });
   }
+});
+
+app.get('/api/twilight', (_req, res) => {
+  res.json({ enabled: twilightEnabled });
+});
+
+app.post('/api/twilight', (req, res) => {
+  twilightEnabled = Boolean(req.body?.enabled);
+  persistTwilightConfig();
+  broadcast('twilight', { enabled: twilightEnabled });
+  res.json({ enabled: twilightEnabled });
 });
 app.get('/api/store', (_, res) => res.json(storeState));
 app.get('/api/products', (_, res) => res.json(productsState));
@@ -606,12 +645,16 @@ app.get('/events', (req, res) => {
   sendEvent(res, 'wishlist', wishlistState);
   sendEvent(res, 'session', sessionState);
   sendEvent(res, 'store', { store: storeState, locale: translations });
+  sendEvent(res, 'twilight', { enabled: twilightEnabled });
   sseClients.add(res);
   req.on('close', () => sseClients.delete(res));
 });
 
 // Static assets
 app.use('/preview-assets', express.static(assetsDir));
+if (fs.existsSync(twilightDir)) {
+  app.use('/runtime-twilight', express.static(twilightDir));
+}
 
 // Routes
 app.get('/', (req, res) => sendPage(res, 'index'));

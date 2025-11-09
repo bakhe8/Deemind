@@ -2,6 +2,7 @@ import { apiFetch, apiJson } from './client';
 import type { StatusResponse } from '../store/useDashboardStore';
 
 export type StoreDemo = { id: string; name: string; meta: Record<string, any>; partials: string[] };
+export type TwilightConfig = { enabled: boolean };
 
 export async function fetchStatus() {
   return apiJson<StatusResponse>('/api/status');
@@ -90,4 +91,15 @@ export async function fetchStoreDiff(params: { demo: string; theme?: string }) {
   query.set('demo', params.demo);
   if (params.theme) query.set('theme', params.theme);
   return apiJson(`/api/store/diff?${query.toString()}`);
+}
+
+export async function fetchTwilightStatus() {
+  return apiJson<TwilightConfig>('/api/twilight');
+}
+
+export async function updateTwilightStatus(enabled: boolean) {
+  return apiJson<TwilightConfig>('/api/twilight', {
+    method: 'POST',
+    body: JSON.stringify({ enabled }),
+  });
 }
