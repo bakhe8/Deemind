@@ -1,0 +1,32 @@
+{
+  "input": {
+    "folder": "salla-new-theme",
+    "assets": []
+  },
+  "parsed": {
+    "sections": [],
+    "components": [],
+    "conflicts": [],
+    "assets": [],
+    "cssMapSample": {},
+    "templateHints": [],
+    "confidence": 0,
+    "semanticStats": {
+      "placeholdersApplied": 0,
+      "bareTokensApplied": 0,
+      "i18nNodesWrapped": 0,
+      "i18nAttributesWrapped": 0,
+      "sanitizedInlineHandlers": 0,
+      "blockedExternalScripts": 0
+    }
+  },
+  "adapted": {
+    "twig": [],
+    "metadata": {}
+  },
+  "validated": {
+    "status": "pending",
+    "warnings": [],
+    "errors": []
+  }
+}

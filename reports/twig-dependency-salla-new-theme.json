@@ -1,0 +1,35 @@
+{
+  "graph": {
+    "partials/product-card.twig": [],
+    "partials/navbar.twig": [],
+    "partials/hero.twig": [],
+    "partials/footer.twig": [],
+    "partials/banner.twig": [],
+    "pages/product.twig": ["layout/default.twig"],
+    "pages/index.twig": [
+      "layout/default.twig",
+      "partials/hero.twig",
+      "partials/product-card.twig"
+    ],
+    "pages/category.twig": [
+      "layout/default.twig",
+      "partials/product-card.twig"
+    ],
+    "pages/cart.twig": ["layout/default.twig"],
+    "layout/default.twig": []
+  },
+  "topo": [
+    "partials/navbar.twig",
+    "partials/footer.twig",
+    "partials/banner.twig",
+    "pages/product.twig",
+    "pages/index.twig",
+    "pages/category.twig",
+    "pages/cart.twig",
+    "partials/hero.twig",
+    "partials/product-card.twig",
+    "layout/default.twig"
+  ],
+  "cycles": [],
+  "fileCount": 10
+}

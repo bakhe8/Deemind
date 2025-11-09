@@ -41,22 +41,17 @@
       "input": "input/fixtures/salla-raed-lite",
       "expected": "output/snapshots_expected/salla-raed-lite",
       "buildCommand": "npm run deemind:build salla-raed-lite"
+    },
+    {
+      "name": "salla-new-theme",
+      "input": "input/fixtures/salla-new-theme",
+      "expected": "output/snapshots_expected/salla-new-theme",
+      "buildCommand": "npm run deemind:build salla-new-theme"
     }
   ],
   "compare": {
-    "includeExtensions": [
-      ".twig",
-      ".html",
-      ".json",
-      ".css",
-      ".js"
-    ],
-    "ignorePaths": [
-      "**/.DS_Store",
-      "**/*.map",
-      "**/theme.json",
-      "theme.json"
-    ],
+    "includeExtensions": [".twig", ".html", ".json", ".css", ".js"],
+    "ignorePaths": ["**/.DS_Store", "**/*.map", "**/theme.json", "theme.json"],
     "ignoreJsonKeys": [
       "timestamp",
       "buildDate",
