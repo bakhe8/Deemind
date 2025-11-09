@@ -1,0 +1,25 @@
+{
+  "id": 1305146709,
+  "name": "Deemind Atelier",
+  "username": "deemind-atelier",
+  "domain": "https://atelier.deemind.local",
+  "language": {
+    "code": "ar",
+    "dir": "rtl"
+  },
+  "currencies": [
+    { "code": "SAR", "symbol": "﷼", "name": "Saudi Riyal" },
+    { "code": "USD", "symbol": "$", "name": "US Dollar" }
+  ],
+  "settings": {
+    "header_is_sticky": true,
+    "imageZoom": true,
+    "placeholder": "images/placeholder.png",
+    "wallet_enabled": true,
+    "wishlist_enabled": true,
+    "auth": {
+      "email_allowed": true,
+      "mobile_allowed": true
+    }
+  }
+}

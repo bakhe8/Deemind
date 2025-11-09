@@ -1,4 +1,4 @@
-﻿# Deemind Local Launcher
+﻿# Deemind Local Launcher (with logging and preview port isolation)
 param(
   [int]$ServiceTimeout = 45,
   [int]$DashboardTimeout = 30
@@ -18,9 +18,7 @@ function Stop-PortProcess {
         }
       } catch {}
     }
-  } catch {
-    # port not in use
-  }
+  } catch {}
 }
 
 function Wait-ForUrl {
@@ -40,9 +38,7 @@ function Wait-ForUrl {
         Write-Host "✅ $Label is up."
         return $true
       }
-    } catch {
-      # still starting, retry shortly
-    }
+    } catch {}
     Start-Sleep -Seconds $interval
     $elapsed += $interval
   }
@@ -53,17 +49,30 @@ function Wait-ForUrl {
 $projectRoot = "C:\Users\Bakheet\Documents\peojects\deemind"
 $dashboardDir = Join-Path $projectRoot 'dashboard'
 $serviceUrl = "http://localhost:5757/api/status"
-$dashboardUrl = "http://localhost:5758/"
+$dashboardPort = 5759
+$dashboardUrl = "http://localhost:$dashboardPort/"
+$logDir = Join-Path $projectRoot 'logs\launcher'
+if (-not (Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir | Out-Null }
+$timestamp = (Get-Date).ToString("yyyy-MM-ddTHH-mm-ss")
+$serviceLog = Join-Path $logDir "service-$timestamp.log"
+$dashboardLog = Join-Path $logDir "dashboard-$timestamp.log"
 
 Stop-PortProcess -Port 5757
-Stop-PortProcess -Port 5758
+Stop-PortProcess -Port $dashboardPort
 
 Write-Host "🚀 Starting Deemind service..."
-Start-Process powershell -ArgumentList "-NoLogo -Command cd `"$projectRoot`"; npm run service:start" -WorkingDirectory $projectRoot | Out-Null
+Start-Process powershell -ArgumentList "-NoLogo -Command cd `"$projectRoot`"; npm run service:start *>> `"$serviceLog`"" -WorkingDirectory $projectRoot | Out-Null
+Write-Host "🗒  Service log → $serviceLog"
 Wait-ForUrl -Url $serviceUrl -TimeoutSeconds $ServiceTimeout -Label "Service"
 
-Write-Host "🖥  Starting Deemind dashboard..."
-Start-Process powershell -ArgumentList "-NoLogo -Command cd `"$dashboardDir`"; npm run dev" -WorkingDirectory $dashboardDir | Out-Null
+Write-Host "🧱 Building dashboard bundle..."
+Push-Location $dashboardDir
+npm run build | Out-Null
+Pop-Location
+
+Write-Host "🖥  Starting Deemind dashboard (preview)..."
+Start-Process powershell -ArgumentList "-NoLogo -Command cd `"$dashboardDir`"; npm run preview -- --host 127.0.0.1 --port $dashboardPort --strictPort *>> `"$dashboardLog`"" -WorkingDirectory $dashboardDir | Out-Null
+Write-Host "🗒  Dashboard log → $dashboardLog"
 Wait-ForUrl -Url $dashboardUrl -TimeoutSeconds $DashboardTimeout -Label "Dashboard"
 
 Write-Host "🌐 Opening dashboard UI..."

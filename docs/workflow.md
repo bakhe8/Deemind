@@ -10,15 +10,16 @@ This is the current, stabilized workflow for Deemind. It reflects the upgraded p
 ## Day-to-day Loop
 
 1. Create a branch: `feature/<task>`
-2. Build locally: `npm run deemind:build <theme> -- --sanitize --i18n --autofix`
-   - Preview auto-launches (configurable via `configs/deemind.config.json`) and serves `/output/<theme>/`.
-3. Validate & fix: `npm run deemind:doctor` (validate → fix → revalidate)
-4. Optional preview rerun: `npm run deemind:preview <theme>` to spin up the live server without a full rebuild.
-5. Tests:
+2. Start the service + dashboard (`npm run service:start` and `cd dashboard && npm run dev`) to keep API + UI online.
+3. Build locally: `npm run deemind:build <theme> -- --sanitize --i18n --autofix`
+   - Preview auto-launches (configurable via `configs/deemind.config.json`) and the dashboard’s “Live Preview” card links to it.
+4. Validate & fix: `npm run deemind:doctor` (validate → fix → revalidate)
+5. Optional preview rerun: `npm run deemind:preview <theme>` to spin up the live server without a full rebuild (also available from the dashboard).
+6. Tests:
    - Snapshots: `npm run test:snapshots`
    - Flaky detector: `npm run test:flaky`
-6. Commit; pre-commit hook runs lint-staged and validator.
-7. Push and open PR; CI runs full suite and posts summaries.
+7. Commit; pre-commit hook runs lint-staged and validator.
+8. Push and open PR; CI runs full suite and posts summaries.
 
 ## CI Overview
 
@@ -30,6 +31,7 @@ This is the current, stabilized workflow for Deemind. It reflects the upgraded p
 ## Tools & Docs
 
 - Architecture: docs/architecture.md
+- Dashboard overview: docs/dashboard.md
 - Configurations: docs/configurations.md
 - Validation rules: docs/validation.md
 - Modules overview: docs/modules.md

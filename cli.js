@@ -25,6 +25,7 @@ import { loadBaselineSet, computeComponentUsage } from "./tools/baseline-compare
 import { ensureBaselineCompleteness } from "./tools/ensure-baseline-theme.js";
 import { preparePreview } from "./tools/preview-prep.js";
 import { runPreviewServer } from "./tools/preview-server.js";
+import { generateStaticPreview } from "./tools/preview-static.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CONFIG_PATH = path.join(__dirname, "configs", "deemind.config.json");
@@ -33,6 +34,7 @@ const PREVIEW_DEFAULTS = {
   autoOpen: true,
   port: 3000,
   multiTheme: false,
+  livereload: true,
 };
 
 /**
@@ -329,6 +331,7 @@ async function run() {
       ].join('\n');
       try { await fs.appendFile(process.env.GITHUB_STEP_SUMMARY, `\n${summary}\n`); } catch (e) { void e; }
     }
+    await generateStaticPreview(themeName, { silent: true });
     const previewMeta = await preparePreview(themeName, {
       outputPath: outputRoot,
       port: previewConfig.port || PREVIEW_DEFAULTS.port,

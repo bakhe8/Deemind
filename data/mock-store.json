@@ -1,0 +1,34 @@
+{
+  "store": {
+    "id": 1305146709,
+    "name": "Deemind Atelier",
+    "currency": "SAR",
+    "language": "ar"
+  },
+  "products": [
+    {
+      "id": 1,
+      "name": "Signature Canvas Backpack",
+      "price": 329,
+      "badge": "New arrival"
+    },
+    {
+      "id": 2,
+      "name": "Midnight Wireless Earbuds",
+      "price": 199,
+      "badge": "Top rated"
+    },
+    { "id": 3, "name": "Smart Watch X2", "price": 249, "badge": "Limited" }
+  ],
+  "cart": {
+    "items": [],
+    "total": 0
+  },
+  "wishlist": {
+    "items": []
+  },
+  "session": {
+    "user": null,
+    "token": null
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "items": [
+    {
+      "product_id": 5001,
+      "title": "Signature Canvas Backpack",
+      "price": "329 SAR",
+      "quantity": 1
+    },
+    {
+      "product_id": 5002,
+      "title": "Midnight Wireless Earbuds",
+      "price": "199 SAR",
+      "quantity": 2
+    }
+  ],
+  "summary": {
+    "subtotal": "727 SAR",
+    "shipping": "Free shipping (mock)",
+    "total": "727 SAR"
+  }
+}

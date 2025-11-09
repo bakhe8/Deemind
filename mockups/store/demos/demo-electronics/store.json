@@ -1,0 +1,20 @@
+{
+  "id": "electronics",
+  "name": "Electro Demo",
+  "meta": {
+    "theme": "modern",
+    "locale": "en",
+    "currency": "SAR"
+  },
+  "partials": [
+    "store/core",
+    "products/gadgets",
+    "hero/tech",
+    "navigation/default",
+    "brands/global",
+    "cart/default",
+    "wishlist/default",
+    "locales/en",
+    "locales/ar"
+  ]
+}

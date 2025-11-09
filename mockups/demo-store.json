@@ -1,0 +1,120 @@
+{
+  "store": {
+    "id": 1305146709,
+    "name": "Deemind Atelier",
+    "url": "https://the-best-store-ever.sa",
+    "language": {
+      "code": "ar",
+      "dir": "rtl"
+    },
+    "theme": {
+      "primary": "#111827",
+      "accent": "#5bd5c4"
+    }
+  },
+  "hero": {
+    "headline": "Twilight-ready concepts rendered locally",
+    "subhead": "Mock storefront showing landing, catalog, PDP, cart, brands, and blog views powered by Deemind.",
+    "ctaPrimary": "Explore Catalog",
+    "ctaSecondary": "View Product"
+  },
+  "products": [
+    {
+      "id": 501,
+      "title": "Signature Canvas Backpack",
+      "price": "329 SAR",
+      "badge": "New arrival",
+      "rating": 4.9,
+      "image": "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=800&q=70"
+    },
+    {
+      "id": 502,
+      "title": "Midnight Wireless Earbuds",
+      "price": "199 SAR",
+      "badge": "Top rated",
+      "rating": 4.8,
+      "image": "https://images.unsplash.com/photo-1518444028784-8728217d9113?auto=format&fit=crop&w=800&q=70"
+    },
+    {
+      "id": 503,
+      "title": "Smart Watch X2",
+      "price": "249 SAR",
+      "badge": "Limited",
+      "rating": 4.7,
+      "image": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=70"
+    },
+    {
+      "id": 504,
+      "title": "Graphite Leather Wallet",
+      "price": "149 SAR",
+      "badge": "Editors’ pick",
+      "rating": 4.6,
+      "image": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=70"
+    },
+    {
+      "id": 505,
+      "title": "Aurora Desk Lamp",
+      "price": "289 SAR",
+      "badge": "Trending",
+      "rating": 4.8,
+      "image": "https://images.unsplash.com/photo-1484704849700-f032a568e944?auto=format&fit=crop&w=800&q=70"
+    },
+    {
+      "id": 506,
+      "title": "Minimal Ceramic Vessel",
+      "price": "119 SAR",
+      "badge": "Handcrafted",
+      "rating": 4.7,
+      "image": "https://images.unsplash.com/photo-1432139509613-5c4255815697?auto=format&fit=crop&w=800&q=70"
+    }
+  ],
+  "cart": [
+    {
+      "id": 501,
+      "title": "Signature Canvas Backpack",
+      "price": "329 SAR",
+      "quantity": 1
+    },
+    {
+      "id": 502,
+      "title": "Midnight Wireless Earbuds",
+      "price": "199 SAR",
+      "quantity": 2
+    }
+  ],
+  "brands": [
+    { "name": "RAED", "tagline": "Baseline hero components" },
+    { "name": "DEEMIND", "tagline": "Hybrid parser tech" },
+    { "name": "NEXA", "tagline": "Adaptive UI kit" },
+    { "name": "KARIMI", "tagline": "Premium tailoring" },
+    { "name": "SAFYA", "tagline": "Beauty & care" },
+    { "name": "RHX", "tagline": "Audio essentials" }
+  ],
+  "testimonials": [
+    {
+      "quote": "Deemind produced a Salla-ready store in three iterations with full Twilight compatibility.",
+      "author": "Layla — Creative Director"
+    },
+    {
+      "quote": "The preview snapshots mirror the live experience, so stakeholders sign off instantly.",
+      "author": "Rakan — Theme Engineer"
+    }
+  ],
+  "articles": [
+    {
+      "title": "Baseline-driven storefronts",
+      "excerpt": "How Raed conventions keep layouts predictable across all Salla themes.",
+      "image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1000&q=70"
+    },
+    {
+      "title": "Twilight-ready API hooks",
+      "excerpt": "Integrating salla.cart and product availability components in Deemind.",
+      "image": "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1000&q=70"
+    },
+    {
+      "title": "Preview stacks at scale",
+      "excerpt": "Static demos + real Twig output ensure zero-regret theme approvals.",
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=70"
+    }
+  ]
+}

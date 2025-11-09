@@ -1,0 +1,16 @@
+{
+  "hero": {
+    "eyebrow": "Flagship launch",
+    "title": "Power your workflow with the new Electro set",
+    "subtitle": "Curated gear, instant pickup, and full Arabic/English localization out of the box.",
+    "primaryCta": {
+      "label": "Shop gadgets",
+      "href": "/page/product/index"
+    },
+    "secondaryCta": {
+      "label": "View bundles",
+      "href": "/page/landing-page"
+    },
+    "media": "https://cdn.deemind.local/hero/tech-stack.png"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "locales": {
+    "en": {
+      "add_to_cart": "Add to Cart",
+      "checkout": "Checkout",
+      "cart_updated": "Cart updated",
+      "wishlist": "Wishlist"
+    }
+  }
+}

@@ -49,6 +49,9 @@ export async function runPreviewServer(themeName, previewConfig = {}) {
 
   const serverPath = path.resolve('server', 'preview.js');
   const args = [serverPath, themeName, `--port=${port}`];
+  if (previewConfig.livereload === false) {
+    args.push('--livereload=false');
+  }
   const child = spawn(process.execPath, args, {
     stdio: 'inherit',
   });

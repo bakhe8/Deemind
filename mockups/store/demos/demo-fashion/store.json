@@ -1,0 +1,20 @@
+{
+  "id": "fashion",
+  "name": "Lumen Fashion Demo",
+  "meta": {
+    "theme": "capsule",
+    "locale": "en",
+    "currency": "USD"
+  },
+  "partials": [
+    "store/fashion",
+    "products/fashion",
+    "hero/spring",
+    "navigation/default",
+    "brands/global",
+    "cart/default",
+    "wishlist/default",
+    "locales/en",
+    "locales/ar"
+  ]
+}

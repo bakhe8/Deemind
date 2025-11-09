@@ -1,0 +1,20 @@
+{
+  "headline": "Twilight-ready storefronts rendered offline",
+  "subhead": "Baseline + Deemind hybrid parser ensures Salla-compatible layouts with zero manual work.",
+  "cta_primary": "Browse Catalog",
+  "cta_secondary": "View Product",
+  "testimonials": [
+    {
+      "quote": "Deemind produced a Salla theme with 98% parser coverage on the first pass.",
+      "author": "Layla — Creative Director"
+    },
+    {
+      "quote": "Baseline fills and static snapshots let us ship themes without waiting on live data.",
+      "author": "Rakan — Lead Engineer"
+    }
+  ],
+  "stats": [
+    { "label": "Parser coverage", "value": "98%" },
+    { "label": "Baseline additions", "value": "123 files" }
+  ]
+}

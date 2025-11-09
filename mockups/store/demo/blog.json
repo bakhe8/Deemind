@@ -1,0 +1,17 @@
+[
+  {
+    "title": "Baseline-driven storefronts",
+    "excerpt": "How Raed conventions keep layouts predictable across all Salla themes.",
+    "image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1000&q=70"
+  },
+  {
+    "title": "Twilight-ready API hooks",
+    "excerpt": "Integrating salla.cart and product availability components in Deemind.",
+    "image": "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1000&q=70"
+  },
+  {
+    "title": "Preview stacks at scale",
+    "excerpt": "Static demos + real Twig output ensure zero-regret theme approvals.",
+    "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=70"
+  }
+]

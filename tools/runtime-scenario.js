@@ -1,0 +1,176 @@
+#!/usr/bin/env node
+import fs from 'fs-extra';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { spawn, spawnSync } from 'child_process';
+import { setTimeout as delay } from 'timers/promises';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const rootDir = path.resolve(__dirname, '..');
+
+const args = process.argv.slice(2);
+const theme = args[0] || 'demo';
+const scenarioName = (args[1] || 'checkout').toLowerCase();
+const port = Number(process.env.RUNTIME_PORT || process.env.PREVIEW_PORT || 4100);
+
+const scenarioDir = path.join(rootDir, 'logs', 'runtime-scenarios');
+
+const flows = {
+  'add-to-cart': async (ctx) => {
+    const { requestStep } = ctx;
+    const products = await requestStep('GET', '/api/products');
+    if (!Array.isArray(products) || !products.length) {
+      throw new Error('No products available for add-to-cart scenario');
+    }
+    const target = products[0];
+    await requestStep('POST', '/api/cart/add', { id: target.id, quantity: 1 });
+    await requestStep('POST', '/api/cart/add', { id: target.id, quantity: 2 });
+    await requestStep('GET', '/api/cart');
+  },
+  checkout: async (ctx) => {
+    const { requestStep } = ctx;
+    const products = await requestStep('GET', '/api/products');
+    if (!Array.isArray(products) || products.length < 2) {
+      throw new Error('Need at least two products for checkout scenario');
+    }
+    const [first, second] = products;
+    await requestStep('POST', '/api/cart/clear');
+    await requestStep('POST', '/api/cart/add', { id: first.id, quantity: 1 });
+    await requestStep('POST', '/api/cart/add', { id: second.id, quantity: 2 });
+    await requestStep('POST', '/api/cart/update', { id: second.id, quantity: 3 });
+    await requestStep('POST', '/api/auth/login', { email: 'scenario@deemind.local', name: 'Scenario Runner' });
+    await requestStep('GET', '/api/cart');
+    await requestStep('POST', '/api/auth/logout');
+  },
+  wishlist: async (ctx) => {
+    const { requestStep } = ctx;
+    const products = await requestStep('GET', '/api/products');
+    if (!Array.isArray(products) || !products.length) {
+      throw new Error('No products available for wishlist scenario');
+    }
+    await requestStep('POST', '/api/wishlist/clear');
+    await requestStep('POST', '/api/wishlist/add', { id: products[0].id });
+    await requestStep('POST', '/api/wishlist/toggle', { id: products[0].id });
+    await requestStep('POST', '/api/wishlist/toggle', { id: products[0].id });
+    await requestStep('GET', '/api/wishlist');
+  },
+};
+
+if (!flows[scenarioName]) {
+  console.error(`❌ Unknown scenario "${scenarioName}". Available: ${Object.keys(flows).join(', ')}`);
+  process.exit(1);
+}
+
+async function pingStub() {
+  try {
+    const response = await fetch(`http://localhost:${port}/api/products`, { method: 'GET' });
+    if (!response.ok) return false;
+    await response.json();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function waitForStub(timeoutMs = 10000) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    if (await pingStub()) return true;
+    await delay(200);
+  }
+  return false;
+}
+
+async function ensureStubRunning() {
+  if (await pingStub()) {
+    return { process: null, started: false };
+  }
+  console.log(`⚙️  Starting runtime stub for ${theme} on port ${port}…`);
+  const child = spawn(process.execPath, ['server/runtime-stub.js', theme], {
+    cwd: rootDir,
+    env: { ...process.env, PREVIEW_PORT: String(port) },
+    stdio: ['ignore', 'inherit', 'inherit'],
+  });
+  const ready = await waitForStub();
+  if (!ready) {
+    child.kill('SIGTERM');
+    throw new Error('Runtime stub did not start in time.');
+  }
+  return { process: child, started: true };
+}
+
+async function runScenario() {
+  await fs.ensureDir(scenarioDir);
+  const seed = spawnSync(process.execPath, ['tools/preview-static.js', theme], {
+    cwd: rootDir,
+    stdio: 'inherit',
+  });
+  if (seed.status !== 0) {
+    console.warn('⚠️  preview:seed failed – scenario will rely on existing snapshots.');
+  }
+  const session = {
+    theme,
+    scenario: scenarioName,
+    port,
+    startedAt: new Date().toISOString(),
+    steps: [],
+  };
+
+  const controller = await ensureStubRunning();
+
+  async function requestStep(method, urlPath, body) {
+    const entry = {
+      method,
+      path: urlPath,
+      body: body ?? null,
+      startedAt: new Date().toISOString(),
+    };
+    try {
+      const response = await fetch(`http://localhost:${port}${urlPath}`, {
+        method,
+        headers: body ? { 'Content-Type': 'application/json' } : undefined,
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      entry.status = response.status;
+      entry.ok = response.ok;
+      const json = await response.json().catch(() => null);
+      entry.response = json;
+      entry.finishedAt = new Date().toISOString();
+      session.steps.push(entry);
+      if (!response.ok) {
+        throw new Error(`Request ${method} ${urlPath} failed (${response.status}).`);
+      }
+      return json;
+    } catch (error) {
+      entry.error = error instanceof Error ? error.message : String(error);
+      entry.finishedAt = new Date().toISOString();
+      session.steps.push(entry);
+      throw error;
+    }
+  }
+
+  try {
+    await flows[scenarioName]({ requestStep });
+    session.succeeded = true;
+  } catch (error) {
+    session.succeeded = false;
+    session.error = error instanceof Error ? error.message : String(error);
+    console.error(`❌ Scenario failed: ${session.error}`);
+  } finally {
+    session.finishedAt = new Date().toISOString();
+    const fileName = `${theme}-${scenarioName}-${Date.now()}.json`;
+    await fs.writeJson(path.join(scenarioDir, fileName), session, { spaces: 2 });
+    console.log(`📝 Scenario log written to logs/runtime-scenarios/${fileName}`);
+    if (controller.process) {
+      controller.process.kill('SIGTERM');
+    }
+  }
+
+  if (!session.succeeded) {
+    process.exitCode = 1;
+  } else {
+    console.log('✅ Scenario completed successfully.');
+  }
+}
+
+runScenario();

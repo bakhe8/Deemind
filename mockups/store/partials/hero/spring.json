@@ -1,0 +1,16 @@
+{
+  "hero": {
+    "eyebrow": "Spring capsule",
+    "title": "Soft tailoring and luminous layers",
+    "subtitle": "Refresh every storefront block with airy textiles and seasonal accents.",
+    "primaryCta": {
+      "label": "Shop the edit",
+      "href": "/page/landing-page"
+    },
+    "secondaryCta": {
+      "label": "Lookbook",
+      "href": "/page/testimonials"
+    },
+    "media": "https://cdn.deemind.local/hero/spring-capsule.png"
+  }
+}

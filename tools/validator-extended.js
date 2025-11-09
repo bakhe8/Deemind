@@ -30,12 +30,96 @@ export async function validateExtended(themePath) {
   }
   report.checks.encoding = true;
 
+  // Load baseline manifest (files copied from fallback)
+  let baselineSummary = null;
+  const baselineManifestPath = path.join(themePath, 'reports', 'baseline-summary.json');
+  try {
+    baselineSummary = await fs.readJson(baselineManifestPath);
+  } catch (err) {
+    void err;
+  }
+  const baselineCopied = new Set(
+    (baselineSummary?.copied || []).map((rel) => rel.replace(/\\/g, '/')),
+  );
+  const baselineFallbackName =
+    baselineSummary?.baselineName ||
+    process.env.DEEMIND_BASELINE ||
+    process.env.DEEMIND_BASELINE_NAME ||
+    'theme-raed';
+  const baselineRoot =
+    baselineSummary?.baselineRoot ||
+    resolveBaselineRootPath(baselineFallbackName);
+  const baselineAllowanceCache = new Map();
+
+  function resolveBaselineRootPath(name) {
+    const envRoot = process.env.DEEMIND_BASELINE_ROOT;
+    if (envRoot) return path.resolve(envRoot);
+    if (!name) return path.resolve('.baselines', 'theme-raed');
+    if (path.isAbsolute(name)) return name;
+    if (name.startsWith('.')) return path.resolve(name);
+    return path.resolve('.baselines', name);
+  }
+
+  function mapBaselineSegments(relPath) {
+    if (relPath.startsWith('layout/')) {
+      return ['src', 'views', 'layouts', relPath.slice('layout/'.length)];
+    }
+    if (relPath.startsWith('pages/')) {
+      return ['src', 'views', 'pages', relPath.slice('pages/'.length)];
+    }
+    if (relPath.startsWith('partials/')) {
+      return ['src', 'views', 'components', relPath.slice('partials/'.length)];
+    }
+    if (relPath.startsWith('locales/')) {
+      return ['src', 'locales', relPath.slice('locales/'.length)];
+    }
+    return null;
+  }
+
+  async function isBaselineFallback(relPath) {
+    if (baselineCopied.has(relPath)) return true;
+    if (!baselineRoot) return false;
+    if (baselineAllowanceCache.has(relPath)) return baselineAllowanceCache.get(relPath);
+    const segments = mapBaselineSegments(relPath);
+    if (!segments) {
+      baselineAllowanceCache.set(relPath, false);
+      return false;
+    }
+    const candidate = path.join(baselineRoot, ...segments);
+    if (!(await fs.pathExists(candidate))) {
+      baselineAllowanceCache.set(relPath, false);
+      return false;
+    }
+    try {
+      const [current, baselineContent] = await Promise.all([
+        fs.readFile(path.join(themePath, relPath), 'utf8'),
+        fs.readFile(candidate, 'utf8'),
+      ]);
+      const same = current === baselineContent;
+      baselineAllowanceCache.set(relPath, same);
+      return same;
+    } catch (err) {
+      baselineAllowanceCache.set(relPath, false);
+      return false;
+    }
+  }
+
   // 2) Inline handlers / unsafe scripts
   const twigs = globSync(`${themePath}/**/*.twig`, { nodir: true });
   for (const file of twigs) {
     const content = await fs.readFile(file, 'utf8');
+    const relFile = path.relative(themePath, file).replace(/\\/g, '/');
+    const baselineAllowed = await isBaselineFallback(relFile);
     if (/\son[a-z]+\s*=\s*["']/i.test(content)) {
-      report.errors.push({ type: 'inline-handler', file, message: 'Inline JS event handler found.' });
+      if (baselineAllowed) {
+        report.warnings.push({
+          type: 'inline-handler-baseline',
+          file,
+          message: 'Baseline fallback file contains inline JS handler. Override in input to replace.',
+        });
+      } else {
+        report.errors.push({ type: 'inline-handler', file, message: 'Inline JS event handler found.' });
+      }
     }
     if (/<script[^>]+src=['"]http:\/\//i.test(content)) {
       report.errors.push({ type: 'insecure-script', file, message: 'Insecure script source (HTTP) detected.' });
@@ -45,7 +129,17 @@ export async function validateExtended(themePath) {
     if (rawUsages) {
       // allowlist check
       const allowed = (settings.rawAllowlist || []).some(a => content.includes(a));
-      if (!allowed) report.errors.push({ type: 'raw-disallowed', file, message: '| raw used without allowlist' });
+      if (!allowed) {
+        if (baselineAllowed) {
+          report.warnings.push({
+            type: 'raw-baseline',
+            file,
+            message: '| raw preserved from baseline fallback. Override input to customize.',
+          });
+        } else {
+          report.errors.push({ type: 'raw-disallowed', file, message: '| raw used without allowlist' });
+        }
+      }
     }
   }
   report.checks.scripts = true;
@@ -137,7 +231,7 @@ export async function validateExtended(themePath) {
     })();
     const oursI18nRatio = (() => {
       const files = twigs.length || 1;
-      // eslint-disable-next-line no-useless-escape
+       
       const i18nFiles = twigs.filter(f => /\|\s*t\b|\{\%\s*trans\b/.test(fs.readFileSync(f, 'utf8'))).length;
       return i18nFiles / files;
     })();
@@ -204,8 +298,15 @@ export async function validateExtended(themePath) {
   // Sample string detection
   const samples = /(Lorem ipsum|Sample Product|PRODUCT_NAME)/i;
   for (const f of twigs) {
-    const text = fs.readFileSync(f, 'utf8');
-    if (samples.test(text)) report.errors.push({ type: 'sample-strings', file: f, message: 'Sample placeholder string found.' });
+    const relFile = path.relative(themePath, f).replace(/\\/g, '/');
+    const text = await fs.readFile(f, 'utf8');
+    if (samples.test(text)) {
+      if (await isBaselineFallback(relFile)) {
+        report.warnings.push({ type: 'sample-strings-baseline', file: f, message: 'Sample placeholder string retained from baseline fallback.' });
+      } else {
+        report.errors.push({ type: 'sample-strings', file: f, message: 'Sample placeholder string found.' });
+      }
+    }
   }
 
   // Case-insensitive partial name collisions

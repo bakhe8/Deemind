@@ -1,0 +1,8 @@
+{
+  "navigation": [
+    { "label": "Home", "href": "/page/index" },
+    { "label": "Products", "href": "/page/product/index" },
+    { "label": "Brands", "href": "/page/brands/index" },
+    { "label": "Blog", "href": "/page/blog/index" }
+  ]
+}

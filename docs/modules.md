@@ -198,6 +198,16 @@ try { cache = await fs.readJson(cacheFile); } catch (e) { /_ ignore \*/
 
 - Imports: path, fs-extra
 
+## Preview & Dashboard
+
+- `tools/preview-prep.js` – inventories generated pages, writes `.preview.json`, and stores preview timestamps/urls.
+- `tools/preview-server.js` – chooses a free port, passes livereload flags, and spawns `server/preview.js`.
+- `server/preview.js` – Express + Twig preview host (routes `/`, `/pages`, `/page/*`).
+- `service/server.ts` – API powering the dashboard (themes, reports, preview status, baseline metrics, log streaming).
+- `dashboard/src/pages/*` – React pages (Upload, Parser, Adapter, Validation, Reports, Settings).
+- `dashboard/src/components/*` – shared UI (log viewer, diff viewer, stats cards, pipeline overview, charts).
+- `docs/dashboard.md` – reference for endpoints, run commands, and page responsibilities.
+
 ## tools/fix-missing-assets.js
 
 /\*\*

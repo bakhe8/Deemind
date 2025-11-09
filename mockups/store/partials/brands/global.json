@@ -1,0 +1,11 @@
+{
+  "brands": [
+    {
+      "id": "needsboxes",
+      "label": "Needsboxes",
+      "href": "/page/brands/single"
+    },
+    { "id": "nimbus", "label": "Nimbus", "href": "/page/brands/single" },
+    { "id": "aurora", "label": "Aurora", "href": "/page/brands/single" }
+  ]
+}

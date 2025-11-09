@@ -5,6 +5,7 @@ node_modules/
 output/
 archives/
 logs/
+.cache/
 
 # OS / Editor
 .DS_Store
@@ -19,3 +20,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 dashboard/dist/
+runtime/state/*
+!runtime/state/.gitkeep
+mockups/store/cache/composed/

@@ -139,3 +139,15 @@
 - [x] Support brand.json for automatic color/font injection
 - [x] Implement “update mode” — only rebuild modified components
 - [x] Optional GUI preview for clients
+
+## 13. Runtime & Dashboard 1.1
+
+- [x] Add SSE bridge `/api/preview/events` and dashboard event feed
+- [x] Build scenario runner (`npm run runtime:scenario`) with log outputs
+- [x] Introduce composable demo store library (partials + manifests + composer)
+- [x] Wire runtime store preset API (`/api/store/preset`) + dashboard controls
+- [x] Add store diff preview (dashboard Settings → “Preview Diff”)
+- [ ] Twilight/NEXUS runtime shim (load Twilight JS locally)
+- [ ] Runtime analytics (capture response times, error counts, dashboard KPIs)
+- [ ] Multi-theme preview orchestration (auto ports + dashboard matrix)
+- [ ] Partial versioning & remote sync support

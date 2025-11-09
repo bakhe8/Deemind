@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --surface: #f5f7fb;
+  --primary: #0046ff;
+  --primary-dark: #073cc2;
+  --accent: #35b9a6;
+}
+
 body {
   font-family:
     "Inter",
@@ -10,15 +17,16 @@ body {
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-  background: #f5f7fb;
+  background: var(--surface);
+  color: #0f172a;
 }
 
 .btn-primary {
-  @apply bg-primary text-white font-semibold px-4 py-2 rounded-md shadow hover:shadow-md transition;
+  @apply bg-primary text-white font-semibold px-4 py-2 rounded-md shadow hover:shadow-md transition disabled:opacity-60;
 }
 
 .btn-secondary {
-  @apply bg-white border border-slate-300 text-slate-800 px-4 py-2 rounded-md shadow-sm hover:bg-slate-50 transition;
+  @apply bg-white border border-slate-300 text-slate-800 px-4 py-2 rounded-md shadow-sm hover:bg-slate-50 transition disabled:opacity-60;
 }
 
 .btn-ghost {

@@ -1,0 +1,28 @@
+{
+  "products": [
+    {
+      "id": 201,
+      "name": "Aurora Silk Dress",
+      "price": 559,
+      "badge": "Editor’s pick",
+      "sku": "DRS-882",
+      "media": ["https://cdn.deemind.local/images/dress-882-1.jpg"]
+    },
+    {
+      "id": 202,
+      "name": "Nimbus Linen Shirt",
+      "price": 249,
+      "badge": "Bestseller",
+      "sku": "SRT-441",
+      "media": ["https://cdn.deemind.local/images/shirt-441-1.jpg"]
+    },
+    {
+      "id": 203,
+      "name": "Lumen Leather Sandals",
+      "price": 329,
+      "badge": "Seasonal",
+      "sku": "SND-110",
+      "media": ["https://cdn.deemind.local/images/sandals-110-1.jpg"]
+    }
+  ]
+}

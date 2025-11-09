@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Deemind Preview · customer/profile</title>
+    <style>
+      :root {
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont;
+        color: #0f172a;
+        background: #f6f7fb;
+        --primary: #111827;
+        --accent: #5bd5c4;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; padding: 0 0 4rem; }
+      .preview-shell { max-width: 1240px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+      header { display:flex; justify-content:space-between; align-items:center; padding:1rem 0 2.5rem; gap:1rem; flex-wrap:wrap; }
+      header strong { font-size:1.1rem; letter-spacing:0.08em; flex:1 1 auto; }
+      header nav { display:flex; gap:0.9rem; font-size:0.9rem; color:#475569; flex-wrap:wrap; align-items:center; }
+      header nav a { text-decoration:none; color:inherit; font-weight:600; padding:0.3rem 0.6rem; border-radius:0.5rem; transition:background .2s; display:flex; align-items:center; gap:0.35rem; }
+      header nav a:hover { background:rgba(15,23,42,0.08); }
+      .cart-count { display:inline-flex; min-width:1.5rem; justify-content:center; align-items:center; font-size:0.75rem; color:white; background:var(--primary); border-radius:999px; padding:0.05rem 0.45rem; }
+      .eyebrow { text-transform:uppercase; letter-spacing:0.2em; font-size:0.75rem; color:#94a3b8; margin-bottom:0.5rem; display:block; }
+      h1 { font-size:2.4rem; margin:0 0 0.75rem; font-weight:700; }
+      h2 { font-size:1.8rem; margin:0 0 0.5rem; }
+      .muted { color:#64748b; line-height:1.6; }
+      .hero { padding:2rem 0 3rem; }
+      .hero-actions { display:flex; gap:1rem; margin-top:1.5rem; flex-wrap:wrap; }
+      .btn { border-radius:999px; padding:0.85rem 1.6rem; border:1px solid transparent; font-weight:600; cursor:pointer; transition:all .2s ease; }
+      .btn.primary { background:var(--primary); color:white; }
+      .btn.primary:hover { opacity:.9; }
+      .btn.ghost { border-color:#cbd5f5; color:var(--primary); background:white; }
+      .btn.full { width:100%; text-align:center; }
+      .grid { display:grid; gap:1.5rem; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); margin:1.5rem 0 0; }
+      .card { background:white; border:1px solid #e2e8f0; border-radius:1.2rem; overflow:hidden; box-shadow:0 10px 30px rgba(15,23,42,0.08); position:relative; }
+      .card-image { background:linear-gradient(135deg,#e2e8f0,#f8fafc); height:220px; }
+      .card-image img { width:100%; height:100%; object-fit:cover; display:block; }
+      .card-body { padding:1.25rem; }
+      .card-badge { position:absolute; margin:1rem; background:rgba(15,23,42,0.85); color:white; padding:0.2rem 0.75rem; border-radius:999px; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; }
+      .stars { color:#fbbf24; font-size:0.85rem; display:flex; gap:0.15rem; margin:0.4rem 0 0.6rem; }
+      .split { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.25rem; margin-top:1.5rem; }
+      .testimonial, .stat-block { background:white; border-radius:1.5rem; padding:1.5rem; border:1px solid #e2e8f0; box-shadow:0 6px 20px rgba(15,23,42,0.06); }
+      .stat-block h3 { margin:0; font-size:2.2rem; }
+      .filters { display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap; }
+      .chip { border-radius:999px; border:1px solid #cbd5f5; padding:0.45rem 1rem; background:white; color:#0f172a; cursor:pointer; font-size:0.85rem; }
+      .chip.active { background:var(--primary); color:white; border-color:var(--primary); }
+      .product-layout { display:grid; gap:2rem; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); align-items:center; margin-top:1rem; }
+      .gallery { background:linear-gradient(135deg,#e2e8f0,#f8fafc); border-radius:1.5rem; height:480px; position:relative; overflow:hidden; }
+      .gallery img { width:100%; height:100%; object-fit:cover; opacity:.85; }
+      .cart { background:white; border-radius:1.5rem; padding:2rem; border:1px solid #e2e8f0; box-shadow:0 10px 30px rgba(15,23,42,0.05); max-width:520px; margin:2rem auto; }
+      .cart-row { display:flex; justify-content:space-between; align-items:center; padding:0.6rem 0; border-bottom:1px solid #e2e8f0; }
+      .cart-total { display:flex; justify-content:space-between; align-items:center; font-size:1.1rem; margin:1.25rem 0; }
+      .brands { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; margin-top:1.5rem; }
+      .brand-tile { background:white; border-radius:1rem; border:1px solid #e2e8f0; padding:1.25rem; box-shadow:0 8px 20px rgba(15,23,42,0.04); }
+      .brand-tile p { margin:0.4rem 0 0; color:#475569; font-size:0.85rem; }
+      .article-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.5rem; }
+      .article { background:white; border-radius:1.2rem; border:1px solid #e2e8f0; box-shadow:0 8px 24px rgba(15,23,42,0.05); overflow:hidden; }
+      .article img { width:100%; height:180px; object-fit:cover; }
+      .article .body { padding:1.25rem; }
+    </style>
+  </head>
+  <body>
+    <div class="preview-shell">
+      <header>
+        <strong>Deemind Preview</strong>
+        <nav>
+          <a href="/page/index">Home</a>
+<a href="/page/product/index">Products</a>
+<a href="/page/blog/index">Blog</a>
+<a href="/page/cart">Cart<span class="cart-count" data-cart-count>0</span></a>
+        </nav>
+      </header>
+      
+    <section class="hero">
+      <span class="eyebrow">Customer portal</span>
+      <h1>Welcome back, Deemind Atelier</h1>
+      <p class="muted">Mock profile page showing addresses and wallet stats.</p>
+    </section>
+    <section class="grid">
+      <article class="card">
+        <div class="card-body">
+          <span class="eyebrow">Contact</span>
+          <h3>https://atelier.deemind.local</h3>
+          <p class="muted">Wallet enabled · Wishlist enabled</p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="card-body">
+          <span class="eyebrow">Address</span>
+          <p class="muted">123 Deemind St · Riyadh, KSA</p>
+        </div>
+      </article>
+    </section>
+  
+    </div>
+  </body>
+</html>

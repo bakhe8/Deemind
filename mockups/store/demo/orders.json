@@ -1,0 +1,14 @@
+[
+  {
+    "id": "INV-1024",
+    "status": "Delivered",
+    "total": "429 SAR",
+    "date": "2025-11-02"
+  },
+  {
+    "id": "INV-1025",
+    "status": "Processing",
+    "total": "199 SAR",
+    "date": "2025-11-05"
+  }
+]
