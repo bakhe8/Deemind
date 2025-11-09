@@ -1,0 +1,16 @@
+{
+  "hero": {
+    "eyebrow": "Spring capsule · v2025-02",
+    "title": "Soft tailoring for luminous days",
+    "subtitle": "Versioned preset showcasing pastel gradients and editorial copy.",
+    "primaryCta": {
+      "label": "Explore capsule",
+      "href": "/page/landing-page"
+    },
+    "secondaryCta": {
+      "label": "Lookbook",
+      "href": "/page/blog/index"
+    },
+    "media": "https://cdn.deemind.local/hero/spring-capsule-v2025-02.png"
+  }
+}

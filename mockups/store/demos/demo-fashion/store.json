@@ -9,7 +9,7 @@
   "partials": [
     "store/fashion",
     "products/fashion",
-    "hero/spring",
+    "hero/spring@2025-02",
     "navigation/default",
     "brands/global",
     "cart/default",

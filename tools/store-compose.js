@@ -39,15 +39,35 @@ async function readJsonSafe(file) {
   }
 }
 
-function resolvePartialId(id) {
-  const normalized = id.replace(/\.json$/i, '');
-  return path.join(PARTIALS_DIR, `${normalized}.json`);
+function normalizePartial(value) {
+  if (typeof value === 'string') {
+    const at = value.lastIndexOf('@');
+    const hasVersion = at > value.lastIndexOf('/');
+    const id = hasVersion ? value.slice(0, at) : value;
+    const version = hasVersion ? value.slice(at + 1) : undefined;
+    const key = version ? `${id}@${version}` : id;
+    return { id, version, key };
+  }
+  if (value && typeof value === 'object') {
+    const id = value.id?.trim();
+    const version = value.version?.trim();
+    if (!id) throw new Error('Partial entries must include an id.');
+    const key = version ? `${id}@${version}` : id;
+    return { id, version, key };
+  }
+  throw new Error(`Invalid partial entry: ${value}`);
 }
 
-async function loadPartial(id) {
-  const filePath = resolvePartialId(id);
+function resolvePartialPath(entry) {
+  const suffix = entry.version ? `@${entry.version}` : '';
+  const normalized = entry.id.replace(/\.json$/i, '');
+  return path.join(PARTIALS_DIR, `${normalized}${suffix}.json`);
+}
+
+async function loadPartial(entry) {
+  const filePath = resolvePartialPath(entry);
   if (!(await fs.pathExists(filePath))) {
-    throw new Error(`Unknown partial "${id}" (expected ${filePath})`);
+    throw new Error(`Unknown partial "${entry.key}" (expected ${filePath})`);
   }
   return readJsonSafe(filePath);
 }
@@ -88,18 +108,29 @@ export async function listStoreDemos() {
 export async function composeStore(demoId = 'electronics', options = {}) {
   const { overrides = {}, includeOnly, writeCache = true } = options;
   const manifest = await loadManifest(demoId);
-  const partials = manifest.partials || [];
-  const filtered = Array.isArray(includeOnly) && includeOnly.length
-    ? partials.filter((id) => includeOnly.includes(id))
-    : partials;
+  const partialEntries = (manifest.partials || []).map((entry) => normalizePartial(entry));
+
+  let includeSet = null;
+  if (Array.isArray(includeOnly) && includeOnly.length) {
+    includeSet = new Set();
+    includeOnly.forEach((value) => {
+      const parsed = normalizePartial(value);
+      includeSet.add(parsed.key);
+      includeSet.add(parsed.id);
+    });
+  }
+
+  const filtered = includeSet
+    ? partialEntries.filter((entry) => includeSet.has(entry.key) || includeSet.has(entry.id))
+    : partialEntries;
 
   if (!filtered.length) {
     throw new Error(`Demo "${demoId}" does not reference any partials.`);
   }
 
   let composedData = {};
-  for (const partialId of filtered) {
-    const partialData = await loadPartial(partialId);
+  for (const partialEntry of filtered) {
+    const partialData = await loadPartial(partialEntry);
     composedData = deepMerge(composedData, partialData);
   }
   composedData = deepMerge(composedData, overrides);
@@ -108,7 +139,7 @@ export async function composeStore(demoId = 'electronics', options = {}) {
     id: manifest.id || demoId,
     name: manifest.name || demoId,
     meta: manifest.meta || {},
-    partials: filtered,
+    partials: filtered.map((entry) => entry.key),
     generatedAt: new Date().toISOString(),
     data: composedData,
   };

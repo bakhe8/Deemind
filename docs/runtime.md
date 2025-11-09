@@ -119,6 +119,8 @@ npm run preview:stub demo
 | `dashboard/src/components/StubStatusCard.tsx` | Shared UI component for Start/Stop/Open/Reset controls.                                       |
 | `runtime/twilight/twilight-shim.js`           | Lightweight Twilight bridge loaded when the shim is enabled.                                  |
 | `logs/runtime-analytics.jsonl`                | Streaming JSONL log of stub API calls (used by dashboard reports).                            |
+| `logs/runtime-scenarios/*.json`               | Scenario runner outputs (chain metadata + per-step details).                                  |
+| `mockups/store/partials/**`                   | Composable JSON blocks; supports `@version` suffix for frozen variants.                       |
 
 ### Twilight / NEXUS shim
 
