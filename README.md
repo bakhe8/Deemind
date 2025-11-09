@@ -14,6 +14,23 @@
 Input folder → `/input/demo`  
 Output folder → `/output/demo`
 
+## 📁 Repository Layout (Runtime 1.1)
+
+```
+core/
+  contracts/       # Theme + API schemas shared between service & dashboard
+  salla/           # Synced Salla schema/filters/partials via `npm run salla:sync`
+  mock/            # Reusable mock datasets (store, products, user, etc.)
+  logger/          # Central log utilities (JSONL + SSE hooks)
+service/           # Express API (task runner, uploads, runtime controls)
+dashboard/         # React/Vite control center
+runtime/           # Preview + runtime stub engines
+tools/             # CLI helpers (store-compose, runtime-scenario, salla-sync)
+docs/              # Architecture, roadmap, runbook, Salla references
+```
+
+> Tip: run `npm run salla:sync` whenever you need the latest Salla schema/filter/partial definitions. The snapshots land in `core/salla/*` with metadata recorded in `core/salla/meta.json`.
+
 ### Local Service, Dashboard & Preview
 
 Deemind now ships with an always-on local service + dashboard bundle:
@@ -32,6 +49,17 @@ npm run deemind:preview demo
 - The **dashboard** covers the entire factory: Upload → Parser → Adapter → Validation → Reports → Settings.
 - Each successful build triggers **preview prep** + the preview server; you can open it from the dashboard’s “Live Preview” card or via `http://localhost:3000`.
 - Want automation? Double-click the **Deemind Launcher** on your desktop to start the service, dashboard, and preview at once.
+
+### Windows Launcher
+
+On Windows you can orchestrate everything via PowerShell. Example:
+
+```powershell
+cd C:\Users\Bakheet\Documents\peojects\deemind
+.\start-deemind.ps1 -DashboardMode dist -DashboardPort 5758 -LaunchStub -Theme demo
+```
+
+The script cleans ports, starts the service, launches the dashboard (dev or dist), optionally spawns the runtime stub, and opens the UI. Logs are written under `logs/launcher/`.
 
 ### Desktop Bundle (Phase 5 option)
 
@@ -90,6 +118,20 @@ Update `data/mock-store.json` if you want different store/products/cart defaults
 > Need the full architecture, API list, and dashboard integration details? See [docs/runtime.md](docs/runtime.md).
 
 > Tip: The Dashboard → Settings page now exposes “Runtime Stub” controls so you can start/stop the stub and inspect its logs without leaving the UI.
+
+#### Multi-stub control & APIs
+
+Every theme can have its own stub instance. The service keeps track of active processes in `stubPool`, and the dashboard ships with a `ThemeStubList` widget (Upload, Adapter, Settings, Runtime Inspector) so you can spin up or stop preview servers per theme with a click. Under the hood:
+
+| Endpoint                                                    | What it does                                                                                      |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `GET /api/preview/stubs`                                    | Returns every running stub: theme, port, recent logs.                                             |
+| `GET /api/preview/stub?theme=demo`                          | Fetches the status/port for a specific theme (falls back to the first running stub).              |
+| `POST /api/preview/stub { "theme": "demo", "port": 4201? }` | Seeds snapshots (if missing) and launches `server/runtime-stub.js` on the next free port.         |
+| `DELETE /api/preview/stub { "theme": "demo" }`              | Stops only that stub (or all of them when no theme is provided).                                  |
+| `POST /api/preview/stub/reset { "theme": "demo" }`          | Clears the persisted state file; if the stub is online it resets in-place via `/api/state/reset`. |
+
+Because ports are assigned dynamically, the dashboard always exposes an “Open Preview” button for each theme. You can safely run `demo`, `animal`, and `salla-new-theme` stubs simultaneously and switch between them inside Runtime Inspector without losing cart/session data.
 
 #### Store Presets & Scenario Runner
 
@@ -195,6 +237,9 @@ npm run deemind:build demo Parse, map, adapt, validate, and output theme
 npm run deemind:validate Run extended QA validator only
 npm run deemind:test Execute test fixtures for regression checking
 npm run deemind:preview demo Serve /output/demo in the preview server (http://localhost:3000)
+npm run mock:data demo electronics Build aggregated mock context (store/products/cart/locales)
+npm run mock:context demo Extract Twig variable structure for previews
+npm run test:mock Sanity-check the mock data layer (store/products/categories/navigation)
 
 🧠 7️⃣ What’s Next
 
@@ -211,6 +256,10 @@ You can now rename your local folder to deemind, run the CLI as-is, and you’ll
 
 ## 📚 Documentation Index
 
+- [Deemind-Architecture.md](docs/Deemind-Architecture.md)
+- [Salla-Integration-Plan.md](docs/Salla-Integration-Plan.md)
+- [Friction-Reduction-Plan.md](docs/Friction-Reduction-Plan.md)
+- [runbook.md](docs/runbook.md)
 - [Adapters.md](docs/Adapters.md)
 - [DEEMIND_STABLE.md](docs/DEEMIND_STABLE.md)
 - [Harmony.md](docs/Harmony.md)

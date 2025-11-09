@@ -35,6 +35,19 @@ mockups/store/partials/   # Composable JSON blocks (products, hero, locales…)
 mockups/store/demos/      # Manifest files describing each demo preset
 mockups/store/cache/      # Composed snapshots written by store-compose.js
 preview-static/<theme>/   # HTML snapshots used by the stub
+
+Core references shared across service + dashboard live at the repository root:
+
+```
+
+core/contracts/ # Theme + API schemas (imported by service + dashboard via @contracts alias)
+core/salla/ # Synced schema/filters/partials → run `npm run salla:sync` to refresh
+core/mock/ # Baseline mock datasets used by preview + runtime scenarios
+core/logger/ # Centralized logging helpers (JSONL writer + SSE broadcaster)
+
+```
+
+Every sync operation records hashes and timestamps in `core/salla/meta.json`, making it easy to audit which schema snapshot a build relied on.
 ```
 
 Key behaviors inside `server/runtime-stub.js`:
@@ -54,18 +67,29 @@ Key behaviors inside `server/runtime-stub.js`:
 | `npm run preview:stub demo`              | Start the runtime stub for `demo` on port 4100.                                                                       |
 | `npm run preview:launch demo`            | Seeds snapshots, launches stub, opens the browser (helper script).                                                    |
 | `npm run runtime:scenario demo checkout` | Runs scripted flows (add-to-cart/checkout/wishlist) against the stub and writes logs under `logs/runtime-scenarios/`. |
+| `npm run runtime:smoke demo electronics` | Spins up a stub, applies a composed preset, and sanity-checks cart/auth/wishlist APIs (ideal for CI smoke gates).     |
+| `npm run mock:data demo electronics`     | Compose `core/mock` + demo partials into `mockups/store/cache/context/demo.json` for previews/runtime.                |
+| `npm run mock:context demo`              | Scan Twig output and record required context keys (`mockups/store/cache/context/demo-structure.json`).                |
 
 Service & dashboard endpoints:
 
 | Endpoint                                                     | Description                                                                                            |
 | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| `GET /api/preview/stubs`                                     | Enumerate every running stub (`theme`, `port`, `logs`).                                                |
+| `GET /api/preview/stub?theme=demo`                           | Return `{ running, theme, port }` for a specific theme (defaults to the first running stub).           |
 | `POST /api/preview/stub { theme }`                           | Seed snapshots and start the stub process.                                                             |
 | `DELETE /api/preview/stub`                                   | Stop the stub.                                                                                         |
 | `POST /api/preview/stub/reset { theme? }`                    | Clear persisted state or hot-reset the running stub.                                                   |
 | `GET /api/preview/stub/logs`                                 | Tail the stub logs in the dashboard.                                                                   |
 | `GET /api/store/demos`                                       | List available demo compositions (from `mockups/store/demos`).                                         |
+| `GET /api/store/partials`                                    | Enumerate every composable JSON block discovered under `mockups/store/partials`.                       |
 | `GET /api/store/compose?demo=fashion&parts=products/fashion` | Preview a composition without applying it.                                                             |
+| `GET /api/runtime/context`                                   | Snapshot of current mock context (store/products/cart/locales/etc.).                                   |
+| `POST /api/runtime/context/regenerate`                       | Rebuild mock context from core presets and reseed stub state.                                          |
 | `POST /api/store/preset { demo, overrides?, parts? }`        | Compose the requested demo, persist it to `runtime/state/`, and (if running) hot-swap the stub’s data. |
+| `POST /api/runtime/scenario { theme, chain }`                | Enqueue a scripted flow (same as `npm run runtime:scenario`) through the service task runner.          |
+
+Dashboard pages (Upload, Adapter/Baseline, Settings, Runtime Inspector) all share a `ThemeStubList` widget that consumes the endpoints above so you can launch, stop, reset, or open preview servers for multiple themes without leaving the UI.
 
 Runtime stub endpoints (when running):
 
@@ -143,5 +167,16 @@ Toggle the Twilight shim from the dashboard Settings page (or via `POST /api/twi
 
 - `/api/runtime/scenarios` → used by the Dashboard Validation page
 - Each log captures `chain`, per-scenario status, and every HTTP step with request/response payloads.
+
+### Smoke test
+
+`npm run runtime:smoke <theme> <demo>` is a lightweight CI gate that:
+
+- Seeds the selected theme’s static preview files.
+- Launches (or reuses) a stub on a dedicated port.
+- Applies the chosen demo preset through the stub’s `/api/store/preset`.
+- Exercises core APIs (state, cart add/clear, auth login/me, wishlist toggle).
+
+It exits non-zero if any step fails, making it safe to wire into CI before heavier scenario chains or dashboard-driven validations.
 
 Until then, Version 1.0 already delivers a complete offline experience: build, preview, interact, and inspect every theme without leaving your machine.

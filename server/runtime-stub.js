@@ -3,6 +3,7 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs-extra';
 import { composeStore, listStoreDemos, deepMerge as mergeStoreData } from '../tools/store-compose.js';
+import { buildMockContext, writeMockContext } from '../tools/mock-layer/mock-data-builder.js';
 
 const app = express();
 app.use(express.json({ limit: '2mb' }));
@@ -25,7 +26,7 @@ const PORT = Number(process.env.PREVIEW_PORT || 4100);
 
 const staticDir = path.resolve('preview-static', theme, 'pages');
 const assetsDir = path.resolve('preview-static', theme);
-const mockStorePath = path.resolve('data', 'mock-store.json');
+const mockStorePath = path.resolve('mockups', 'store', 'cache', 'context', `${theme}.json`);
 const themeStorePath = path.resolve('data', `mock-store-${theme}.json`);
 const localesDir = path.resolve('data', 'locales');
 const stateRoot = path.resolve('runtime', 'state');
@@ -47,6 +48,7 @@ const defaultState = {
   cart: { items: [], total: 0 },
   wishlist: { items: [] },
   session: { user: null, token: null },
+  locales: {},
 };
 
 const deepClone = (value) => JSON.parse(JSON.stringify(value));
@@ -61,9 +63,13 @@ async function readJsonSafe(file, fallback = defaultState) {
 }
 
 async function buildSeedState() {
-  const base = fs.existsSync(themeStorePath)
+  const hasThemeStore = await fs.pathExists(themeStorePath);
+  const hasCacheStore = await fs.pathExists(mockStorePath);
+  const base = hasThemeStore
     ? await readJsonSafe(themeStorePath, defaultState)
-    : await readJsonSafe(mockStorePath, defaultState);
+    : hasCacheStore
+    ? await readJsonSafe(mockStorePath, defaultState)
+    : defaultState;
   return {
     ...deepClone(defaultState),
     ...deepClone(base),
@@ -71,6 +77,7 @@ async function buildSeedState() {
     wishlist: base.wishlist ? { items: base.wishlist.items || [] } : deepClone(defaultState.wishlist),
     session: base.session ? { user: base.session.user || null, token: base.session.token || null } : deepClone(defaultState.session),
     products: Array.isArray(base.products) ? base.products : [],
+    locales: base.locales || {},
   };
 }
 
@@ -105,6 +112,10 @@ let productsState = Array.isArray(initialState.products) ? initialState.products
 let cartState = cloneCart(initialState.cart);
 let wishlistState = cloneWishlist(initialState.wishlist);
 let sessionState = cloneSession(initialState.session);
+let navigationState = Array.isArray(initialState.navigation) ? initialState.navigation.map((item) => ({ ...item })) : [];
+let heroState = deepClone(initialState.hero || {});
+let categoriesState = Array.isArray(initialState.categories) ? initialState.categories.map((item) => ({ ...item })) : [];
+let userState = initialState.user ? { ...initialState.user } : null;
 let presetState = initialState.preset || null;
 let twilightEnabled = true;
 
@@ -143,7 +154,15 @@ async function setLocale(code) {
   translations = await loadLocaleBundle(next);
   storeState.language = next;
   persistState();
-  broadcast('store', { store: storeState, locale: translations });
+  broadcast('store', {
+    store: storeState,
+    locale: translations,
+    navigation: navigationState,
+    hero: heroState,
+    categories: categoriesState,
+    user: userState,
+  });
+  broadcast('context', snapshotState());
   return { language: next, locale: translations };
 }
 
@@ -155,6 +174,10 @@ function applyState(next) {
   cartState = cloneCart(next.cart);
   wishlistState = cloneWishlist(next.wishlist);
   sessionState = cloneSession(next.session);
+  navigationState = Array.isArray(next.navigation) ? next.navigation.map((item) => ({ ...item })) : [];
+  heroState = deepClone(next.hero || {});
+  categoriesState = Array.isArray(next.categories) ? next.categories.map((item) => ({ ...item })) : [];
+  userState = next.user ? { ...next.user } : null;
   presetState = next.preset || null;
 }
 
@@ -166,6 +189,16 @@ function snapshotState() {
     cart: cartState,
     wishlist: wishlistState,
     session: sessionState,
+    navigation: navigationState,
+    hero: heroState,
+    categories: categoriesState,
+    user: userState,
+    locales: translations,
+    meta: {
+      theme,
+      preset: presetState?.demo || null,
+      generatedAt: new Date().toISOString(),
+    },
   });
 }
 
@@ -182,7 +215,15 @@ async function resetRuntimeState() {
   broadcast('cart', cartState);
   broadcast('wishlist', wishlistState);
   broadcast('session', sessionState);
-  broadcast('store', { store: storeState, locale: translations });
+  broadcast('store', {
+    store: storeState,
+    locale: translations,
+    navigation: navigationState,
+    hero: heroState,
+    categories: categoriesState,
+    user: userState,
+  });
+  broadcast('context', snapshotState());
   return snapshotState();
 }
 
@@ -228,12 +269,26 @@ async function hydrateFromComposedStore(composed) {
   broadcast('cart', cartState);
   broadcast('wishlist', wishlistState);
   broadcast('session', sessionState);
-  broadcast('store', { store: storeState, locale: translations });
+  broadcast('store', {
+    store: storeState,
+    locale: translations,
+    navigation: navigationState,
+    hero: heroState,
+    categories: categoriesState,
+    user: userState,
+  });
+  broadcast('context', snapshotState());
   return snapshotState();
 }
 
 async function applyStorePreset({ demo = 'electronics', overrides = {}, includeOnly } = {}) {
   const composed = await composeStore(demo, { overrides, includeOnly, writeCache: true });
+  try {
+    const context = await buildMockContext(demo);
+    await writeMockContext(theme, context);
+  } catch (error) {
+    console.warn(`⚠️ Failed to refresh mock context for preset ${demo}:`, error.message || error);
+  }
   const snapshot = await hydrateFromComposedStore(composed);
   return { composed, snapshot };
 }
@@ -267,14 +322,7 @@ function recalcCart() {
 }
 
 function injectRuntime(html) {
-  const payload = {
-    store: storeState,
-    products: productsState,
-    cart: cartState,
-    locale: translations,
-    wishlist: wishlistState,
-    session: sessionState,
-  };
+  const payload = snapshotState();
   const script = `
     <script>
       (() => {
@@ -284,7 +332,10 @@ function injectRuntime(html) {
         window.__SALLA_STUB__ = ${JSON.stringify(payload).replace(/<\/script>/gi, '<\\/script>')};
         document.documentElement.lang = window.__SALLA_STUB__.store?.language || 'en';
         window.salla = window.salla || {};
-        window.salla.t = (key) => (window.__SALLA_STUB__.locale && window.__SALLA_STUB__.locale[key]) || key;
+        window.salla.t = (key) => {
+          const bundles = window.__SALLA_STUB__.locales || {};
+          return bundles[key] || key;
+        };
         window.salla.cart = {
           addItem: (id, quantity = 1) => invoke('/api/cart/add', { id, quantity }),
           removeItem: (id) => invoke('/api/cart/remove', { id }),
@@ -459,8 +510,20 @@ function injectRuntime(html) {
         source.addEventListener('store', (evt) =>
           handle(evt, (payload) => {
             window.__SALLA_STUB__.store = payload.store;
-            window.__SALLA_STUB__.locale = payload.locale;
-            document.documentElement.lang = payload.store.language || 'en';
+            window.__SALLA_STUB__.locales = payload.locale;
+            window.__SALLA_STUB__.navigation = payload.navigation || window.__SALLA_STUB__.navigation || [];
+            window.__SALLA_STUB__.hero = payload.hero || window.__SALLA_STUB__.hero || {};
+            document.documentElement.lang = (payload.store && payload.store.language) || 'en';
+          }),
+        );
+        source.addEventListener('context', (evt) =>
+          handle(evt, (snapshot) => {
+            window.__SALLA_STUB__ = snapshot;
+            updateCartBadge(snapshot.cart);
+            updateWishlistBadge(snapshot.wishlist);
+            syncWishlistButtons();
+            updateAuthState(snapshot.session);
+            document.documentElement.lang = (snapshot.store && snapshot.store.language) || 'en';
           }),
         );
         source.onerror = (error) => console.warn('SSE connection issue', error);
@@ -475,6 +538,7 @@ function logAnalytics(entry) {
   const payload = {
     ts: new Date().toISOString(),
     preset: presetState?.demo || null,
+    theme,
     ...entry,
   };
   fs.appendFile(analyticsLogPath, `${JSON.stringify(payload)}\n`).catch(() => undefined);
@@ -497,6 +561,18 @@ app.get('/api/state', (_req, res) => res.json(snapshotState()));
 app.post('/api/state/reset', async (_req, res) => {
   const next = await resetRuntimeState();
   res.json({ success: true, state: next });
+});
+app.get('/api/runtime/context', (_req, res) => res.json(snapshotState()));
+app.post('/api/runtime/context/regenerate', async (req, res) => {
+  const demo = String(req.body?.demo || presetState?.demo || theme || 'electronics');
+  try {
+    const context = await buildMockContext(demo);
+    await writeMockContext(theme, context);
+    const state = await resetRuntimeState();
+    res.json({ success: true, demo, state });
+  } catch (error) {
+    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+  }
 });
 app.get('/api/store/demos', async (_req, res) => {
   try {

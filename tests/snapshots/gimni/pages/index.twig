@@ -472,8 +472,8 @@
     <div class="container mx-auto px-4 py-2 flex items-center justify-between">
       <p>شحن سريع — دفع آمن — منتجات أصلية 100%</p>
       <div class="flex items-center gap-4">
-        <span class="flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> ضمان سنة</span>
-        <span class="flex items-center gap-2"><i class="fa-solid fa-truck-fast"></i> توصيل خلال 48 ساعة*</span>
+        <span class="flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i>{% trans %}ضمان سنة{% endtrans %}</span>
+        <span class="flex items-center gap-2"><i class="fa-solid fa-truck-fast"></i>{% trans %}توصيل خلال 48 ساعة*{% endtrans %}</span>
       </div>
     </div>
   </div>
@@ -486,9 +486,9 @@
     <div class="container mx-auto px-4 py-3 flex items-center gap-3 justify-between">
       <!-- Left Side: Menu + Logo -->
       <div class="flex items-center gap-3">
-        <button id="sidebarToggle" class="lg:hidden px-3 py-2 rounded-xl bg-white ring-1 ring-gray-200 hover:bg-gray-50 dark:bg-gray-700 dark:ring-white/10 dark:hover:bg-gray-600" aria-label="{{ &quot;Menu&quot; | t }}"><i class="fa-solid fa-bars"></i></button>
-        <a href="#" class="flex items-center gap-2" aria-label="{{ &quot;Home&quot; | t }}">{% trans %}NEEDS BOXES{% endtrans %}</a>
-        <nav class="hidden lg:flex items-center gap-6 font-semibold" aria-label="{{ &quot;Main Navigation&quot; | t }}">
+        <button id="sidebarToggle" class="lg:hidden px-3 py-2 rounded-xl bg-white ring-1 ring-gray-200 hover:bg-gray-50 dark:bg-gray-700 dark:ring-white/10 dark:hover:bg-gray-600" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Menu&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}"><i class="fa-solid fa-bars"></i></button>
+        <a href="#" class="flex items-center gap-2" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Home&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">{% trans %}NEEDS BOXES{% endtrans %}</a>
+        <nav class="hidden lg:flex items-center gap-6 font-semibold" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Main Navigation&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
           <a class="hover:text-[var(--primary-blue)] dark:hover:text-[var(--accent-coral)] transition-colors duration-200" href="#offers">{% trans %}العروض{% endtrans %}</a>
           <a class="hover:text-[var(--primary-blue)] dark:hover:text-[var(--accent-coral)] transition-colors duration-200" href="#categories">{% trans %}التصنيفات{% endtrans %}</a>
           <a class="hover:text-[var(--primary-blue)] dark:hover:text-[var(--accent-coral)] transition-colors duration-200" href="#featured-products">{% trans %}المميزة{% endtrans %}</a>
@@ -499,19 +499,19 @@
       <!-- Right Side: Search + Actions -->
       <div class="flex items-center gap-2">
         <div class="relative hidden md:block">
-          <input id="searchInput" class="peer w-64 px-4 py-2 rounded-full border dark:border-white/10 dark:bg-gray-700 outline-none focus:ring-2 focus:ring-[var(--primary-blue)]" placeholder="ابحث عن المنتجات…" aria-label="{{ &quot;Search products&quot; | t }}">
+          <input id="searchInput" class="peer w-64 px-4 py-2 rounded-full border dark:border-white/10 dark:bg-gray-700 outline-none focus:ring-2 focus:ring-[var(--primary-blue)]" placeholder="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'ابحث عن المنتجات…\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Search products&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" aria-hidden="true"></i>
         </div>
         <!-- 5. Dual Language & Direction Support -->
-        <button id="dirToggle" class="px-3 py-2 rounded-xl bg-white ring-1 ring-gray-200 hover:bg-gray-50 dark:bg-gray-700 dark:ring-white/10 dark:hover:bg-gray-600" aria-label="{{ &quot;Toggle Language Direction&quot; | t }}">
+        <button id="dirToggle" class="px-3 py-2 rounded-xl bg-white ring-1 ring-gray-200 hover:bg-gray-50 dark:bg-gray-700 dark:ring-white/10 dark:hover:bg-gray-600" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Toggle Language Direction&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
           <i class="fa-solid fa-language"></i>
         </button>
         <!-- 4. Dynamic Theming Engine -->
-        <button id="themeToggle" class="px-3 py-2 rounded-xl bg-white ring-1 ring-gray-200 hover:bg-gray-50 dark:bg-gray-700 dark:ring-white/10 dark:hover:bg-gray-600" aria-label="{{ &quot;Toggle Dark Mode&quot; | t }}">
+        <button id="themeToggle" class="px-3 py-2 rounded-xl bg-white ring-1 ring-gray-200 hover:bg-gray-50 dark:bg-gray-700 dark:ring-white/10 dark:hover:bg-gray-600" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Toggle Dark Mode&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
           <i class="fa-solid fa-moon"></i>
         </button>
         <!-- 1. Mini-Cart Drawer -->
-        <button id="cartBtn" class="px-4 py-2 rounded-full text-white bg-gradient-to-r from-[var(--accent-coral)] to-[var(--accent-orange-dark)] hover:shadow-lg shadow-coral flex items-center gap-2" aria-label="{{ &quot;View Cart&quot; | t }}">{% trans %}0{% endtrans %}</button>
+        <button id="cartBtn" class="px-4 py-2 rounded-full text-white bg-gradient-to-r from-[var(--accent-coral)] to-[var(--accent-orange-dark)] hover:shadow-lg shadow-coral flex items-center gap-2" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;View Cart&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">{% trans %}0{% endtrans %}</button>
       </div>
     </div>
     <!-- Decorative bottom border -->
@@ -520,13 +520,13 @@
 
   <!-- 1. Header & Navigation: Sidebar (Mobile Menu) -->
   <div id="sidebarOverlay" class="sidebar-overlay" aria-hidden="true"></div>
-  <aside id="sidebar" class="sidebar" aria-label="{{ &quot;Site menu&quot; | t }}">
+  <aside id="sidebar" class="sidebar" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Site menu&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
     <div class="p-4 border-b border-gray-200/70 dark:border-white/10 flex items-center justify-between">
       <h2 class="font-extrabold text-lg text-[var(--primary-dark)] dark:text-[var(--accent-coral)]">{% trans %}NEEDS BOXES{% endtrans %}</h2>
-      <button id="sidebarClose" class="text-2xl" aria-label="{{ &quot;Close&quot; | t }}"><i class="fa-solid fa-xmark"></i></button>
+      <button id="sidebarClose" class="text-2xl" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Close&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="p-4 space-y-3 overflow-y-auto">
-      <div class="mb-2"><input id="mobileSearch" type="search" placeholder="ابحث…" class="w-full px-4 py-2.5 rounded-full border dark:border-white/10 dark:bg-gray-700 bg-white/90 focus:outline-none focus:ring-2 focus:ring-[var(--primary-blue)]" aria-label="{{ &quot;Search&quot; | t }}"></div>
+      <div class="mb-2"><input id="mobileSearch" type="search" placeholder="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'ابحث…\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}" class="w-full px-4 py-2.5 rounded-full border dark:border-white/10 dark:bg-gray-700 bg-white/90 focus:outline-none focus:ring-2 focus:ring-[var(--primary-blue)]" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Search&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}"></div>
       <a class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200" href="#">{% trans %}الرئيسية{% endtrans %}</a>
       <a class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200" href="#categories">{% trans %}التصنيفات{% endtrans %}</a>
       <a class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200" href="#featured-products">{% trans %}المميزة{% endtrans %}</a>
@@ -542,16 +542,16 @@
       IV. HERO, PROMOTIONAL & TRUST SECTIONS
       1. Hero Section (Swiper)
     -->
-    <section id="hero" class="relative h-[70vh] min-h-[500px] overflow-hidden bg-brand-blue text-white" aria-label="{{ &quot;عرض الشركة&quot; | t }}">
+    <section id="hero" class="relative h-[70vh] min-h-[500px] overflow-hidden bg-brand-blue text-white" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;عرض الشركة&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
       <div class="swiper hero-swiper w-full h-full">
         <div class="swiper-wrapper">
           <!-- Slide 1 -->
           <div class="swiper-slide">
             <div class="hero-slide relative h-full flex items-center justify-center text-center">
-              <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&amp;w=2070&amp;auto=format&amp;fit=crop" alt="{{ &quot;خلفية&quot; | t }}" class="absolute inset-0 w-full h-full object-cover opacity-20" loading="eager">
+              <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&amp;w=2070&amp;auto=format&amp;fit=crop" alt="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;خلفية&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}" class="absolute inset-0 w-full h-full object-cover opacity-20" loading="eager">
               <div class="hero-content relative z-10 max-w-2xl p-8" data-aos="fade-up">
                 <h1 class="hero-title text-3xl sm:text-5xl mb-4 font-extrabold text-white">{% trans %}الأجهزة التي تثق بها{% endtrans %}</h1>
-                <p class="hero-subtitle text-lg sm:text-xl mb-8 opacity-90">اكتشف مجموعتنا من الإلكترونيات عالية الجودة والملحقات المبتكرة.</p>
+                <p class="hero-subtitle text-lg sm:text-xl mb-8 opacity-90">{% trans %}اكتشف مجموعتنا من الإلكترونيات عالية الجودة والملحقات المبتكرة.{% endtrans %}</p>
                 <a href="#featured-products" class="hero-cta inline-block bg-white text-primary-dark px-8 py-3 rounded-full text-lg font-bold shadow-lg hover:bg-gray-100 transition-all hover:-translate-y-0.5">{% trans %}تسوق الآن{% endtrans %}</a>
               </div>
             </div>
@@ -559,10 +559,10 @@
           <!-- Slide 2 -->
           <div class="swiper-slide">
             <div class="hero-slide relative h-full flex items-center justify-center text-center">
-              <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&amp;w=2070&amp;auto=format&amp;fit=crop" alt="{{ &quot;خلفية&quot; | t }}" class="absolute inset-0 w-full h-full object-cover opacity-20">
+              <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&amp;w=2070&amp;auto=format&amp;fit=crop" alt="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;خلفية&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}" class="absolute inset-0 w-full h-full object-cover opacity-20">
               <div class="hero-content relative z-10 max-w-2xl p-8" data-aos="fade-up">
                 <h1 class="hero-title text-3xl sm:text-5xl mb-4 font-extrabold text-white">{% trans %}عروض وتخفيضات حصرية{% endtrans %}</h1>
-                <p class="hero-subtitle text-lg sm:text-xl mb-8 opacity-90">استفد من عروضنا الحصرية وتوصيل سريع لجميع أنحاء المملكة.</p>
+                <p class="hero-subtitle text-lg sm:text-xl mb-8 opacity-90">{% trans %}استفد من عروضنا الحصرية وتوصيل سريع لجميع أنحاء المملكة.{% endtrans %}</p>
                 <a href="#offers" class="hero-cta inline-block bg-white text-primary-dark px-8 py-3 rounded-full text-lg font-bold shadow-lg hover:bg-gray-100 transition-all hover:-translate-y-0.5">{% trans %}استعرض العروض{% endtrans %}</a>
               </div>
             </div>
@@ -605,25 +605,25 @@
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden flex flex-col md:flex-row items-center p-6 md:p-8">
           <!-- Product Image -->
           <div class="w-full md:w-1/3 mb-4 md:mb-0">
-            <img src="https://cdn.salla.sa/mQbARj/2w1sSRRfycRdql1J5TMiIlC1EiOaFAGM8dkCu4yT.jpg" alt="{{ &quot;Deal of the Day&quot; | t }}" class="rounded-xl object-cover w-full" loading="lazy" decoding="async">
+            <img src="https://cdn.salla.sa/mQbARj/2w1sSRRfycRdql1J5TMiIlC1EiOaFAGM8dkCu4yT.jpg" alt="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Deal of the Day&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}" class="rounded-xl object-cover w-full" loading="lazy" decoding="async">
           </div>
           <!-- Deal Details -->
           <div class="w-full md:w-2/3 text-center md:text-right md:pr-8">
-            <span class="inline-block bg-accent-coral text-white text-sm font-bold px-4 py-1 rounded-full mb-3">عرض اليوم</span>
+            <span class="inline-block bg-accent-coral text-white text-sm font-bold px-4 py-1 rounded-full mb-3">{% trans %}عرض اليوم{% endtrans %}</span>
             <h2 class="font-heading text-3xl font-extrabold mb-2">{% trans %}سماعة M90 Pro اللاسلكية{% endtrans %}</h2>
-            <p class="text-gray-600 dark:text-gray-300 mb-4">تجربة صوتية لا مثيل لها مع شاشة LED لمعرفة الشحن. احصل عليها الآن!</p>
+            <p class="text-gray-600 dark:text-gray-300 mb-4">{% trans %}تجربة صوتية لا مثيل لها مع شاشة LED لمعرفة الشحن. احصل عليها الآن!{% endtrans %}</p>
             <div class="flex items-center justify-center md:justify-start gap-3 mb-4">
-              <span class="text-primary-dark dark:text-white font-bold text-3xl">٤٠ ر.س</span>
-              <span class="text-gray-400 line-through text-xl">٧٥ ر.س</span>
+              <span class="text-primary-dark dark:text-white font-bold text-3xl">{% trans %}٤٠ ر.س{% endtrans %}</span>
+              <span class="text-gray-400 line-through text-xl">{% trans %}٧٥ ر.س{% endtrans %}</span>
             </div>
             <!-- Countdown Timer -->
             <div class="mb-5">
-              <p class="font-bold text-gray-700 dark:text-gray-300 mb-2">ينتهي العرض خلال:</p>
-              <div id="countdown-timer" class="flex justify-center md:justify-start gap-2 text-center" aria-label="{{ &quot;Time left for deal&quot; | t }}">
-                <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-xl min-w-[70px]"><span id="countdown-days" class="text-2xl font-bold text-primary-dark dark:text-white block">--</span><span class="text-xs text-gray-600 dark:text-gray-400">أيام</span></div>
-                <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-xl min-w-[70px]"><span id="countdown-hours" class="text-2xl font-bold text-primary-dark dark:text-white block">--</span><span class="text-xs text-gray-600 dark:text-gray-400">ساعات</span></div>
-                <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-xl min-w-[70px]"><span id="countdown-minutes" class="text-2xl font-bold text-primary-dark dark:text-white block">--</span><span class="text-xs text-gray-600 dark:text-gray-400">دقائق</span></div>
-                <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-xl min-w-[70px]"><span id="countdown-seconds" class="text-2xl font-bold text-primary-dark dark:text-white block">--</span><span class="text-xs text-gray-600 dark:text-gray-400">ثواني</span></div>
+              <p class="font-bold text-gray-700 dark:text-gray-300 mb-2">{% trans %}ينتهي العرض خلال:{% endtrans %}</p>
+              <div id="countdown-timer" class="flex justify-center md:justify-start gap-2 text-center" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Time left for deal&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
+                <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-xl min-w-[70px]"><span id="countdown-days" class="text-2xl font-bold text-primary-dark dark:text-white block">--</span><span class="text-xs text-gray-600 dark:text-gray-400">{% trans %}أيام{% endtrans %}</span></div>
+                <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-xl min-w-[70px]"><span id="countdown-hours" class="text-2xl font-bold text-primary-dark dark:text-white block">--</span><span class="text-xs text-gray-600 dark:text-gray-400">{% trans %}ساعات{% endtrans %}</span></div>
+                <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-xl min-w-[70px]"><span id="countdown-minutes" class="text-2xl font-bold text-primary-dark dark:text-white block">--</span><span class="text-xs text-gray-600 dark:text-gray-400">{% trans %}دقائق{% endtrans %}</span></div>
+                <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-xl min-w-[70px]"><span id="countdown-seconds" class="text-2xl font-bold text-primary-dark dark:text-white block">--</span><span class="text-xs text-gray-600 dark:text-gray-400">{% trans %}ثواني{% endtrans %}</span></div>
               </div>
             </div>
             <!-- CTA -->
@@ -682,16 +682,16 @@
           </div>
           <!-- Sorting & Price -->
           <div class="flex flex-col sm:flex-row items-center gap-3">
-            <select id="sortSelect" class="px-3 py-2 rounded-xl border dark:border-white/10 dark:bg-gray-700 w-full sm:w-auto" aria-label="{{ &quot;Sort products&quot; | t }}">
-              <option value="pop">الأكثر رواجًا</option>
-              <option value="priceAsc">السعر: من الأقل للأعلى</option>
-              <option value="priceDesc">السعر: من الأعلى للأقل</option>
-              <option value="rating">الأعلى تقييمًا</option>
-              <option value="new">الأحدث</option>
+            <select id="sortSelect" class="px-3 py-2 rounded-xl border dark:border-white/10 dark:bg-gray-700 w-full sm:w-auto" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Sort products&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
+              <option value="pop">{% trans %}الأكثر رواجًا{% endtrans %}</option>
+              <option value="priceAsc">{% trans %}السعر: من الأقل للأعلى{% endtrans %}</option>
+              <option value="priceDesc">{% trans %}السعر: من الأعلى للأقل{% endtrans %}</option>
+              <option value="rating">{% trans %}الأعلى تقييمًا{% endtrans %}</option>
+              <option value="new">{% trans %}الأحدث{% endtrans %}</option>
             </select>
             <div class="flex items-center gap-2">
-              <input id="priceMin" type="number" min="0" placeholder="أقل سعر" class="px-3 py-2 rounded-xl border dark:border-white/10 dark:bg-gray-700 w-28" aria-label="{{ &quot;Minimum price&quot; | t }}">
-              <input id="priceMax" type="number" min="0" placeholder="أعلى سعر" class="px-3 py-2 rounded-xl border dark:border-white/10 dark:bg-gray-700 w-28" aria-label="{{ &quot;Maximum price&quot; | t }}">
+              <input id="priceMin" type="number" min="0" placeholder="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'أقل سعر\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}" class="px-3 py-2 rounded-xl border dark:border-white/10 dark:bg-gray-700 w-28" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Minimum price&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
+              <input id="priceMax" type="number" min="0" placeholder="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'أعلى سعر\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}" class="px-3 py-2 rounded-xl border dark:border-white/10 dark:bg-gray-700 w-28" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Maximum price&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
             </div>
           </div>
         </div>
@@ -740,25 +740,19 @@
         <h2 class="text-2xl font-extrabold mb-6 salla-section-title text-center">{% trans %}الأسئلة الشائعة{% endtrans %}</h2>
         <div class="max-w-3xl mx-auto space-y-4 mt-8">
           <details class="bg-white dark:bg-gray-800 rounded-2xl p-4 border dark:border-white/10 shadow-sm transition-all duration-300 hover:shadow-md" open="">
-            <summary class="font-bold cursor-pointer list-none flex items-center justify-between">
-              هل المنتجات أصلية؟
-              <i class="fa-solid fa-plus text-primary-dark dark:text-accent-coral group-open:rotate-45 transition-transform"></i>
+            <summary class="font-bold cursor-pointer list-none flex items-center justify-between">{% trans %}هل المنتجات أصلية؟{% endtrans %}<i class="fa-solid fa-plus text-primary-dark dark:text-accent-coral group-open:rotate-45 transition-transform"></i>
             </summary>
             <p class="mt-2 text-gray-600 dark:text-gray-300">نعم، جميع منتجاتنا أصلية 100% ومشمولة بضمان الوكيل المعتمد.</p>
           </details>
           <details class="bg-white dark:bg-gray-800 rounded-2xl p-4 border dark:border-white/10 shadow-sm transition-all duration-300 hover:shadow-md">
-            <summary class="font-bold cursor-pointer list-none flex items-center justify-between">
-              كم يستغرق التوصيل؟
-              <i class="fa-solid fa-plus text-primary-dark dark:text-accent-coral group-open:rotate-45 transition-transform"></i>
+            <summary class="font-bold cursor-pointer list-none flex items-center justify-between">{% trans %}كم يستغرق التوصيل؟{% endtrans %}<i class="fa-solid fa-plus text-primary-dark dark:text-accent-coral group-open:rotate-45 transition-transform"></i>
             </summary>
-            <p class="mt-2 text-gray-600 dark:text-gray-300">عادةً يستغرق التوصيل من 48 إلى 72 ساعة داخل المدن الرئيسية في المملكة.</p>
+            <p class="mt-2 text-gray-600 dark:text-gray-300">{% trans %}عادةً يستغرق التوصيل من 48 إلى 72 ساعة داخل المدن الرئيسية في المملكة.{% endtrans %}</p>
           </details>
           <details class="bg-white dark:bg-gray-800 rounded-2xl p-4 border dark:border-white/10 shadow-sm transition-all duration-300 hover:shadow-md">
-            <summary class="font-bold cursor-pointer list-none flex items-center justify-between">
-              هل يمكن الاستبدال/الاسترجاع؟
-              <i class="fa-solid fa-plus text-primary-dark dark:text-accent-coral group-open:rotate-45 transition-transform"></i>
+            <summary class="font-bold cursor-pointer list-none flex items-center justify-between">{% trans %}هل يمكن الاستبدال/الاسترجاع؟{% endtrans %}<i class="fa-solid fa-plus text-primary-dark dark:text-accent-coral group-open:rotate-45 transition-transform"></i>
             </summary>
-            <p class="mt-2 text-gray-600 dark:text-gray-300">نعم، نوفر خدمة الاستبدال والاسترجاع خلال 7 أيام من تاريخ استلام الطلب، وفقًا للشروط والأحكام.</p>
+            <p class="mt-2 text-gray-600 dark:text-gray-300">{% trans %}نعم، نوفر خدمة الاستبدال والاسترجاع خلال 7 أيام من تاريخ استلام الطلب، وفقًا للشروط والأحكام.{% endtrans %}</p>
           </details>
         </div>
       </div>
@@ -773,17 +767,17 @@
         <h2 class="text-2xl font-extrabold mb-6 salla-section-title text-center">{% trans %}تواصل معنا{% endtrans %}</h2>
         <div class="grid md:grid-cols-2 gap-6 mt-8">
           <form class="bg-white dark:bg-gray-800 rounded-2xl p-4 border dark:border-white/10 shadow-soft space-y-3 transition-all duration-300 hover:shadow-md">
-            <input class="w-full px-4 py-2 rounded-xl border dark:border-white/10 dark:bg-gray-700" placeholder="الاسم" aria-label="{{ &quot;Name&quot; | t }}">
-            <input class="w-full px-4 py-2 rounded-xl border dark:border-white/10 dark:bg-gray-700" placeholder="البريد الإلكتروني" aria-label="{{ &quot;Email&quot; | t }}">
-            <textarea class="w-full px-4 py-2 rounded-xl border dark:border-white/10 dark:bg-gray-700" rows="4" placeholder="رسالتك" aria-label="{{ &quot;Your message&quot; | t }}"></textarea>
+            <input class="w-full px-4 py-2 rounded-xl border dark:border-white/10 dark:bg-gray-700" placeholder="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'الاسم\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Name&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
+            <input class="w-full px-4 py-2 rounded-xl border dark:border-white/10 dark:bg-gray-700" placeholder="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'البريد الإلكتروني\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Email&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
+            <textarea class="w-full px-4 py-2 rounded-xl border dark:border-white/10 dark:bg-gray-700" rows="4" placeholder="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'رسالتك\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Your message&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}"></textarea>
             <button type="submit" class="px-4 py-2 rounded-xl text-white bg-gradient-to-r from-[var(--primary-dark)] to-[var(--primary-blue)] transition-all hover:scale-105">{% trans %}إرسال{% endtrans %}</button>
           </form>
           <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 border dark:border-white/10 shadow-soft space-y-3 transition-all duration-300 hover:shadow-md">
             <p class="flex items-center gap-2"><i class="fa-solid fa-phone text-[var(--accent-coral)]"></i> 966-57-372-5600</p>
-            <p class="flex items-center gap-2"><i class="fa-brands fa-whatsapp text-green-500"></i> واتساب متاح</p>
-            <p class="flex items-center gap-2"><i class="fa-solid fa-location-dot text-[var(--accent-coral)]"></i> الرياض، المملكة العربية السعودية</p>
+            <p class="flex items-center gap-2"><i class="fa-brands fa-whatsapp text-green-500"></i>{% trans %}واتساب متاح{% endtrans %}</p>
+            <p class="flex items-center gap-2"><i class="fa-solid fa-location-dot text-[var(--accent-coral)]"></i>{% trans %}الرياض، المملكة العربية السعودية{% endtrans %}</p>
             <div class="h-48 rounded-lg overflow-hidden mt-4">
-              <img src="https://placehold.co/600x300/e0e8ff/0D2C6C?text=Riyadh+Location+Map" alt="{{ &quot;Map&quot; | t }}" class="w-full h-full object-cover">
+              <img src="https://placehold.co/600x300/e0e8ff/0D2C6C?text=Riyadh+Location+Map" alt="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Map&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}" class="w-full h-full object-cover">
             </div>
           </div>
         </div>
@@ -801,10 +795,10 @@
         <div class="w-12 h-12 grid place-items-center rounded-xl bg-gradient-to-br from-[var(--accent-coral)] to-[var(--accent-orange-dark)] mb-3">
           <div class="needsbox-logo"><div class="needsbox-box"></div></div>
         </div>
-        <p class="text-white/80">NeedsBoxes — كل ما تحتاجه… في صندوق واحد.</p>
+        <p class="text-white/80">{% trans %}NeedsBoxes — كل ما تحتاجه… في صندوق واحد.{% endtrans %}</p>
       </div>
       <div>
-        <h4 class="font-extrabold mb-3">روابط</h4>
+        <h4 class="font-extrabold mb-3">{% trans %}روابط{% endtrans %}</h4>
         <ul class="space-y-2 text-white/85">
           <li><a href="#categories" class="hover:underline transition-colors duration-200">{% trans %}التصنيفات{% endtrans %}</a></li>
           <li><a href="#all-products" class="hover:underline transition-colors duration-200">{% trans %}المنتجات{% endtrans %}</a></li>
@@ -812,19 +806,19 @@
         </ul>
       </div>
       <div>
-        <h4 class="font-extrabold mb-3">الدفع والشحن</h4>
-        <p class="text-white/80">دفع آمن | توصيل سريع</p>
+        <h4 class="font-extrabold mb-3">{% trans %}الدفع والشحن{% endtrans %}</h4>
+        <p class="text-white/80">{% trans %}دفع آمن | توصيل سريع{% endtrans %}</p>
          <div class="flex flex-wrap gap-2 mt-2">
-            <img class="h-6 bg-white rounded p-0.5" src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Visa_2021.svg" alt="{{ &quot;Visa&quot; | t }}">
-            <img class="h-6 bg-white rounded p-0.5" src="https://upload.wikimedia.org/wikipedia/commons/b/b7/MasterCard_Logo.svg" alt="{{ &quot;Mastercard&quot; | t }}">
-            <img class="h-6 bg-white rounded p-0.5" src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Mada_Logo.svg" alt="{{ &quot;Mada&quot; | t }}">
-            <img class="h-6 bg-white rounded p-0.5" src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Apple_Pay_logo.svg" alt="{{ &quot;Apple Pay&quot; | t }}">
+            <img class="h-6 bg-white rounded p-0.5" src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Visa_2021.svg" alt="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Visa&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
+            <img class="h-6 bg-white rounded p-0.5" src="https://upload.wikimedia.org/wikipedia/commons/b/b7/MasterCard_Logo.svg" alt="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Mastercard&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
+            <img class="h-6 bg-white rounded p-0.5" src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Mada_Logo.svg" alt="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Mada&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
+            <img class="h-6 bg-white rounded p-0.5" src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Apple_Pay_logo.svg" alt="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Apple Pay&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
         </div>
       </div>
       <div>
-        <h4 class="font-extrabold mb-3">النشرة البريدية</h4>
+        <h4 class="font-extrabold mb-3">{% trans %}النشرة البريدية{% endtrans %}</h4>
         <form class="flex gap-2">
-          <input type="email" placeholder="بريدك الإلكتروني" class="flex-1 px-3 py-2 rounded-xl border text-black" aria-label="{{ &quot;Email for newsletter&quot; | t }}">
+          <input type="email" placeholder="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'بريدك الإلكتروني\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}" class="flex-1 px-3 py-2 rounded-xl border text-black" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Email for newsletter&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
           <button type="submit" class="px-4 py-2 rounded-xl text-[#07173f] bg-white font-bold">{% trans %}اشتراك{% endtrans %}</button>
         </form>
       </div>
@@ -836,7 +830,7 @@
     VII. CUSTOMER EXPERIENCE & SOCIAL ENGAGEMENT
     4. Contact & Communication: Floating WhatsApp
   -->
-  <a href="https://wa.me/966573725600" class="salla-whatsapp-button fixed bottom-20 left-5 md:bottom-5 w-14 h-14 bg-[#25D366] flex items-center justify-center text-white text-3xl rounded-full shadow-lg z-50 hover:scale-110 transition-transform animate-pulse" target="_blank" aria-label="{{ &quot;تواصل معنا عبر واتساب&quot; | t }}">
+  <a href="https://wa.me/966573725600" class="salla-whatsapp-button fixed bottom-20 left-5 md:bottom-5 w-14 h-14 bg-[#25D366] flex items-center justify-center text-white text-3xl rounded-full shadow-lg z-50 hover:scale-110 transition-transform animate-pulse" target="_blank" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;تواصل معنا عبر واتساب&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
     <i class="fab fa-whatsapp"></i>
   </a>
   
@@ -844,7 +838,7 @@
     III. LAYOUT & NAVIGATION SYSTEM
     3. Mobile Optimization: Bottom Navigation Tab Bar
   -->
-  <nav class="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-gray-200 md:hidden dark:bg-gray-800/95 dark:border-white/10" aria-label="{{ &quot;التنقل السفلي&quot; | t }}">
+  <nav class="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-gray-200 md:hidden dark:bg-gray-800/95 dark:border-white/10" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;التنقل السفلي&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
     <ul class="grid grid-cols-4 text-center text-xs font-semibold">
       <li><a href="#" class="block py-3 text-[var(--primary-dark)] dark:text-accent-coral focus:outline-none focus:ring-1 focus:ring-inset focus:ring-[var(--primary-dark)]">{% trans %}الرئيسية{% endtrans %}</a></li>
       <li><a href="#categories" class="block py-3 text-gray-600 dark:text-gray-300 hover:text-[var(--primary-dark)] focus:outline-none focus:ring-1 focus:ring-inset focus:ring-[var(--primary-dark)]">{% trans %}الأقسام{% endtrans %}</a></li>
@@ -858,18 +852,18 @@
     1. Mini-Cart Drawer
   -->
   <aside class="mini-cart-overlay" id="mini-cart-overlay"></aside>
-  <aside class="mini-cart" id="mini-cart" aria-label="{{ &quot;سلة التسوق&quot; | t }}">
+  <aside class="mini-cart" id="mini-cart" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;سلة التسوق&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
     <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-white/10">
       <h2 class="text-xl font-bold">{% trans %}سلة التسوق{% endtrans %}</h2>
-      <button id="mini-cart-close" class="text-gray-500 hover:text-red-500" aria-label="{{ &quot;إغلاق السلة&quot; | t }}"><i class="fas fa-times text-xl"></i></button>
+      <button id="mini-cart-close" class="text-gray-500 hover:text-red-500" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;إغلاق السلة&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}"><i class="fas fa-times text-xl"></i></button>
     </div>
     <div class="flex-1 overflow-y-auto p-4" id="mini-cart-body">
-      <p id="mini-cart-empty" class="text-gray-500 text-center py-10">سلتك فارغة حالياً.</p>
+      <p id="mini-cart-empty" class="text-gray-500 text-center py-10">{% trans %}سلتك فارغة حالياً.{% endtrans %}</p>
     </div>
     <div class="p-4 border-t border-gray-200 dark:border-white/10">
       <div class="flex justify-between items-center font-bold text-lg mb-4">
-        <span>الإجمالي:</span>
-        <span id="mini-cart-total">0 ر.س</span>
+        <span>{% trans %}الإجمالي:{% endtrans %}</span>
+        <span id="mini-cart-total">{% trans %}0 ر.س{% endtrans %}</span>
       </div>
       <a href="#" class="block w-full text-center bg-gradient-to-l from-[var(--accent-coral)] to-[var(--accent-orange-dark)] text-white py-3 rounded-xl font-extrabold text-lg transition-all hover:from-[var(--accent-orange-dark)] hover:to-[var(--accent-coral)] shadow-nb hover:shadow-lg">{% trans %}إتمام الطلب{% endtrans %}</a>
       <button id="mini-cart-continue" class="w-full text-center text-gray-600 dark:text-gray-300 py-2 mt-2">{% trans %}متابعة التسوق{% endtrans %}</button>
@@ -880,16 +874,16 @@
     V. PRODUCT CATALOG & DISCOVERY ENGINE
     5. Quick View Modal
   -->
-  <div id="quickViewModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="{{ &quot;نظرة سريعة&quot; | t }}">
+  <div id="quickViewModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;نظرة سريعة&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
     <div class="modal-card">
-      <button class="modal-close-btn absolute top-3 left-3 bg-gray-100 dark:bg-gray-700 w-10 h-10 rounded-full text-lg z-20" aria-label="{{ &quot;إغلاق&quot; | t }}">
+      <button class="modal-close-btn absolute top-3 left-3 bg-gray-100 dark:bg-gray-700 w-10 h-10 rounded-full text-lg z-20" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;إغلاق&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
         <i class="fa-solid fa-xmark"></i>
       </button>
       <div class="grid md:grid-cols-2 gap-0">
         <!-- Modal Gallery -->
         <div class="p-4">
           <div class="rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-700">
-            <img id="modal-main-image" src="https://placehold.co/600x600/0D2C6C/ffffff?text=Product" alt="{{ &quot;Product image&quot; | t }}" class="w-full h-80 object-cover">
+            <img id="modal-main-image" src="https://placehold.co/600x600/0D2C6C/ffffff?text=Product" alt="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Product image&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}" class="w-full h-80 object-cover">
           </div>
           <!-- Tabs for media -->
           <div class="flex gap-2 border-b border-gray-200 dark:border-white/10 mt-2">
@@ -906,7 +900,7 @@
             </div>
             <div id="modal-video-panel" class="modal-tab-panel">
               <div class="rounded-2xl overflow-hidden aspect-video" id="video-container">
-                <iframe id="modal-video-iframe" class="w-full h-full" src="" title="{{ &quot;Product video&quot; | t }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+                <iframe id="modal-video-iframe" class="w-full h-full" src="" title="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'{{ &quot;Product video&quot; | t }}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
               </div>
             </div>
             <div id="modal-user-photos-panel" class="modal-tab-panel">
@@ -942,7 +936,7 @@
           </div>
           <!-- Modal Upsell -->
           <div class="mt-3 p-3 rounded-xl bg-[var(--accent-ultralight)] dark:bg-gray-700">
-             <h4 class="font-bold mb-2">يُشترى معه عادة:</h4>
+             <h4 class="font-bold mb-2">{% trans %}يُشترى معه عادة:{% endtrans %}</h4>
              <div id="modal-upsell-item" class="flex items-center gap-3">
                 <!-- Upsell item injected here -->
              </div>
@@ -953,9 +947,7 @@
   </div>
 
   <!-- Toast Notification -->
-  <div id="toast" class="toast">
-    تمت الإضافة إلى السلة
-  </div>
+  <div id="toast" class="toast">{% trans %}تمت الإضافة إلى السلة{% endtrans %}</div>
 
   <!-- 
     I. FOUNDATIONAL ARCHITECTURE
@@ -1067,18 +1059,18 @@
         o += `<i class="fa-${i<=n?'solid':'regular'} fa-star text-sm"></i>`
       } 
       // 10. Accessibility
-      return `<div class="text-amber-400" role="img" aria-label="Rating ${n} out of 5 stars">${o}</div>`
+      return `<div class="text-amber-400" role="img" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'Rating ${n} out of 5 stars\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">${o}</div>`
     }
 
     // Generates HTML for a single product card
     function productCard(p){
       const old = p.old? `<span class=\"line-through text-gray-500 mr-2\">${SAR(p.old)}</span>`:'';
-      const stockBadge = p.stock? '' : `<span class=\"out-of-stock-badge\">غير متوفر</span>`;
+      const stockBadge = p.stock? '' : `<span class=\"out-of-stock-badge\">{% trans %}غير متوفر{% endtrans %}</span>`;
       return `<li class=\"salla-product-card ${p.stock? '':'out-of-stock'}\" data-aos="fade-up">
         <div class="relative">
           <span class=\"salla-product-badge absolute top-3 left-3 text-xs font-extrabold px-2 py-1 rounded-lg z-10\">${p.featured?'مميز':'جديد'}</span>
           ${stockBadge}
-          <a href="#" class=\"salla-product-image relative block\" aria-label="${p.name}">
+          <a href="#" class=\"salla-product-image relative block\" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'${p.name}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
             <img src=\"${p.img}\" alt=\"${p.name}\" class=\"w-full h-[250px] object-cover\" loading=\"lazy\" decoding="async"/>
           </a>
         </div>
@@ -1091,10 +1083,10 @@
             <div class="flex items-baseline gap-2 mt-2\"><span class="text-[var(--primary-dark)] dark:text-white font-extrabold text-lg\">${SAR(p.price)}</span>${old}</div>
           </div>
           <div class="flex items-center gap-2 mt-3">
-            <button class="salla-icon-btn" data-qv="${p.id}" aria-label="Quick View ${p.name}">
+            <button class="salla-icon-btn" data-qv="${p.id}" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'Quick View ${p.name}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
               <i class="fas fa-eye"></i>
             </button>
-            <button class="salla-icon-btn" aria-label="Add ${p.name} to Wishlist">
+            <button class="salla-icon-btn" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'Add ${p.name} to Wishlist\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">
               <i class="fa-regular fa-heart"></i>
             </button>
             <button class="salla-add-to-cart" data-add="${p.id}" ${p.stock?'':'disabled'}>
@@ -1148,7 +1140,7 @@
       if(sort==='new') list.sort((a,b)=> new Date(b.date) - new Date(a.date));
       if(sort==='pop') list.sort((a,b)=> (b.pop||0)-(a.pop||0));
       
-      grid.innerHTML = list.length ? list.map(productCard).join('') : `<p class="col-span-full text-center text-gray-500">لا توجد منتجات تطابق بحثك.</p>`;
+      grid.innerHTML = list.length ? list.map(productCard).join('') : `<p class="col-span-full text-center text-gray-500">{% trans %}لا توجد منتجات تطابق بحثك.{% endtrans %}</p>`;
       grid.removeAttribute('aria-busy');
       attachCardListeners(); // Re-attach listeners to new cards
       AOS.refresh(); // Refresh AOS for new items
@@ -1175,7 +1167,7 @@
       testimonialsWrapper.innerHTML = TESTIMONIALS.map(t => `
         <div class="swiper-slide">
           <div class="salla-testimonial bg-white dark:bg-gray-800 p-8 text-center rounded-2xl shadow-soft border border-gray-100 dark:border-white/10 h-full">
-            <img src="${t.avatar}" class="w-16 h-16 rounded-full mx-auto mb-3 border-2 border-[var(--primary-dark)]" alt="${t.name}" loading="lazy" decoding="async">
+            <img src="${t.avatar}" class="w-16 h-16 rounded-full mx-auto mb-3 border-2 border-[var(--primary-dark)]" alt="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'${t.name}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}" loading="lazy" decoding="async">
             <div class="mb-2">
               ${star(t.rating)}
             </div>
@@ -1196,7 +1188,7 @@
       const cartCountBadge = $('#cartCount');
       
       if(!CART.length){ 
-        body.innerHTML = `<p id=\"mini-cart-empty\" class=\"text-gray-500 text-center py-10\">سلتك فارغة حالياً.</p>`; 
+        body.innerHTML = `<p id=\"mini-cart-empty\" class=\"text-gray-500 text-center py-10\">{% trans %}سلتك فارغة حالياً.{% endtrans %}</p>`; 
         totalEl.textContent=SAR(0); 
         cartCountBadge.textContent = '0';
         return; 
@@ -1212,7 +1204,7 @@
         return `<div class=\"flex items-center justify-between gap-3 py-2 border-b dark:border-white/10\">
           <div class=\"flex items-center gap-3\"><img src=\"${p.img}\" class=\"w-12 h-12 object-cover rounded-lg\" alt=\"${p.name}\"/>
           <div><div class=\"font-bold text-sm\">${p.name}</div><div class=\"text-xs\">${SAR(p.price)} × ${it.qty}</div></div></div>
-          <button class=\"text-red-500\" data-del=\"${it.id}\" aria-label="Remove ${p.name}"><i class=\"fas fa-trash\"></i></button>
+          <button class=\"text-red-500\" data-del=\"${it.id}\" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'Remove ${p.name}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}"><i class=\"fas fa-trash\"></i></button>
         </div>` 
       }).join('');
       
@@ -1332,22 +1324,22 @@
       const userPhotosGrid = $('#modal-user-photos-grid');
       const userPhotosTab = $('[data-tab-target="#modal-user-photos-panel"]');
       if (p.userImages && p.userImages.length > 0) {
-        userPhotosGrid.innerHTML = p.userImages.map(img => `<img src="${img}" class="w-full h-20 object-cover rounded-md" alt="User photo">`).join('');
+        userPhotosGrid.innerHTML = p.userImages.map(img => `<img src="${img}" class="w-full h-20 object-cover rounded-md" alt="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'User photo\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">`).join('');
         if(userPhotosTab) userPhotosTab.style.display = 'block';
       } else {
-        userPhotosGrid.innerHTML = `<p class="text-sm text-gray-500 col-span-4">لا توجد صور.</p>`;
+        userPhotosGrid.innerHTML = `<p class="text-sm text-gray-500 col-span-4">{% trans %}لا توجد صور.{% endtrans %}</p>`;
         if(userPhotosTab) userPhotosTab.style.display = 'none';
       }
       
        const thumbnailGrid = $('#modal-thumbnail-grid');
-       thumbnailGrid.innerHTML = `<img src="${p.img}" class="w-full h-20 object-cover rounded-md border-2 border-[var(--primary-dark)]" alt="Thumbnail">`;
+       thumbnailGrid.innerHTML = `<img src="${p.img}" class="w-full h-20 object-cover rounded-md border-2 border-[var(--primary-dark)]" alt="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'Thumbnail\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}">`;
        
       // Upsell
       const up = PRODUCTS.find(x=> x.cat===p.cat && x.id!==p.id);
       if(up) {
-         $('#modal-upsell-item').innerHTML = `<img src='${up.img}' class='w-12 h-12 rounded-lg object-cover' alt='${up.name}'/><div class='text-sm flex-1'><div class='font-bold'>${up.name}</div><div class='text-[var(--primary-dark)] dark:text-white font-extrabold'>${SAR(up.price)}</div></div> <button class="salla-add-to-cart text-white w-9 h-9 rounded-full" data-add="${up.id}" aria-label="Add ${up.name} to cart"><i class="fas fa-plus"></i></button>`;
+         $('#modal-upsell-item').innerHTML = `<img src='${up.img}' class='w-12 h-12 rounded-lg object-cover' alt="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'${up.name}\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}"/><div class='text-sm flex-1'><div class='font-bold'>${up.name}</div><div class='text-[var(--primary-dark)] dark:text-white font-extrabold'>${SAR(up.price)}</div></div> <button class="salla-add-to-cart text-white w-9 h-9 rounded-full" data-add="${up.id}" aria-label="{{ '{{ \'{{ \\'{{ \\\'{{ \\\\'{{ \\\\\'{{ \\\\\\'Add ${up.name} to cart\\\\\\' | t }}\\\\\' | t }}\\\\' | t }}\\\' | t }}\\' | t }}\' | t }}' | t }}"><i class="fas fa-plus"></i></button>`;
       } else {
-        $('#modal-upsell-item').innerHTML = '<p class="text-sm text-gray-500">لا توجد منتجات مقترحة.</p>';
+        $('#modal-upsell-item').innerHTML = '<p class="text-sm text-gray-500">{% trans %}لا توجد منتجات مقترحة.{% endtrans %}</p>';
       }
       
       $('#modal-add-to-cart').setAttribute('data-product-id', p.id);
@@ -1482,7 +1474,7 @@
         if (distance < 0) {
           clearInterval(timer);
           const timerEl = $("#countdown-timer");
-          if(timerEl) timerEl.innerHTML = "<div class='text-red-500 font-bold p-3 bg-gray-100 rounded-xl'>انتهى العرض!</div>";
+          if(timerEl) timerEl.innerHTML = "<div class='text-red-500 font-bold p-3 bg-gray-100 rounded-xl'>{% trans %}انتهى العرض!{% endtrans %}</div>";
           return;
         }
 

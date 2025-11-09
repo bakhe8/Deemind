@@ -8,22 +8,210 @@ import extract from 'extract-zip';
 import { v4 as uuid } from 'uuid';
 import dotenv from 'dotenv';
 import { globSync } from 'glob';
-import { execSync, spawn, ChildProcess } from 'child_process';
+import { execSync, execFileSync, spawn, ChildProcess } from 'child_process';
 import { Readable } from 'stream';
+import crypto from 'crypto';
 import { TaskRunner } from './task-runner.js';
 import { makeAuthMiddleware } from './security.js';
 import { ServiceLogger } from './logger.js';
+import { DEFAULT_JSON_TEMPLATES, mergeJsonWithTemplate, ensureJsonFile } from './default-schemas.js';
+import type { RunRequest } from '../core/contracts/api.contract.ts';
+import { registerRunRoutes } from './routes/run.js';
 
 dotenv.config();
 
 const CONFIG_PATH = path.join(process.cwd(), 'service', 'config.json');
 const composerModulePromise = import('../tools/store-compose.js');
+const mockLayerModulePromise = import('../tools/mock-layer/mock-data-builder.js');
+const INPUT_MANIFEST_FILENAME = '.deemind-manifest.json';
+const PRESET_METADATA_FILENAME = '.deemind.json';
+const MANIFEST_IGNORE = new Set([INPUT_MANIFEST_FILENAME, PRESET_METADATA_FILENAME]);
+const MOCK_CONTEXT_DIR = path.join(process.cwd(), 'mockups', 'store', 'cache', 'context');
+
+type StubInstance = {
+  process: ChildProcess;
+  theme: string;
+  port: number;
+  logs: string[];
+};
+
+const stubPool = new Map<string, StubInstance>();
+type BuildSessionStatus = 'queued' | 'running' | 'succeeded' | 'failed';
+type BuildSession = {
+  id: string;
+  theme: string;
+  diff: boolean;
+  status: BuildSessionStatus;
+  startedAt: string | null;
+  finishedAt: string | null;
+  logs: string[];
+  source: string;
+  exitCode: number | null;
+  metrics?: {
+    errors: number;
+    warnings: number;
+  } | null;
+};
+
+const buildSessions: BuildSession[] = [];
+const buildStreamClients = new Set<express.Response>();
+const logStreamClients = new Set<express.Response>();
+let activeBuildId: string | null = null;
+const MAX_BUILD_SESSIONS = 15;
+const MAX_BUILD_LOGS = 400;
+function parseBaselineList(value: string) {
+  return value
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
+type ScenarioSessionStatus = 'queued' | 'running' | 'succeeded' | 'failed';
+type ScenarioSession = {
+  id: string;
+  theme: string;
+  chain: string[];
+  status: ScenarioSessionStatus;
+  startedAt: string | null;
+  finishedAt: string | null;
+  source: string;
+  logFile: string | null;
+  exitCode: number | null;
+  durationMs?: number | null;
+};
+
+const scenarioSessions: ScenarioSession[] = [];
+const scenarioStreamClients = new Set<express.Response>();
+const MAX_SCENARIO_SESSIONS = 20;
+const scenarioFlows = [
+  { id: 'add-to-cart', label: 'Add to Cart' },
+  { id: 'checkout', label: 'Checkout Flow' },
+  { id: 'wishlist', label: 'Wishlist Loop' },
+];
+
+async function syncStateFromStub(theme: string, stateDir: string) {
+  const stub = getStubState(theme);
+  if (!stub) return null;
+  const response = await fetch(`http://localhost:${stub.port}/api/state`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch runtime state from stub (${response.status})`);
+  }
+  const state = await response.json();
+  await writeRuntimeState(theme, stateDir, state);
+  return state;
+}
+
+async function mutateOfflineState(theme: string, stateDir: string, mutator: (state: any) => any) {
+  const filePath = path.join(stateDir, `${theme}.json`);
+  if (!(await fs.pathExists(filePath))) {
+    throw new Error('No runtime state found for theme');
+  }
+  const current = await fs.readJson(filePath);
+  const cloned = JSON.parse(JSON.stringify(current));
+  const next = mutator(cloned);
+  await writeRuntimeState(theme, stateDir, next);
+  return next;
+}
+
+async function fetchStubContext(theme?: string | null) {
+  const stub = getStubState(theme || undefined);
+  if (!stub) return null;
+  const response = await fetch(`http://localhost:${stub.port}/api/runtime/context`);
+  if (!response.ok) {
+    throw new Error(`Stub context request failed (${response.status})`);
+  }
+  return response.json();
+}
+
+async function readCachedContext(theme: string) {
+  const file = path.join(MOCK_CONTEXT_DIR, `${theme}.json`);
+  if (!(await fs.pathExists(file))) return null;
+  return fs.readJson(file);
+}
+
+async function regenerateMockContext(theme: string, demo: string) {
+  const module = await mockLayerModulePromise;
+  if (!module?.buildMockContext || !module?.writeMockContext) {
+    throw new Error('Mock layer module unavailable');
+  }
+  const context = await module.buildMockContext(demo);
+  const file = await module.writeMockContext(theme, context);
+  return { context, file };
+}
 
 async function loadConfig() {
   if (!(await fs.pathExists(CONFIG_PATH))) {
     throw new Error('Missing service/config.json');
   }
   return fs.readJson(CONFIG_PATH);
+}
+
+type InputManifest = {
+  generatedAt: string;
+  files: Record<string, string>;
+};
+
+async function generateInputManifest(dir: string): Promise<InputManifest> {
+  const files = globSync('**/*', { cwd: dir, nodir: true, dot: true });
+  const entries = await Promise.all(
+    files
+      .filter((relative) => !MANIFEST_IGNORE.has(path.basename(relative)))
+      .map(async (relative) => {
+        const absolute = path.join(dir, relative);
+        const buffer = await fs.readFile(absolute);
+        const hash = crypto.createHash('sha1').update(buffer).digest('hex');
+        return [relative.replace(/\\/g, '/'), hash] as const;
+      }),
+  );
+  const map: Record<string, string> = {};
+  for (const [relative, hash] of entries) {
+    map[relative] = hash;
+  }
+  return {
+    generatedAt: new Date().toISOString(),
+    files: map,
+  };
+}
+
+function diffManifests(previous: Record<string, string> | null | undefined, next: Record<string, string>) {
+  const prevMap = previous || {};
+  const added: string[] = [];
+  const removed: string[] = [];
+  const changed: string[] = [];
+
+  for (const [file, hash] of Object.entries(next)) {
+    if (!(file in prevMap)) {
+      added.push(file);
+    } else if (prevMap[file] !== hash) {
+      changed.push(file);
+    }
+  }
+  for (const file of Object.keys(prevMap)) {
+    if (!(file in next)) {
+      removed.push(file);
+    }
+  }
+  return { added, removed, changed };
+}
+
+async function applyDefaultTemplates(themeDir: string) {
+  const applied: string[] = [];
+  await Promise.all(
+    Object.entries(DEFAULT_JSON_TEMPLATES).map(async ([relativePath, template]) => {
+      const filePath = path.join(themeDir, relativePath);
+      if (!(await fs.pathExists(filePath))) {
+        await ensureJsonFile(filePath, template);
+        applied.push(`${relativePath} (created)`);
+      } else {
+        const before = await fs.readJson(filePath).catch(() => ({}));
+        const merged = await mergeJsonWithTemplate(filePath, template);
+        if (JSON.stringify(before) !== JSON.stringify(merged)) {
+          applied.push(`${relativePath} (merged)`);
+        }
+      }
+    }),
+  );
+  return applied;
 }
 
 async function safeReadJson(file) {
@@ -33,9 +221,11 @@ async function safeReadJson(file) {
     return null;
   }
 }
-async function getThemeStateSnapshot(theme: string, stubState: any, stateDir: string) {
-  const targetTheme = theme || stubState?.theme || 'demo';
-  if (stubState?.process && targetTheme === stubState.theme) {
+async function getThemeStateSnapshot(theme: string, stateDir: string) {
+  const normalized = theme ? theme.toLowerCase() : '';
+  const stubState = getStubState(normalized || undefined);
+  const effectiveTheme = normalized || stubState?.theme || 'demo';
+  if (stubState) {
     try {
       const res = await fetch(`http://localhost:${stubState.port}/api/state`);
       if (res.ok) {
@@ -45,7 +235,7 @@ async function getThemeStateSnapshot(theme: string, stubState: any, stateDir: st
       void 0;
     }
   }
-  const filePath = path.join(stateDir, `${targetTheme}.json`);
+  const filePath = path.join(stateDir, `${effectiveTheme}.json`);
   if (await fs.pathExists(filePath)) {
     return fs.readJson(filePath);
   }
@@ -78,12 +268,100 @@ function diffPartials(current: string[] = [], next: string[] = []) {
   return { current, next, added, removed };
 }
 
-async function readRuntimeAnalytics(logPath: string, limit = 50) {
+function broadcastBuildEvent(event: string, payload: any) {
+  for (const client of buildStreamClients) {
+    client.write(`event: ${event}\ndata: ${JSON.stringify(payload)}\n\n`);
+  }
+}
+
+function getBuildSessionsSnapshot() {
+  return buildSessions.map((session) => ({ ...session }));
+}
+
+function recordBuildSession(session: BuildSession) {
+  buildSessions.unshift(session);
+  if (buildSessions.length > MAX_BUILD_SESSIONS) {
+    buildSessions.pop();
+  }
+  broadcastBuildEvent('status', session);
+}
+
+function updateBuildSession(sessionId: string, patch: Partial<BuildSession>) {
+  const idx = buildSessions.findIndex((session) => session.id === sessionId);
+  if (idx === -1) return null;
+  buildSessions[idx] = { ...buildSessions[idx], ...patch };
+  broadcastBuildEvent('status', buildSessions[idx]);
+  return buildSessions[idx];
+}
+
+function appendBuildLog(sessionId: string, line: string) {
+  const session = buildSessions.find((entry) => entry.id === sessionId);
+  if (!session) return;
+  session.logs = [...session.logs, line].slice(-MAX_BUILD_LOGS);
+  broadcastBuildEvent('log', { id: sessionId, line });
+}
+
+function normalizeCart(cart: any) {
+  const items = Array.isArray(cart?.items) ? cart.items : [];
+  return {
+    items: items.map((item) => ({
+      ...item,
+      quantity: Math.max(1, Number(item?.quantity) || 1),
+      price: Number(item?.price) || 0,
+    })),
+    total: Number(cart?.total) || 0,
+  };
+}
+
+function recalcCartTotals(cart: { items: Array<{ price: number; quantity: number }>; total: number }) {
+  cart.total = cart.items.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.quantity) || 0), 0);
+}
+
+function broadcastScenarioEvent(event: string, payload: any) {
+  for (const client of scenarioStreamClients) {
+    client.write(`event: ${event}\ndata: ${JSON.stringify(payload)}\n\n`);
+  }
+}
+
+function getScenarioSessionsSnapshot() {
+  return scenarioSessions.map((session) => ({ ...session }));
+}
+
+function recordScenarioSession(session: ScenarioSession) {
+  scenarioSessions.unshift(session);
+  if (scenarioSessions.length > MAX_SCENARIO_SESSIONS) {
+    scenarioSessions.pop();
+  }
+  broadcastScenarioEvent('status', session);
+}
+
+function updateScenarioSession(sessionId: string, patch: Partial<ScenarioSession>) {
+  const idx = scenarioSessions.findIndex((session) => session.id === sessionId);
+  if (idx === -1) return null;
+  const current = scenarioSessions[idx];
+  const next = { ...current, ...patch };
+  if (next.startedAt && next.finishedAt && typeof next.durationMs !== 'number') {
+    const start = new Date(next.startedAt).getTime();
+    const end = new Date(next.finishedAt).getTime();
+    if (!Number.isNaN(start) && !Number.isNaN(end) && end >= start) {
+      next.durationMs = end - start;
+    }
+  }
+  scenarioSessions[idx] = next;
+  broadcastScenarioEvent('status', scenarioSessions[idx]);
+  return scenarioSessions[idx];
+}
+
+function sanitizeScenarioId(raw?: string) {
+  if (!raw) return '';
+  return raw.toLowerCase().replace(/[^a-z0-9-_]/gi, '');
+}
+
+async function readRuntimeAnalytics(logPath: string, limit = 50, theme?: string) {
   if (!(await fs.pathExists(logPath))) return [];
   const content = await fs.readFile(logPath, 'utf8');
   const lines = content.split(/\r?\n/).filter(Boolean);
-  return lines
-    .slice(-limit)
+  let entries = lines
     .map((line) => {
       try {
         return JSON.parse(line);
@@ -92,6 +370,10 @@ async function readRuntimeAnalytics(logPath: string, limit = 50) {
       }
     })
     .filter(Boolean);
+  if (theme) {
+    entries = entries.filter((entry: any) => entry?.theme === theme);
+  }
+  return entries.slice(-limit);
 }
 
 async function readScenarioRuns(dir: string, limit = 10) {
@@ -128,6 +410,24 @@ async function readScenarioRuns(dir: string, limit = 10) {
     });
   }
   return runs;
+}
+
+function findAvailablePort(preferred?: number) {
+  const usedPorts = new Set(Array.from(stubPool.values()).map((state) => state.port));
+  if (preferred && !usedPorts.has(preferred)) {
+    return preferred;
+  }
+  const base = 4100;
+  for (let port = base; port < base + 20; port += 1) {
+    if (!usedPorts.has(port)) return port;
+  }
+  return base + usedPorts.size + 1;
+}
+
+function getStubState(theme?: string) {
+  if (theme) return stubPool.get(theme) || null;
+  const first = stubPool.values().next();
+  return first.done ? null : first.value;
 }
 
 function computeCompleteness(structure) {
@@ -253,39 +553,106 @@ async function main() {
   const twilightConfigFile = path.join(rootDir, 'runtime', 'twilight', 'config.json');
   const analyticsLogPath = path.join(rootDir, 'logs', 'runtime-analytics.jsonl');
   const scenarioLogDir = path.join(logsDir, 'runtime-scenarios');
-  const stubState: {
-    process: ChildProcess | null;
-    theme: string | null;
-    port: number;
-    logs: string[];
-  } = {
-    process: null,
-    theme: null,
-    port: Number(process.env.PREVIEW_STUB_PORT || 4100),
-    logs: [],
-  };
-
-  function recordStubLog(line: string) {
-    stubState.logs.push(line);
-    if (stubState.logs.length > 200) stubState.logs.shift();
+  function listStubStates() {
+    return Array.from(stubPool.values()).map((state) => ({
+      theme: state.theme,
+      port: state.port,
+      running: Boolean(state.process),
+      logs: state.logs.slice(-50),
+    }));
   }
 
-  function stopStubProcess() {
-    if (stubState.process) {
-      try {
-        stubState.process.kill();
-      } catch (err) {
-        recordStubLog(`stub error: ${(err as Error).message}`);
-      }
-      stubState.process = null;
-      stubState.theme = null;
-      recordStubLog('stub stopped');
+  function recordStubLog(theme: string, line: string) {
+    const state = stubPool.get(theme);
+    if (!state) return;
+    state.logs.push(line);
+    if (state.logs.length > 200) state.logs.shift();
+  }
+
+  function stopStubProcess(theme?: string) {
+    if (!theme) {
+      Array.from(stubPool.keys()).forEach((key) => stopStubProcess(key));
+      return;
     }
+    const instance = stubPool.get(theme);
+    if (!instance) return;
+    try {
+      instance.process.kill();
+    } catch (err) {
+      recordStubLog(theme, `stub error: ${(err as Error).message}`);
+    }
+    stubPool.delete(theme);
+    recordStubLog(theme, 'stub stopped');
   }
-  const logger = new ServiceLogger(rootDir);
-  const runner = new TaskRunner();
-  const token = process.env.DEEMIND_SERVICE_TOKEN || config.token || '';
-  const auth = makeAuthMiddleware(token);
+const logger = new ServiceLogger(rootDir);
+const runner = new TaskRunner();
+const token = process.env.DEEMIND_SERVICE_TOKEN || config.token || '';
+const auth = makeAuthMiddleware(token);
+
+  logger.on('entry', (entry) => {
+    const payload = `data: ${JSON.stringify(entry)}\n\n`;
+    for (const client of logStreamClients) {
+      client.write(payload);
+    }
+  });
+  function enqueueBuild(themeName: string, options: { diff?: boolean; source?: string } = {}) {
+    const diff = Boolean(options.diff);
+    const source = options.source || 'api';
+    const session: BuildSession = {
+      id: uuid(),
+      theme: themeName,
+      diff,
+      status: 'queued',
+      startedAt: null,
+      finishedAt: null,
+      logs: [],
+      source,
+      exitCode: null,
+    };
+    recordBuildSession(session);
+    const { command, args } = buildRunCommand(themeName, diff ? ['--diff'] : []);
+    runner.enqueue({
+      id: session.id,
+      label: `build:${themeName}`,
+      command,
+      args,
+      cwd: rootDir,
+      meta: { buildId: session.id, theme: themeName },
+    });
+    return session;
+  }
+
+  function enqueueScenario(themeName: string, chain: string[], options: { source?: string } = {}) {
+    const source = options.source || 'api';
+    const cleanedChain = chain.filter((item) => item && typeof item === 'string').map((item) => item.toLowerCase());
+    const session: ScenarioSession = {
+      id: uuid(),
+      theme: themeName,
+      chain: cleanedChain.length ? cleanedChain : ['checkout'],
+      status: 'queued',
+      startedAt: null,
+      finishedAt: null,
+      source,
+      logFile: null,
+      exitCode: null,
+    };
+    recordScenarioSession(session);
+    const logFile = path.join(scenarioLogDir, `${session.id}.json`);
+    const args = ['tools/runtime-scenario.js', themeName];
+    if (session.chain.length) {
+      args.push(`--chain=${session.chain.join(',')}`);
+    }
+    runner.enqueue({
+      id: session.id,
+      label: `scenario:${themeName}`,
+      command: 'node',
+      args,
+      cwd: rootDir,
+      meta: { scenarioId: session.id, scenarioLogFile: logFile },
+      env: { SCENARIO_LOG_FILE: logFile },
+    });
+    return session;
+  }
 
   const allowedOriginsEnv = process.env.DASHBOARD_ORIGIN
     ? process.env.DASHBOARD_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean)
@@ -309,26 +676,95 @@ async function main() {
   app.use(cors(corsOptions));
   app.use(express.json({ limit: '10mb' }));
 
-  runner.on('task-started', (task) => logger.write(`Task started: ${task?.label}`));
-  runner.on('task-finished', ({ id, code }) => logger.write(`Task finished: ${id} exit=${code}`));
-  runner.on('log', (line) => logger.write(line.trim()));
+  registerRunRoutes({ app, auth, config, runner, rootDir, logger });
 
-  // Task runner endpoint
-  app.post('/api/run', auth, (req, res) => {
-    const { task = 'build-all' } = req.body || {};
-    const def = config.tasks?.[task];
-    if (!def) {
-      return res.status(400).json({ error: `Unknown task: ${task}` });
+  async function captureBuildMetrics(themeName: string) {
+    const reportPath = path.join(outputDir, themeName, 'report-extended.json');
+    if (!(await fs.pathExists(reportPath))) return null;
+    const report = await safeReadJson(reportPath);
+    if (!report) return null;
+    const errors = Array.isArray(report.errors) ? report.errors.length : Number(report.errorCount) || 0;
+    const warnings = Array.isArray(report.warnings) ? report.warnings.length : Number(report.warningCount) || 0;
+    return { errors, warnings };
+  }
+
+  runner.on('task-started', (task) => {
+    logger.write(`Task started: ${task?.label}`);
+    if (task?.meta?.buildId) {
+      activeBuildId = task.meta.buildId;
+      updateBuildSession(task.meta.buildId, { status: 'running', startedAt: new Date().toISOString() });
     }
-    const id = uuid();
-    runner.enqueue({
-      id,
-      label: task,
-      command: def.command,
-      args: def.args || [],
-      cwd: rootDir,
+    if (task?.meta?.scenarioId) {
+      updateScenarioSession(task.meta.scenarioId, { status: 'running', startedAt: new Date().toISOString() });
+    }
+  });
+  runner.on('task-finished', ({ id, code, meta }) => {
+    logger.write(`Task finished: ${id} exit=${code}`);
+    if (meta?.buildId) {
+      const status: BuildSessionStatus = code === 0 ? 'succeeded' : 'failed';
+      (async () => {
+        let metrics = null;
+        if (status === 'succeeded' && typeof meta.theme === 'string' && meta.theme) {
+          metrics = await captureBuildMetrics(meta.theme);
+        }
+        updateBuildSession(meta.buildId, {
+          status,
+          finishedAt: new Date().toISOString(),
+          exitCode: typeof code === 'number' ? code : null,
+          metrics,
+        });
+        if (activeBuildId === meta.buildId) {
+          activeBuildId = null;
+        }
+      })().catch((err) => logger.write(`build metrics error: ${err instanceof Error ? err.message : String(err)}`));
+    }
+    if (meta?.jobId) {
+    }
+    if (meta?.scenarioId) {
+      const status: ScenarioSessionStatus = code === 0 ? 'succeeded' : 'failed';
+      const patch: Partial<ScenarioSession> = {
+        status,
+        finishedAt: new Date().toISOString(),
+        exitCode: typeof code === 'number' ? code : null,
+      };
+      if (meta.scenarioLogFile) {
+        patch.logFile = path.relative(rootDir, meta.scenarioLogFile);
+      }
+      updateScenarioSession(meta.scenarioId, patch);
+    }
+  });
+  runner.on('log', (line) => {
+    const text = line.toString().trim();
+    logger.write(text);
+    if (activeBuildId) {
+      appendBuildLog(activeBuildId, text);
+    }
+  });
+
+  app.post('/api/build/start', auth, (req, res) => {
+    const theme = sanitizeThemeName(String(req.body?.theme || ''));
+    if (!theme) {
+      return res.status(400).json({ error: 'theme is required' });
+    }
+    const diff = Boolean(req.body?.diff);
+    const session = enqueueBuild(theme, { diff, source: 'build-start' });
+    res.json({ enqueued: true, session });
+  });
+
+  app.get('/api/build/sessions', auth, (_req, res) => {
+    res.json({ sessions: getBuildSessionsSnapshot() });
+  });
+
+  app.get('/api/build/stream', auth, (req, res) => {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders?.();
+    res.write(`event: snapshot\ndata: ${JSON.stringify({ sessions: getBuildSessionsSnapshot() })}\n\n`);
+    buildStreamClients.add(res);
+    req.on('close', () => {
+      buildStreamClients.delete(res);
     });
-    res.json({ enqueued: true, id });
   });
 
   app.get('/api/status', auth, (_req, res) => {
@@ -363,13 +799,41 @@ async function main() {
     res.json({ saved: true });
   });
 
-  app.post('/api/themes/:theme/run', auth, async (req, res) => {
-    const theme = req.params.theme;
+  app.get('/api/themes/:theme/preset', auth, async (req, res) => {
+    const file = path.join(inputDir, req.params.theme, PRESET_METADATA_FILENAME);
+    const data = (await safeReadJson(file)) || {};
+    res.json(data);
+  });
+
+  app.post('/api/themes/:theme/preset', auth, async (req, res) => {
+    const themeDir = path.join(inputDir, req.params.theme);
+    const file = path.join(themeDir, PRESET_METADATA_FILENAME);
+    await fs.ensureDir(themeDir);
+    await fs.writeJson(file, req.body || {}, { spaces: 2 });
+    res.json({ saved: true });
+  });
+
+  app.post('/api/themes/:theme/defaults', auth, async (req, res) => {
+    const themeDir = path.join(inputDir, req.params.theme);
+    if (!(await fs.pathExists(themeDir))) {
+      return res.status(404).json({ error: 'theme not found in input/' });
+    }
+    try {
+      const applied = await applyDefaultTemplates(themeDir);
+      res.json({ success: true, applied });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
+  app.post('/api/themes/:theme/run', auth, (req, res) => {
+    const theme = sanitizeThemeName(req.params.theme);
+    if (!theme) {
+      return res.status(400).json({ error: 'theme is required' });
+    }
     const { diff = false } = req.body || {};
-    const { command, args } = buildRunCommand(theme, diff ? ['--diff'] : []);
-    const id = uuid();
-    runner.enqueue({ id, label: `build:${theme}`, command, args, cwd: rootDir });
-    res.json({ enqueued: true, id });
+    const session = enqueueBuild(theme, { diff, source: 'theme-route' });
+    res.json({ enqueued: true, id: session.id, session });
   });
 
   app.get('/api/themes/:theme/reports', auth, async (req, res) => {
@@ -383,12 +847,26 @@ async function main() {
     res.json({ manifest, extended, baseline, diff });
   });
 
-  app.get('/api/preview/stub', auth, (_req, res) => {
-    res.json({ running: Boolean(stubState.process), theme: stubState.theme, port: stubState.port });
+  app.get('/api/preview/stub', auth, (req, res) => {
+    const requestedTheme = sanitizeThemeName(String(req.query.theme || ''));
+    const state = getStubState(requestedTheme || undefined);
+    if (!state) {
+      return res.json({ running: false, theme: requestedTheme || null, port: null });
+    }
+    res.json({ running: true, theme: state.theme, port: state.port });
   });
 
-  app.get('/api/preview/stub/logs', auth, (_req, res) => {
-    res.json({ logs: stubState.logs });
+  app.get('/api/preview/stub/logs', auth, (req, res) => {
+    const requestedTheme = sanitizeThemeName(String(req.query.theme || ''));
+    const state = getStubState(requestedTheme || undefined);
+    res.json({
+      theme: state?.theme || requestedTheme || null,
+      logs: state?.logs || [],
+    });
+  });
+
+  app.get('/api/preview/stubs', auth, (_req, res) => {
+    res.json({ stubs: listStubStates() });
   });
 
   async function readTwilightConfig() {
@@ -407,64 +885,72 @@ async function main() {
   }
 
   app.post('/api/preview/stub', auth, async (req, res) => {
-    if (stubState.process) {
-      return res.status(409).json({ error: 'Stub already running', port: stubState.port, theme: stubState.theme });
+    const requestedTheme = sanitizeThemeName(req.body?.theme as string);
+    if (!requestedTheme) {
+      return res.status(400).json({ error: 'Theme is required.' });
     }
-    const { theme: requestedTheme } = req.body || {};
-    const theme = sanitizeThemeName(requestedTheme) || 'demo';
+    if (stubPool.has(requestedTheme)) {
+      const existing = stubPool.get(requestedTheme)!;
+      return res.status(409).json({ error: 'Stub already running for theme', port: existing.port, theme: requestedTheme });
+    }
+    const preferredPort = req.body?.port ? Number(req.body.port) : undefined;
+    const port = findAvailablePort(preferredPort);
     try {
-      execSync(`${process.execPath} tools/preview-static.js ${theme}`, { cwd: rootDir, stdio: 'inherit' });
+      execFileSync(process.execPath, ['tools/preview-static.js', requestedTheme], { cwd: rootDir, stdio: 'inherit' });
     } catch (err) {
-      recordStubLog(`preview:seed failed ${err instanceof Error ? err.message : String(err)}`);
-      return res.status(500).json({ error: 'Failed to seed preview snapshots.' });
+      console.warn(`preview:seed failed for ${requestedTheme}: ${err instanceof Error ? err.message : String(err)}`);
     }
-    recordStubLog(`starting stub for theme ${theme}`);
-    const child = spawn(process.execPath, ['server/runtime-stub.js', theme], {
+    const child = spawn(process.execPath, ['server/runtime-stub.js', requestedTheme], {
       cwd: rootDir,
-      env: { ...process.env, PREVIEW_PORT: String(stubState.port) },
+      env: { ...process.env, PREVIEW_PORT: String(port) },
       stdio: ['ignore', 'pipe', 'pipe'],
     });
-    stubState.process = child;
-    stubState.theme = theme;
-    child.stdout?.on('data', (buf) => recordStubLog(buf.toString().trim()));
-    child.stderr?.on('data', (buf) => recordStubLog(buf.toString().trim()));
+    const instance: StubInstance = { process: child, theme: requestedTheme, port, logs: [] };
+    stubPool.set(requestedTheme, instance);
+    recordStubLog(requestedTheme, `stub starting on port ${port}`);
+    child.stdout?.on('data', (buf) => recordStubLog(requestedTheme, buf.toString().trim()));
+    child.stderr?.on('data', (buf) => recordStubLog(requestedTheme, buf.toString().trim()));
     child.on('exit', (code) => {
-      recordStubLog(`stub exited with code ${code}`);
-      stubState.process = null;
-      stubState.theme = null;
+      recordStubLog(requestedTheme, `stub exited with code ${code}`);
+      stubPool.delete(requestedTheme);
     });
-    res.json({ running: true, port: stubState.port, theme });
+    res.json({ running: true, port, theme: requestedTheme });
   });
 
-  app.delete('/api/preview/stub', auth, (_req, res) => {
+  app.delete('/api/preview/stub', auth, (req, res) => {
+    const requestedTheme = sanitizeThemeName(String(req.body?.theme || req.query.theme || ''));
+    if (requestedTheme) {
+      stopStubProcess(requestedTheme);
+      return res.json({ theme: requestedTheme, running: false });
+    }
     stopStubProcess();
     res.json({ running: false });
   });
 
   app.post('/api/preview/stub/reset', auth, async (req, res) => {
-    const requestedTheme = sanitizeThemeName(req.body?.theme as string);
-    const targetTheme = requestedTheme || stubState.theme;
+    const targetTheme = sanitizeThemeName(req.body?.theme as string);
     if (!targetTheme) {
       return res.status(400).json({ error: 'Theme required to reset stub state.' });
     }
     await fs.ensureDir(stateDir);
     const stateFile = path.join(stateDir, `${targetTheme}.json`);
     let resetInProcess = false;
-    if (stubState.process && stubState.theme === targetTheme) {
+    const runningStub = stubPool.get(targetTheme);
+    if (runningStub) {
       try {
-        const response = await fetch(`http://localhost:${stubState.port}/api/state/reset`, { method: 'POST' });
+        const response = await fetch(`http://localhost:${runningStub.port}/api/state/reset`, { method: 'POST' });
         if (!response.ok) {
           throw new Error(`Stub responded with ${response.status}`);
         }
         resetInProcess = true;
-        recordStubLog(`state reset via stub API for theme ${targetTheme}`);
+        recordStubLog(targetTheme, 'state reset via stub API');
       } catch (error) {
-        recordStubLog(`state reset via stub API failed for ${targetTheme}: ${error instanceof Error ? error.message : String(error)}`);
+        recordStubLog(targetTheme, `state reset via stub API failed: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
     if (!resetInProcess) {
       await fs.remove(stateFile);
-      recordStubLog(`state file cleared for theme ${targetTheme}`);
+      recordStubLog(targetTheme, 'state file cleared');
     }
     res.json({ success: true, theme: targetTheme, inPlace: resetInProcess });
   });
@@ -476,6 +962,18 @@ async function main() {
       res.json({ demos });
     } catch (error) {
       res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
+  app.get('/api/store/partials', auth, async (_req, res) => {
+    try {
+      const { listStorePartials } = await composerModulePromise;
+      const partials = await listStorePartials();
+      res.json({ partials });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ error: error instanceof Error ? error.message : String(error) });
     }
   });
 
@@ -496,41 +994,115 @@ async function main() {
     }
   });
 
+  app.get('/api/runtime/context', auth, async (req, res) => {
+    const theme = sanitizeThemeName(String(req.query?.theme || '')) || 'demo';
+    try {
+      const stubContext = await fetchStubContext(theme);
+      if (stubContext) {
+        return res.json({ theme, source: 'stub', context: stubContext });
+      }
+    } catch (error) {
+      logger.write(`runtime context via stub failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    try {
+      const cached = await readCachedContext(theme);
+      if (cached) {
+        return res.json({ theme, source: 'cache', context: cached });
+      }
+      res.status(404).json({ error: `No cached context for theme "${theme}". Run npm run mock:data ${theme} <demo>.` });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
+  app.post('/api/runtime/context', auth, async (req, res) => {
+    const normalizedTheme = sanitizeThemeName(String(req.body?.theme || '')) || 'demo';
+    const demo = String(req.body?.demo || normalizedTheme || 'electronics');
+    try {
+      const { context, file } = await regenerateMockContext(normalizedTheme, demo);
+      const stub = getStubState(normalizedTheme);
+      if (stub) {
+        try {
+          await fetch(`http://localhost:${stub.port}/api/runtime/context/regenerate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ demo }),
+          });
+          recordStubLog(normalizedTheme, `runtime context regenerated via demo ${demo}`);
+        } catch (error) {
+          recordStubLog(
+            normalizedTheme,
+            `runtime context live sync failed: ${error instanceof Error ? error.message : String(error)}`,
+          );
+        }
+      }
+      res.json({
+        success: true,
+        theme: normalizedTheme,
+        demo,
+        file: path.relative(process.cwd(), file),
+        context,
+      });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
   app.post('/api/store/preset', auth, async (req, res) => {
     const { demo = 'electronics', overrides = {}, parts, theme: requestedTheme } = req.body || {};
     const includeOnly = Array.isArray(parts) ? parts : undefined;
     try {
       const { composeStore } = await composerModulePromise;
       const composed = await composeStore(demo, { overrides, includeOnly, writeCache: true });
-      const targetTheme = sanitizeThemeName(requestedTheme) || stubState.theme || 'demo';
+      const normalizedTheme = sanitizeThemeName(requestedTheme);
+      const targetStub = getStubState(normalizedTheme || undefined);
+      const targetTheme = normalizedTheme || targetStub?.theme || 'demo';
+
+      try {
+        const { buildMockContext, writeMockContext } = await mockLayerModulePromise;
+        if (buildMockContext && writeMockContext) {
+          const mockContext = await buildMockContext(demo);
+          await writeMockContext(normalizedTheme || targetTheme, mockContext);
+        }
+      } catch (mockError) {
+        logger.write(
+          `mock context update failed: ${
+            mockError instanceof Error ? mockError.message : String(mockError)
+          }`,
+        );
+      }
+
       await fs.ensureDir(stateDir);
-  const stateFile = path.join(stateDir, `${targetTheme}.json`);
-  const snapshot = {
-    preset: {
-      demo: composed.id,
-      name: composed.name,
-      partials: composed.partials,
-      meta: composed.meta,
-      generatedAt: composed.generatedAt,
-    },
-    store: composed.data.store || {},
-    products: composed.data.products || [],
-    cart: composed.data.cart || { items: [], total: 0 },
-    wishlist: composed.data.wishlist || { items: [] },
-    session: { user: null, token: null },
-  };
+      const stateFile = path.join(stateDir, `${targetTheme}.json`);
+      const snapshot = {
+        preset: {
+          demo: composed.id,
+          name: composed.name,
+          partials: composed.partials,
+          meta: composed.meta,
+          generatedAt: composed.generatedAt,
+        },
+        store: composed.data.store || {},
+        products: composed.data.products || [],
+        cart: composed.data.cart || { items: [], total: 0 },
+        wishlist: composed.data.wishlist || { items: [] },
+        session: { user: null, token: null },
+      };
       await fs.writeJson(stateFile, snapshot, { spaces: 2 });
 
-      if (stubState.process && stubState.theme === targetTheme) {
+      if (targetStub && targetStub.theme === targetTheme) {
         try {
-          await fetch(`http://localhost:${stubState.port}/api/store/preset`, {
+          await fetch(`http://localhost:${targetStub.port}/api/store/preset`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ demo, overrides, includeOnly }),
           });
-          recordStubLog(`store preset applied live for theme ${targetTheme} using demo ${demo}`);
+          recordStubLog(targetTheme, `store preset applied live using demo ${demo}`);
         } catch (error) {
-          recordStubLog(`store preset live sync failed: ${error instanceof Error ? error.message : String(error)}`);
+          recordStubLog(
+            targetTheme,
+            `store preset live sync failed: ${error instanceof Error ? error.message : String(error)}`,
+          );
         }
       }
 
@@ -548,25 +1120,38 @@ async function main() {
   app.post('/api/twilight', auth, async (req, res) => {
     const desired = { enabled: Boolean(req.body?.enabled ?? true) };
     await writeTwilightConfig(desired);
-    if (stubState.process) {
-      try {
-        await fetch(`http://localhost:${stubState.port}/api/twilight`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(desired),
-        });
-        recordStubLog(`twilight mode set to ${desired.enabled ? 'enabled' : 'disabled'}`);
-      } catch (error) {
-        recordStubLog(`failed to sync twilight mode: ${error instanceof Error ? error.message : String(error)}`);
-      }
-    }
+    await Promise.all(
+      Array.from(stubPool.values()).map(async (state) => {
+        try {
+          await fetch(`http://localhost:${state.port}/api/twilight`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(desired),
+          });
+          recordStubLog(state.theme, `twilight mode set to ${desired.enabled ? 'enabled' : 'disabled'}`);
+        } catch (error) {
+          recordStubLog(state.theme, `failed to sync twilight mode: ${error instanceof Error ? error.message : String(error)}`);
+        }
+      }),
+    );
     res.json(desired);
   });
 
   app.get('/api/runtime/analytics', auth, async (req, res) => {
     const limit = Number(req.query.limit) || 50;
-    const entries = await readRuntimeAnalytics(analyticsLogPath, limit);
+    const themeFilter = sanitizeThemeName(String(req.query.theme || ''));
+    const entries = await readRuntimeAnalytics(analyticsLogPath, limit, themeFilter || undefined);
     res.json({ entries });
+  });
+
+  app.post('/api/runtime/scenario', auth, (req, res) => {
+    const requestedTheme = sanitizeThemeName(String(req.body?.theme || ''));
+    if (!requestedTheme) {
+      return res.status(400).json({ error: 'theme is required' });
+    }
+    const chainInput = Array.isArray(req.body?.chain) ? req.body.chain : [];
+    const session = enqueueScenario(requestedTheme, chainInput, { source: 'dashboard' });
+    res.json({ enqueued: true, session });
   });
 
   app.get('/api/runtime/scenarios', auth, async (req, res) => {
@@ -575,9 +1160,45 @@ async function main() {
     res.json({ runs });
   });
 
+  app.get('/api/runtime/scenario/flows', auth, (_req, res) => {
+    res.json({ flows: scenarioFlows });
+  });
+
+  app.get('/api/runtime/scenario/sessions', auth, (_req, res) => {
+    res.json({ sessions: getScenarioSessionsSnapshot() });
+  });
+
+  app.get('/api/runtime/scenario/stream', auth, (req, res) => {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders?.();
+    res.write(`event: snapshot\ndata: ${JSON.stringify({ sessions: getScenarioSessionsSnapshot() })}\n\n`);
+    scenarioStreamClients.add(res);
+    req.on('close', () => {
+      scenarioStreamClients.delete(res);
+    });
+  });
+
+  app.get('/api/runtime/scenarios/:id', auth, async (req, res) => {
+    const id = sanitizeScenarioId(req.params.id);
+    if (!id) {
+      return res.status(400).json({ error: 'scenario id is required' });
+    }
+    const filePath = path.join(scenarioLogDir, `${id}.json`);
+    if (!(await fs.pathExists(filePath))) {
+      return res.status(404).json({ error: 'Scenario log not found', id });
+    }
+    const log = await safeReadJson(filePath);
+    const session = scenarioSessions.find((entry) => entry.id === id) || null;
+    res.json({ id, session, log });
+  });
+
+  registerRuntimeStateRoutes(app, auth, stateDir);
+
   app.get('/api/store/diff', auth, async (req, res) => {
     const demo = String(req.query.demo || 'electronics');
-    const theme = sanitizeThemeName(String(req.query.theme || 'demo'));
+    const theme = sanitizeThemeName(String(req.query.theme || ''));
     const parts = req.query.parts
       ? String(req.query.parts)
           .split(',')
@@ -587,7 +1208,7 @@ async function main() {
     try {
       const { composeStore } = await composerModulePromise;
       const composed = await composeStore(demo, { includeOnly: parts, writeCache: false });
-      const currentSnapshot = (await getThemeStateSnapshot(theme, stubState, stateDir)) || {};
+      const currentSnapshot = (await getThemeStateSnapshot(theme, stateDir)) || {};
       const currentSummary = summarizeSnapshot(currentSnapshot);
       const nextSummary = summarizeSnapshot({
         preset: {
@@ -612,13 +1233,21 @@ async function main() {
   });
 
   app.get('/api/preview/events', auth, async (req, res) => {
+    const requestedTheme = sanitizeThemeName(String(req.query.theme || ''));
+    const targetStub = getStubState(requestedTheme || undefined);
+
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders?.();
 
-    if (!stubState.process || !stubState.theme) {
-      res.write(`event: status\ndata: ${JSON.stringify({ running: false })}\n\n`);
+    if (!targetStub) {
+      res.write(
+        `event: status\ndata: ${JSON.stringify({
+          running: false,
+          theme: requestedTheme || null,
+        })}\n\n`,
+      );
       return res.end();
     }
 
@@ -630,13 +1259,17 @@ async function main() {
     req.on('close', endStream);
 
     try {
-      const upstream = await fetch(`http://localhost:${stubState.port}/events`, { signal: controller.signal });
+      const upstream = await fetch(`http://localhost:${targetStub.port}/events`, { signal: controller.signal });
       if (!upstream.body) {
         res.write(`event: status\ndata: ${JSON.stringify({ running: false, error: 'no upstream stream' })}\n\n`);
         return endStream();
       }
       res.write(
-        `event: status\ndata: ${JSON.stringify({ running: true, theme: stubState.theme, port: stubState.port })}\n\n`,
+        `event: status\ndata: ${JSON.stringify({
+          running: true,
+          theme: targetStub.theme,
+          port: targetStub.port,
+        })}\n\n`,
       );
       const relay = Readable.fromWeb(upstream.body as any);
       relay.on('data', (chunk) => res.write(chunk));
@@ -680,8 +1313,35 @@ async function main() {
       } else {
         await fs.move(file.path, path.join(targetDir, file.originalname), { overwrite: true });
       }
+      const defaultsApplied = await applyDefaultTemplates(targetDir);
+      const manifestPath = path.join(targetDir, INPUT_MANIFEST_FILENAME);
+      const previousManifest = (await safeReadJson(manifestPath)) as InputManifest | null;
+      const newManifest = await generateInputManifest(targetDir);
+      await fs.writeJson(manifestPath, newManifest, { spaces: 2 });
+      const manifestDiff = diffManifests(previousManifest?.files, newManifest.files);
+
+      let presetMetadata: Record<string, any> | null = null;
+      const presetPath = path.join(targetDir, PRESET_METADATA_FILENAME);
+      if (await fs.pathExists(presetPath)) {
+        try {
+          const parsed = await fs.readJson(presetPath);
+          if (parsed && typeof parsed === 'object') {
+            presetMetadata = parsed;
+            const metadataPath = path.join(targetDir, 'theme.json');
+            let merged = parsed;
+            if (await fs.pathExists(metadataPath)) {
+              const existingMeta = (await fs.readJson(metadataPath).catch(() => ({}))) || {};
+              merged = { ...existingMeta, ...parsed };
+            }
+            await fs.writeJson(metadataPath, merged, { spaces: 2 });
+          }
+        } catch {
+          presetMetadata = null;
+        }
+      }
+
       await cleanup();
-      return res.json({ theme, inputPath: targetDir });
+      return res.json({ theme, inputPath: targetDir, diff: manifestDiff, preset: presetMetadata, defaultsApplied });
     } catch (err) {
       await cleanup();
       await fs.remove(targetDir);
@@ -711,6 +1371,22 @@ async function main() {
       pages: previewMeta.pages || pageList,
       timestamp: previewMeta.timestamp || null,
     });
+  });
+
+  app.post('/api/themes/:theme/preview', auth, async (req, res) => {
+    const theme = sanitizeThemeName(req.params.theme);
+    if (!theme) {
+      return res.status(400).json({ error: 'theme is required' });
+    }
+    try {
+      execFileSync(process.execPath, ['tools/preview-static.js', theme], { cwd: rootDir, stdio: 'inherit' });
+    } catch (error) {
+      return res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+    }
+    const basePath = path.join(outputDir, theme);
+    const previewFile = path.join(basePath, '.preview.json');
+    const previewMeta = (await safeReadJson(previewFile)) || {};
+    res.json({ success: true, preview: previewMeta });
   });
 
   // Reports list (existing behavior)
@@ -800,18 +1476,16 @@ async function main() {
     res.json(lines);
   });
 
-  app.get('/api/log/stream', auth, (req, res) => {
+  app.get('/api/log/stream', auth, async (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
-
-    const listener = (line: string) => {
-      res.write(`data: ${line}\n\n`);
-    };
-    runner.on('log', listener);
-
+    res.flushHeaders?.();
+    const history = await logger.tail(50);
+    history.forEach((entry) => res.write(`data: ${JSON.stringify(entry)}\n\n`));
+    logStreamClients.add(res);
     req.on('close', () => {
-      runner.off('log', listener);
+      logStreamClients.delete(res);
     });
   });
 
@@ -834,3 +1508,193 @@ main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
+async function writeRuntimeState(theme: string, stateDir: string, nextState: any) {
+  const filePath = path.join(stateDir, `${theme}.json`);
+  await fs.ensureDir(path.dirname(filePath));
+  await fs.writeJson(filePath, nextState, { spaces: 2 });
+}
+
+function registerRuntimeStateRoutes(app: express.Express, auth: express.RequestHandler, stateDir: string) {
+  app.get('/api/runtime/state', auth, async (req, res) => {
+    const theme = sanitizeThemeName(String(req.query.theme || ''));
+    if (!theme) {
+      return res.status(400).json({ error: 'theme is required' });
+    }
+    const state = await getThemeStateSnapshot(theme, stateDir);
+    if (!state) {
+      return res.status(404).json({ error: 'No runtime state found for theme', theme });
+    }
+    res.json({ theme, state });
+  });
+
+  app.post('/api/runtime/locale', auth, async (req, res) => {
+    const theme = sanitizeThemeName(String(req.body?.theme || ''));
+    const language = String(req.body?.language || '').trim();
+    if (!theme || !language) {
+      return res.status(400).json({ error: 'theme and language are required' });
+    }
+    const targetStub = getStubState(theme);
+    if (targetStub) {
+      try {
+        await fetch(`http://localhost:${targetStub.port}/api/store/locale`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ language }),
+        });
+        const snapshot = await getThemeStateSnapshot(theme, stateDir);
+        if (snapshot) {
+          await writeRuntimeState(theme, stateDir, snapshot);
+        }
+        return res.json({ success: true, theme, language, state: snapshot || null, live: true });
+      } catch (error) {
+        return res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+      }
+    }
+    const filePath = path.join(stateDir, `${theme}.json`);
+    if (!(await fs.pathExists(filePath))) {
+      return res.status(404).json({ error: 'No runtime state found for theme' });
+    }
+    const current = await fs.readJson(filePath);
+    current.store = current.store || {};
+    current.store.language = language;
+    await writeRuntimeState(theme, stateDir, current);
+    res.json({ success: true, theme, language, state: current, live: false });
+  });
+
+  const handleStubMutation = async (
+    theme: string,
+    pathSuffix: string,
+    body: any,
+    fallback: () => Promise<any>,
+  ) => {
+    const stub = getStubState(theme);
+    if (stub) {
+      const response = await fetch(`http://localhost:${stub.port}${pathSuffix}`, {
+        method: 'POST',
+        headers: body ? { 'Content-Type': 'application/json' } : undefined,
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      if (!response.ok) {
+        throw new Error(`Stub responded with ${response.status}`);
+      }
+      const state = await syncStateFromStub(theme, stateDir);
+      if (!state) {
+        throw new Error('Failed to synchronize runtime state from stub.');
+      }
+      return { state, live: true };
+    }
+    const state = await fallback();
+    return { state, live: false };
+  };
+
+  app.post('/api/runtime/cart/clear', auth, async (req, res) => {
+    const theme = sanitizeThemeName(String(req.body?.theme || ''));
+    if (!theme) return res.status(400).json({ error: 'theme is required' });
+    try {
+      const result = await handleStubMutation(
+        theme,
+        '/api/cart/clear',
+        null,
+        () =>
+          mutateOfflineState(theme, stateDir, (state) => {
+            const cart = normalizeCart(state.cart);
+            cart.items = [];
+            cart.total = 0;
+            state.cart = cart;
+            return state;
+          }),
+      );
+      res.json({ success: true, ...result });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
+  app.post('/api/runtime/cart/remove', auth, async (req, res) => {
+    const theme = sanitizeThemeName(String(req.body?.theme || ''));
+    const id = Number(req.body?.id);
+    if (!theme) return res.status(400).json({ error: 'theme is required' });
+    if (!Number.isFinite(id)) return res.status(400).json({ error: 'valid id is required' });
+    try {
+      const result = await handleStubMutation(
+        theme,
+        '/api/cart/remove',
+        { id },
+        () =>
+          mutateOfflineState(theme, stateDir, (state) => {
+            const cart = normalizeCart(state.cart);
+            cart.items = cart.items.filter((item) => Number(item.id) !== id);
+            recalcCartTotals(cart);
+            state.cart = cart;
+            return state;
+          }),
+      );
+      res.json({ success: true, ...result });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
+  app.post('/api/runtime/wishlist/clear', auth, async (req, res) => {
+    const theme = sanitizeThemeName(String(req.body?.theme || ''));
+    if (!theme) return res.status(400).json({ error: 'theme is required' });
+    try {
+      const result = await handleStubMutation(
+        theme,
+        '/api/wishlist/clear',
+        null,
+        () =>
+          mutateOfflineState(theme, stateDir, (state) => {
+            state.wishlist = { items: [] };
+            return state;
+          }),
+      );
+      res.json({ success: true, ...result });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
+  app.post('/api/runtime/wishlist/remove', auth, async (req, res) => {
+    const theme = sanitizeThemeName(String(req.body?.theme || ''));
+    const id = Number(req.body?.id);
+    if (!theme) return res.status(400).json({ error: 'theme is required' });
+    if (!Number.isFinite(id)) return res.status(400).json({ error: 'valid id is required' });
+    try {
+      const result = await handleStubMutation(
+        theme,
+        '/api/wishlist/remove',
+        { id },
+        () =>
+          mutateOfflineState(theme, stateDir, (state) => {
+            const wishlist = Array.isArray(state?.wishlist?.items) ? state.wishlist.items : [];
+            state.wishlist = { items: wishlist.filter((item) => Number(item.id) !== id) };
+            return state;
+          }),
+      );
+      res.json({ success: true, ...result });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
+  app.post('/api/runtime/session/logout', auth, async (req, res) => {
+    const theme = sanitizeThemeName(String(req.body?.theme || ''));
+    if (!theme) return res.status(400).json({ error: 'theme is required' });
+    try {
+      const result = await handleStubMutation(
+        theme,
+        '/api/auth/logout',
+        null,
+        () =>
+          mutateOfflineState(theme, stateDir, (state) => {
+            state.session = { user: null, token: null };
+            return state;
+          }),
+      );
+      res.json({ success: true, ...result });
+    } catch (error) {
+      res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+}
