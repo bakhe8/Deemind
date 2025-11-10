@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { fetchPreviewMatrix, type PreviewMatrixEntry } from '../api/themes';
+import { fetchPreviewMatrix, type PreviewMatrixEntry } from '../api';
 
 type Options = {
   pollMs?: number | null;

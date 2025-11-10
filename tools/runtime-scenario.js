@@ -29,6 +29,7 @@ if (!scenarioChain.length) {
   scenarioChain = ['checkout'];
 }
 const port = Number(process.env.RUNTIME_PORT || process.env.PREVIEW_PORT || 4100);
+const sessionRoot = path.join(rootDir, 'runtime', 'sessions', theme);
 
 const scenarioDir = path.join(rootDir, 'logs', 'runtime-scenarios');
 const rawLogPath = outputFlag ? outputFlag.split('=').slice(1).join('=').trim() : process.env.SCENARIO_LOG_FILE;
@@ -114,7 +115,7 @@ async function ensureStubRunning() {
   console.log(`⚙️  Starting runtime stub for ${theme} on port ${port}…`);
   const child = spawn(process.execPath, ['server/runtime-stub.js', theme], {
     cwd: rootDir,
-    env: { ...process.env, PREVIEW_PORT: String(port) },
+    env: { ...process.env, PREVIEW_PORT: String(port), RUNTIME_SESSION_ROOT: sessionRoot },
     stdio: ['ignore', 'inherit', 'inherit'],
   });
   const ready = await waitForStub();

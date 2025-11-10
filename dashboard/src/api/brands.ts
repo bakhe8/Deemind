@@ -1,3 +1,10 @@
+/**
+ * @layer Dashboard (UI-only)
+ * This module must never access filesystem or child_process.
+ * All mutations occur via REST APIs exposed by service/server.ts.
+ */
+import { apiFetch } from './client';
+
 export type BrandPreset = {
   slug: string;
   name: string;
@@ -7,10 +14,7 @@ export type BrandPreset = {
 };
 
 async function jsonFetch(url: string, options?: RequestInit) {
-  const res = await fetch(url, options);
-  if (!res.ok) {
-    throw new Error(await res.text());
-  }
+  const res = await apiFetch(url, options);
   return res.json();
 }
 

@@ -1,3 +1,8 @@
+/**
+ * @layer Dashboard (UI-only)
+ * This module must never access filesystem or child_process.
+ * All mutations occur via REST APIs exposed by service/server.ts.
+ */
 import { apiFetch, apiJson } from './client';
 
 export type BuildSession = {

@@ -1,4 +1,96 @@
 {
-  "nodes": [],
-  "edges": []
+  "nodes": [
+    "pages/index.twig",
+    "pages/4.twig",
+    "pages/6.twig",
+    "pages/2.twig",
+    "pages/5.twig",
+    "pages/1.twig",
+    "pages/3.twig",
+    "pages/sub/index.twig",
+    "pages/sub/first.twig",
+    "pages/sub/cards.twig",
+    "pages/sub/carectars.twig",
+    "pages/sub/1.twig",
+    "pages/sub/book.twig",
+    "pages/sub/boxing.twig",
+    "pages/sub/cat/index.twig"
+  ],
+  "edges": [
+    {
+      "from": "pages/index.twig",
+      "to": "layout/default.twig",
+      "type": "extends"
+    },
+    {
+      "from": "pages/4.twig",
+      "to": "layout/default.twig",
+      "type": "extends"
+    },
+    {
+      "from": "pages/6.twig",
+      "to": "layout/default.twig",
+      "type": "extends"
+    },
+    {
+      "from": "pages/2.twig",
+      "to": "layout/default.twig",
+      "type": "extends"
+    },
+    {
+      "from": "pages/5.twig",
+      "to": "layout/default.twig",
+      "type": "extends"
+    },
+    {
+      "from": "pages/1.twig",
+      "to": "layout/default.twig",
+      "type": "extends"
+    },
+    {
+      "from": "pages/3.twig",
+      "to": "layout/default.twig",
+      "type": "extends"
+    },
+    {
+      "from": "pages/sub/index.twig",
+      "to": "layout/default.twig",
+      "type": "extends"
+    },
+    {
+      "from": "pages/sub/first.twig",
+      "to": "layout/default.twig",
+      "type": "extends"
+    },
+    {
+      "from": "pages/sub/cards.twig",
+      "to": "layout/default.twig",
+      "type": "extends"
+    },
+    {
+      "from": "pages/sub/carectars.twig",
+      "to": "layout/default.twig",
+      "type": "extends"
+    },
+    {
+      "from": "pages/sub/1.twig",
+      "to": "layout/default.twig",
+      "type": "extends"
+    },
+    {
+      "from": "pages/sub/book.twig",
+      "to": "layout/default.twig",
+      "type": "extends"
+    },
+    {
+      "from": "pages/sub/boxing.twig",
+      "to": "layout/default.twig",
+      "type": "extends"
+    },
+    {
+      "from": "pages/sub/cat/index.twig",
+      "to": "layout/default.twig",
+      "type": "extends"
+    }
+  ]
 }

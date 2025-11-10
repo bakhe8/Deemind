@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import LogViewer from '../components/LogViewer';
 import { useThemesCatalog } from '../hooks/useThemesCatalog';
 import { getExtendedReport } from '../lib/api';
-import { digestReport, getRemediationLink, type IssueGroup } from '../lib/reportView';
+import { digestReport, getRemediationLink, type IssueGroup } from '../lib/reports';
 
 const FILTERS: Array<{ label: string; value: 'all' | 'error' | 'warning' }> = [
   { label: 'All', value: 'all' },

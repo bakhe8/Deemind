@@ -24,20 +24,31 @@ app.use((req, res, next) => {
 const theme = process.argv[2] || 'demo';
 const PORT = Number(process.env.PREVIEW_PORT || 4100);
 
-const staticDir = path.resolve('preview-static', theme, 'pages');
-const assetsDir = path.resolve('preview-static', theme);
+const themeOutputRoot = path.resolve('output', theme);
+const staticDir = path.join(themeOutputRoot, 'pages');
+const assetsDir = themeOutputRoot;
 const mockStorePath = path.resolve('mockups', 'store', 'cache', 'context', `${theme}.json`);
 const themeStorePath = path.resolve('data', `mock-store-${theme}.json`);
 const localesDir = path.resolve('data', 'locales');
-const stateRoot = path.resolve('runtime', 'state');
-const themeStatePath = path.join(stateRoot, `${theme}.json`);
+const sessionRoot = process.env.RUNTIME_SESSION_ROOT
+  ? path.resolve(process.env.RUNTIME_SESSION_ROOT)
+  : path.resolve('runtime', 'sessions', theme);
+const stateRoot = process.env.RUNTIME_STATE_DIR
+  ? path.resolve(process.env.RUNTIME_STATE_DIR)
+  : path.join(sessionRoot, 'state');
+const runtimeStateFile = process.env.RUNTIME_STATE_FILE
+  ? path.resolve(process.env.RUNTIME_STATE_FILE)
+  : path.join(stateRoot, 'state.json');
+const legacyStateFile = path.resolve('runtime', 'state', `${theme}.json`);
 const localeOverrides = {};
 const twilightDir = path.resolve('runtime', 'twilight');
 const twilightConfigPath = path.join(twilightDir, 'config.json');
-const analyticsLogPath = path.resolve('logs', 'runtime-analytics.jsonl');
+const analyticsLogPath = process.env.RUNTIME_ANALYTICS_LOG
+  ? path.resolve(process.env.RUNTIME_ANALYTICS_LOG)
+  : path.join(sessionRoot, 'logs', 'runtime-analytics.jsonl');
 
 if (!fs.existsSync(staticDir)) {
-  console.error(`❌ Static preview not found for theme "${theme}". Run "npm run preview:seed" first.`);
+  console.error(`❌ Built preview not found for theme "${theme}". Run "npm run deemind:build ${theme}" first.`);
   process.exit(1);
 }
 
@@ -84,11 +95,21 @@ async function buildSeedState() {
 async function loadRuntimeState({ forceSeed = false } = {}) {
   const seed = await buildSeedState();
   await fs.ensureDir(stateRoot);
-  if (forceSeed || !(await fs.pathExists(themeStatePath))) {
-    await fs.writeJson(themeStatePath, seed, { spaces: 2 });
+  const hasSessionState = await fs.pathExists(runtimeStateFile);
+  const hasLegacyState = await fs.pathExists(legacyStateFile);
+
+  if (forceSeed || (!hasSessionState && !hasLegacyState)) {
+    persistSnapshot(seed);
     return deepClone(seed);
   }
-  return readJsonSafe(themeStatePath, seed);
+
+  if (!hasSessionState && hasLegacyState) {
+    const legacy = await readJsonSafe(legacyStateFile, seed);
+    persistSnapshot(legacy);
+    return deepClone(legacy);
+  }
+
+  return readJsonSafe(runtimeStateFile, seed);
 }
 
 function cloneCart(cart) {
@@ -203,8 +224,17 @@ function snapshotState() {
 }
 
 function persistState() {
+  persistSnapshot(snapshotState());
+}
+
+function persistSnapshot(snapshot) {
   fs.ensureDirSync(stateRoot);
-  fs.writeJsonSync(themeStatePath, snapshotState(), { spaces: 2 });
+  fs.writeJsonSync(runtimeStateFile, snapshot, { spaces: 2 });
+  if (legacyStateFile !== runtimeStateFile) {
+    fs.ensureDirSync(path.dirname(legacyStateFile));
+    fs.writeJsonSync(legacyStateFile, snapshot, { spaces: 2 });
+  }
+  return snapshot;
 }
 
 async function resetRuntimeState() {
@@ -1050,6 +1080,9 @@ app.get('/events', (req, res) => {
 
 // Static assets
 app.use('/preview-assets', express.static(assetsDir));
+app.use('/assets', express.static(path.join(themeOutputRoot, 'assets')));
+app.use('/public', express.static(path.join(themeOutputRoot, 'public')));
+app.use('/static', express.static(themeOutputRoot));
 if (fs.existsSync(twilightDir)) {
   app.use('/runtime-twilight', express.static(twilightDir));
 }

@@ -24,3 +24,5 @@
 | needsboxes      | 0     | 0       | -        | 0      | 0        |
 | salla-mono-lite | 129   | 0       | 0.24s    | 0      | 0        |
 | demo            | 0     | 0       | -        | 0      | 0        |
+| animal          | 0     | 0       | -        | 0      | 0        |
+| animal          | 0     | 0       | -        | 0      | 0        |

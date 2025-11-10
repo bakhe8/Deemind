@@ -19,7 +19,7 @@ import {
   type ThemeStructure,
   type ThemeReports,
   type PreviewStatus,
-} from '../api/themes';
+} from '../api';
 import PipelineProgress from '../components/PipelineProgress';
 import { useRuntimeStub } from '../hooks/useRuntimeStub';
 import { usePreviewMatrix } from '../hooks/usePreviewMatrix';
@@ -572,4 +572,3 @@ export default function UploadTheme() {
     </div>
   );
 }
-

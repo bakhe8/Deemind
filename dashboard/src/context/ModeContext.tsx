@@ -27,6 +27,7 @@ export const ModeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (typeof window !== 'undefined') {
       window.localStorage.setItem('deemindMode', mode);
       document.body.dataset.mode = mode;
+      (window as any).__DEEMIND_MODE__ = mode;
     }
   }, [mode]);
 
@@ -38,4 +39,3 @@ export const ModeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 };
 
 export const useMode = () => useContext(ModeContext);
-

@@ -15,7 +15,8 @@ export async function validateExtended(themePath) {
   const report = {
     errors: [],
     warnings: [],
-    checks: {}
+    checks: {},
+    logs: [],
   };
   // Load settings
   let settings = { rawAllowlist: [], failOnBudget: false, requireI18n: false };
@@ -40,8 +41,8 @@ export async function validateExtended(themePath) {
   const baselineManifestPath = path.join(themePath, 'reports', 'baseline-summary.json');
   try {
     baselineSummary = await fs.readJson(baselineManifestPath);
-  } catch (err) {
-    void err;
+  } catch {
+    /* ignore missing baseline summary */
   }
   const baselineCopied = new Set(
     (baselineSummary?.copied || []).map((rel) => rel.replace(/\\/g, '/')),
@@ -103,7 +104,7 @@ export async function validateExtended(themePath) {
       const same = current === baselineContent;
       baselineAllowanceCache.set(relPath, same);
       return same;
-    } catch (err) {
+    } catch {
       baselineAllowanceCache.set(relPath, false);
       return false;
     }
@@ -381,10 +382,22 @@ export async function validateExtended(themePath) {
 
   // 7) Manifest + version integrity
   const manifestPath = path.join(themePath, 'manifest.json');
+  let manifestPreviewMeta = null;
   if (fs.existsSync(manifestPath)) {
     const manifest = await fs.readJson(manifestPath);
     manifest.checksum = createHash('md5').update(JSON.stringify(manifest)).digest('hex');
     await fs.writeJson(manifestPath, manifest, { spaces: 2 });
+    manifestPreviewMeta = manifest?.preview || null;
+    if (manifestPreviewMeta?.url || typeof manifestPreviewMeta?.port !== 'undefined') {
+      report.logs.push({
+        type: 'preview-manifest',
+        message: `Preview mapped to ${manifestPreviewMeta?.url || 'n/a'} (port ${manifestPreviewMeta?.port ?? 'n/a'})`,
+        url: manifestPreviewMeta?.url || null,
+        port: typeof manifestPreviewMeta?.port === 'number' ? manifestPreviewMeta.port : null,
+        routes: Array.isArray(manifestPreviewMeta?.routes) ? manifestPreviewMeta.routes : [],
+        timestamp: new Date().toISOString(),
+      });
+    }
   } else {
     report.errors.push({ type: 'manifest-missing', message: 'manifest.json not found.' });
   }
@@ -405,6 +418,10 @@ export async function validateExtended(themePath) {
     budgetExceeded,
     sdkUnknownCount,
     timestamp: new Date().toISOString(),
+    preview: {
+      url: manifestPreviewMeta?.url || null,
+      port: typeof manifestPreviewMeta?.port === 'number' ? manifestPreviewMeta.port : null,
+    },
   };
   await fs.writeJson(outFile, { ...report, summary }, { spaces: 2 });
 

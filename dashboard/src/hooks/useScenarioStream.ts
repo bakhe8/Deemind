@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchScenarioSessions } from '../api/system';
+import { fetchScenarioSessions } from '../api';
 import { useDashboardStore } from '../store/useDashboardStore';
 import { SERVICE_URL } from '../utils/constants';
 

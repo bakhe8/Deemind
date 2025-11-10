@@ -1,6 +1,6 @@
 ﻿import { useEffect, useMemo, useState } from 'react';
 import BaselineBarChart from '../components/charts/BaselineBarChart';
-import { fetchBaselineLogs, fetchBaselineMetrics } from '../api/system';
+import { fetchBaselineLogs, fetchBaselineMetrics } from '../api';
 import RuntimeEventFeed from '../components/RuntimeEventFeed';
 import RuntimeAnalyticsTable from '../components/RuntimeAnalyticsTable';
 import { usePreviewMatrix } from '../hooks/usePreviewMatrix';
@@ -146,4 +146,3 @@ export default function ReportsMetrics() {
     </div>
   );
 }
-

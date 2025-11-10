@@ -21,6 +21,7 @@ export default defineConfig({
     }
   },
   define: {
-    __SERVICE_URL__: JSON.stringify(process.env.VITE_SERVICE_URL || 'http://localhost:5757')
+    __SERVICE_URL__: JSON.stringify(process.env.VITE_SERVICE_URL || 'http://localhost:5757'),
+    'process.env.FS_BLOCKED': JSON.stringify(true)
   }
 });

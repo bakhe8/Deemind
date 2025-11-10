@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchRuntimeAnalytics } from '../api/system';
+import { fetchRuntimeAnalytics } from '../api';
 
 type AnalyticsEntry = {
   ts: string;

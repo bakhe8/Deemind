@@ -2,7 +2,7 @@
 import StatsCard from '../components/StatsCard';
 import DiffViewer from '../components/DiffViewer';
 import ThemeStubList from '../components/ThemeStubList';
-import { fetchThemes, fetchThemeReports, type ThemeSummary } from '../api/themes';
+import { fetchThemes, fetchThemeReports, type ThemeSummary } from '../api';
 import StubStatusCard from '../components/StubStatusCard';
 import { useRuntimeStub } from '../hooks/useRuntimeStub';
 import { usePreviewMatrix } from '../hooks/usePreviewMatrix';
@@ -117,4 +117,3 @@ export default function AdapterBaseline() {
     </div>
   );
 }
-

@@ -1,15 +1,30 @@
 import { NavLink } from 'react-router-dom';
 import clsx from 'clsx';
+import { useMode } from '../context/ModeContext';
+import { ENABLE_BRANDS } from '../utils/constants';
 
-const links = [
-  { to: '/brands', label: 'Brands & Identity', emoji: '🧠' },
-  { to: '/creative/brand-wizard', label: 'Brand Wizard', emoji: '🎨' },
+type NavItem = {
+  to: string;
+  label: string;
+  emoji: string;
+  requiresBrands?: boolean;
+};
+
+const baseLinks: NavItem[] = [
+  { to: '/brands', label: 'Brands & Identity', emoji: '🧠', requiresBrands: true },
+  { to: '/creative/brand-wizard', label: 'Brand Wizard', emoji: '🎨', requiresBrands: true },
   { to: '/build', label: 'Build & Validation', emoji: '⚙️' },
   { to: '/reports', label: 'Reports & Logs', emoji: '📊' },
   { to: '/preview', label: 'Preview & Delivery', emoji: '🚀' },
 ];
 
 export default function SidebarNav() {
+  const { mode } = useMode();
+  const visibleBase = baseLinks.filter((link) => !link.requiresBrands || ENABLE_BRANDS);
+  const links =
+    mode === 'developer'
+      ? [...visibleBase, { to: '/dev/console', label: 'Developer Console', emoji: '🛠️' }]
+      : visibleBase;
   return (
     <aside className="w-68 bg-slate-900 text-slate-100 flex flex-col">
       <div className="px-6 py-5 border-b border-slate-800">

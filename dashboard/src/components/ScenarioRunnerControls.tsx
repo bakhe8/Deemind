@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchScenarioFlows, runRuntimeScenario } from '../api/system';
+import { fetchScenarioFlows, runRuntimeScenario } from '../api';
 
 type Props = {
   theme?: string;

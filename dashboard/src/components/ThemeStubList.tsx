@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { ThemeSummary, PreviewMatrixEntry } from '../api/themes';
-import type { RuntimeStubInfo } from '../api/system';
+import type { ThemeSummary, PreviewMatrixEntry, RuntimeStubInfo } from '../api';
 
 type Props = {
   themes: ThemeSummary[];

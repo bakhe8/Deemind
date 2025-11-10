@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { fetchRunJobs } from '../api/system';
+import { fetchRunJobs } from '../api';
 import type { JobStatus } from '../lib/contracts';
 
 type UseJobHistoryOptions = {

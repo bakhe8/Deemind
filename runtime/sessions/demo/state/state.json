@@ -1,0 +1,100 @@
+{
+  "preset": {
+    "demo": "electronics",
+    "name": "Electro Demo",
+    "partials": [
+      "store/core",
+      "products/gadgets",
+      "hero/tech",
+      "navigation/default",
+      "brands/global",
+      "cart/default",
+      "wishlist/default",
+      "locales/en",
+      "locales/ar"
+    ],
+    "meta": {
+      "theme": "modern",
+      "locale": "en",
+      "currency": "SAR"
+    },
+    "generatedAt": "2025-11-10T08:34:11.466Z"
+  },
+  "store": {
+    "id": 1305146709,
+    "name": "Deemind Atelier",
+    "currency": "SAR",
+    "language": "en",
+    "domain": "demo.deemind.local"
+  },
+  "products": [
+    {
+      "id": 101,
+      "name": "Signature Canvas Backpack",
+      "price": 329,
+      "badge": "New arrival",
+      "sku": "BAG-101",
+      "media": [
+        "https://cdn.deemind.local/images/bag-101-1.jpg",
+        "https://cdn.deemind.local/images/bag-101-2.jpg"
+      ]
+    },
+    {
+      "id": 102,
+      "name": "Midnight Wireless Earbuds",
+      "price": 199,
+      "badge": "Top rated",
+      "sku": "EAR-204",
+      "media": ["https://cdn.deemind.local/images/earbuds-204-1.jpg"]
+    },
+    {
+      "id": 103,
+      "name": "Smart Watch X2",
+      "price": 249,
+      "badge": "Limited",
+      "sku": "WATCH-302",
+      "media": ["https://cdn.deemind.local/images/watch-302-1.jpg"]
+    }
+  ],
+  "cart": {
+    "items": [],
+    "total": 0
+  },
+  "wishlist": {
+    "items": [
+      {
+        "id": 101,
+        "name": "Signature Canvas Backpack",
+        "price": 329,
+        "badge": "New arrival",
+        "sku": "BAG-101",
+        "media": [
+          "https://cdn.deemind.local/images/bag-101-1.jpg",
+          "https://cdn.deemind.local/images/bag-101-2.jpg"
+        ]
+      }
+    ]
+  },
+  "session": {
+    "user": {
+      "email": "smoke@deemind.local",
+      "name": "Smoke Tester"
+    },
+    "token": "stub-1762763651506"
+  },
+  "navigation": [],
+  "hero": {},
+  "categories": [],
+  "user": null,
+  "locales": {
+    "add_to_cart": "Add to Cart",
+    "checkout": "Checkout",
+    "cart_updated": "Cart updated",
+    "wishlist": "Wishlist"
+  },
+  "meta": {
+    "theme": "demo",
+    "preset": "electronics",
+    "generatedAt": "2025-11-10T08:34:11.521Z"
+  }
+}

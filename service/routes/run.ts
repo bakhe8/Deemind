@@ -1,9 +1,13 @@
+/**
+ * @layer Service (mutation layer)
+ * Only this layer can trigger builds, validation, packaging, or filesystem mutations.
+ */
 import type express from 'express';
 import path from 'path';
 import type { RunMode, RunRequest, JobStatus } from '../../core/contracts/api.contract.js';
 import type { TaskRunner } from '../task-runner.js';
 import type { ServiceLogger } from '../logger.js';
-import { sanitizeThemeName } from '../lib/sanitize.js';
+import { sanitizeThemeName } from '../../core/utils/sanitize.js';
 
 type RegisterRunRouteOptions = {
   app: express.Express;
@@ -26,14 +30,34 @@ const MODE_TASK_MAP: Record<RunMode, string> = {
   validate: 'validate',
   doctor: 'doctor',
 };
+const MAX_JOB_HISTORY = 50;
+
+const respond = (res: express.Response, status: number, payload: Record<string, unknown>) =>
+  res.status(status).json(payload);
 
 export function registerRunRoutes(options: RegisterRunRouteOptions) {
   const { app, auth, config, runner, rootDir, logger } = options;
   const jobStatusMap = new Map<string, JobStatus>();
+  const allowUIBuild =
+    String(process.env.ALLOW_UI_BUILD || '').toLowerCase() === 'true';
+  const resolveRequestSource = (req: express.Request) => {
+    const header = req.headers['x-deemind-source'];
+    if (typeof header === 'string' && header) return header;
+    const querySource = req.query?.source;
+    if (typeof querySource === 'string' && querySource) return querySource;
+    return 'api';
+  };
+  const resolveRequestMode = (req: express.Request) => {
+    const header = req.headers['x-deemind-mode'];
+    if (typeof header === 'string' && header) return header;
+    const queryMode = req.query?.mode;
+    if (typeof queryMode === 'string' && queryMode) return queryMode;
+    return 'friendly';
+  };
 
   const recordJob = (job: JobStatus) => {
     jobStatusMap.set(job.id, job);
-    if (jobStatusMap.size > 50) {
+    if (jobStatusMap.size > MAX_JOB_HISTORY) {
       const oldest = jobStatusMap.keys().next().value;
       jobStatusMap.delete(oldest);
     }
@@ -58,11 +82,16 @@ export function registerRunRoutes(options: RegisterRunRouteOptions) {
 
   app.post('/api/run', auth, (req, res) => {
     const payload = (req.body || {}) as LegacyRunRequest;
+    const requestSource = resolveRequestSource(req);
+    const requestMode = resolveRequestMode(req);
+    if (requestSource === 'dashboard' && !allowUIBuild) {
+      return respond(res, 403, { error: 'UI-triggered builds disabled' });
+    }
     if (payload.cmd) {
       const theme = payload.theme ? sanitizeThemeName(payload.theme) : undefined;
       const derived = resolveSimpleCommand(payload.cmd, { theme, args: payload.args });
       if (!derived) {
-        return res.status(400).json({ error: 'unsupported cmd or theme missing' });
+        return respond(res, 400, { error: 'unsupported cmd or theme missing' });
       }
       const id = cryptoId();
       const job: JobStatus = {
@@ -73,7 +102,12 @@ export function registerRunRoutes(options: RegisterRunRouteOptions) {
         message: `${payload.cmd}${theme ? `:${theme}` : ''}`,
       };
       recordJob(job);
-      logger.write(`enqueue cmd ${payload.cmd} (${id})`);
+      logger.write(`enqueue cmd ${payload.cmd} (${id})`, {
+        category: 'runner',
+        theme,
+        sessionId: id,
+        meta: { source: requestSource, mode: requestMode, cmd: payload.cmd },
+      });
       runner.enqueue({
         id,
         label: `${payload.cmd}${theme ? `:${theme}` : ''}`,
@@ -87,11 +121,11 @@ export function registerRunRoutes(options: RegisterRunRouteOptions) {
     const resolved = resolveRunTask(payload);
     const taskKey = resolved?.task;
     if (!taskKey) {
-      return res.status(400).json({ error: 'mode or task is required' });
+      return respond(res, 400, { error: 'mode or task is required' });
     }
     const def = config.tasks?.[taskKey];
     if (!def) {
-      return res.status(400).json({ error: `Unknown task: ${taskKey}` });
+      return respond(res, 400, { error: `Unknown task: ${taskKey}` });
     }
     const args = Array.isArray(def.args) ? [...def.args] : [];
     if (payload.inputFolder) {
@@ -106,7 +140,11 @@ export function registerRunRoutes(options: RegisterRunRouteOptions) {
       message: resolved?.mode ? `mode:${resolved.mode}` : undefined,
     };
     recordJob(job);
-    logger.write(`enqueue task ${taskKey} (${id})`);
+    logger.write(`enqueue task ${taskKey} (${id})`, {
+      category: 'runner',
+      sessionId: id,
+      meta: { task: taskKey, source: requestSource, mode: requestMode },
+    });
     runner.enqueue({
       id,
       label: taskKey,
@@ -126,7 +164,7 @@ export function registerRunRoutes(options: RegisterRunRouteOptions) {
   app.get('/api/run/jobs/:id', auth, (req, res) => {
     const job = jobStatusMap.get(req.params.id);
     if (!job) {
-      return res.status(404).json({ error: 'job not found' });
+      return respond(res, 404, { error: 'job not found' });
     }
     res.json(job);
   });

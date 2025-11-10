@@ -9,6 +9,8 @@ Edges: 39
 
 ## Topological order (first 25)
 
+- layout/master.twig
+- layout/customer.twig
 - pages/thank-you.twig
 - pages/testimonials.twig
 - pages/page-single.twig
@@ -22,8 +24,6 @@ Edges: 39
 - pages/3.twig
 - pages/2.twig
 - pages/1.twig
-- layout/master.twig
-- layout/customer.twig
 - partials/home/youtube.twig
 - partials/home/testimonials.twig
 - partials/home/store-features.twig

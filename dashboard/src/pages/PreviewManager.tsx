@@ -6,7 +6,7 @@ import {
   generatePreviewSnapshots,
   type ThemeSummary,
   type PreviewMatrixEntry,
-} from '../api/themes';
+} from '../api';
 import { useMode } from '../context/ModeContext';
 
 type CoverageRow = {

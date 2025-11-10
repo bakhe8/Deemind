@@ -1,4 +1,9 @@
-﻿import { apiFetch, apiJson } from './client';
+/**
+ * @layer Dashboard (UI-only)
+ * This module must never access filesystem or child_process.
+ * All mutations occur via REST APIs exposed by service/server.ts.
+ */
+import { apiFetch, apiJson } from './client';
 
 export type ThemeSummary = { name: string; status: string; updated?: string | null };
 export type ThemeStructure = {

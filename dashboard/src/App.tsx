@@ -6,6 +6,7 @@ import BuildValidation from './pages/BuildValidation';
 import ReportsAndLogs from './pages/ReportsLogs';
 import PreviewDelivery from './pages/PreviewDelivery';
 import BrandWizardView from './views/BrandWizard';
+import DeveloperConsole from './views/DeveloperConsole';
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
             <Route path="/reports" element={<ReportsAndLogs />} />
             <Route path="/preview" element={<PreviewDelivery />} />
             <Route path="/creative/brand-wizard" element={<BrandWizardView />} />
+            <Route path="/dev/console" element={<DeveloperConsole />} />
             <Route path="*" element={<Navigate to="/brands" replace />} />
           </Routes>
         </main>

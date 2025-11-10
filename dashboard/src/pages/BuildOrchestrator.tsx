@@ -1,12 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
-import { fetchThemes, type ThemeSummary } from '../api/themes';
-import { startBuild, type BuildSession } from '../api/build';
-import { triggerRunJob } from '../api/system';
+import {
+  fetchThemes,
+  startBuild,
+  triggerRunJob,
+  getExtendedReport,
+  type ThemeSummary,
+  type BuildSession,
+} from '../api';
+import { digestReport } from '../lib/reports';
 import { useBuildStream } from '../hooks/useBuildStream';
 import { useJobHistory } from '../hooks/useJobHistory';
 import { useRunnerStatus } from '../hooks/useRunnerStatus';
 import type { JobStatus, RunMode } from '../lib/contracts';
 import { usePreviewMatrix } from '../hooks/usePreviewMatrix';
+import { useMode } from '../context/ModeContext';
 
 function formatTimestamp(value: string | null) {
   if (!value) return '—';
@@ -51,6 +58,9 @@ export default function BuildOrchestrator() {
   const [runMode, setRunMode] = useState<RunMode>('build');
   const [inputFolder, setInputFolder] = useState('');
   const [jobLoading, setJobLoading] = useState(false);
+  const [reportDigest, setReportDigest] = useState<ReturnType<typeof digestReport> | null>(null);
+  const [reportLoading, setReportLoading] = useState(false);
+  const [reportError, setReportError] = useState<string | null>(null);
   const { sessions, getLogs } = useBuildStream();
   const { jobs, loading: jobsLoading, error: jobsError, refresh: refreshJobs } = useJobHistory();
   const { status: runnerStatus, loading: runnerLoading, error: runnerError, refresh: refreshRunner } = useRunnerStatus();
@@ -59,6 +69,7 @@ export default function BuildOrchestrator() {
     loading: previewMatrixLoading,
     refresh: refreshPreviewMatrix,
   } = usePreviewMatrix();
+  const { mode } = useMode();
   const themeOptions = useMemo(() => {
     const set = new Set<string>();
     themes.forEach((theme) => set.add(theme.name));
@@ -90,8 +101,32 @@ export default function BuildOrchestrator() {
     return filteredSessions.find((session) => session.id === selectedSessionId) || filteredSessions[0] || null;
   }, [filteredSessions, selectedSessionId]);
 
+  useEffect(() => {
+    if (!activeSession?.theme) {
+      setReportDigest(null);
+      setReportError(null);
+      return;
+    }
+    setReportLoading(true);
+    getExtendedReport(activeSession.theme)
+      .then((payload) => {
+        setReportDigest(digestReport(payload));
+        setReportError(null);
+      })
+      .catch((error) => {
+        const reason = error instanceof Error ? error.message : 'Unable to load report.';
+        setReportDigest(null);
+        setReportError(reason);
+      })
+      .finally(() => setReportLoading(false));
+  }, [activeSession?.theme]);
+
   const handleStartBuild = async (withDiff: boolean) => {
     if (!selectedTheme) return;
+    if (mode !== 'developer') {
+      setMessage('Switch to Developer mode to queue builds.');
+      return;
+    }
     setLaunching(true);
     setMessage(null);
     try {
@@ -107,6 +142,10 @@ export default function BuildOrchestrator() {
   };
 
   const handleRunJob = async () => {
+    if (mode !== 'developer') {
+      setJobError('Switch to Developer mode to queue CLI tasks.');
+      return;
+    }
     setJobMessage(null);
     setJobError(null);
     setJobLoading(true);
@@ -126,6 +165,31 @@ export default function BuildOrchestrator() {
       setTimeout(() => setJobMessage(null), 4000);
     }
   };
+
+  const BUCKET_KEYS = ['filter-unknown', 'sdk-unknown', 'webcomponents-unknown', 'baseline-convention', 'budget-css'];
+  const BUCKET_PATHS: Record<string, string> = {
+    'filter-unknown': 'components/filters.md',
+    'sdk-unknown': 'components/sdk.md',
+    'webcomponents-unknown': 'components/webcomponents.md',
+    'baseline-convention': 'notes/baseline.md',
+    'budget-css': 'assets/css.md',
+  };
+
+  const topBuckets = useMemo(() => {
+    if (!reportDigest || !activeSession?.theme) return [];
+    return reportDigest.groups
+      .filter((group) => BUCKET_KEYS.includes(group.key.toLowerCase()))
+      .sort((a, b) => b.entries.length - a.entries.length)
+      .slice(0, 5)
+      .map((group) => {
+        const key = group.key.toLowerCase();
+        const rel = BUCKET_PATHS[key] || `notes/${key}.md`;
+        return {
+          group,
+          path: `preview-static/${activeSession.theme}/${rel}`,
+        };
+      });
+  }, [reportDigest, activeSession?.theme]);
 
   const logs = activeSession ? getLogs(activeSession.id) : [];
   const selectedSnapshot = selectedTheme ? previewMap[selectedTheme] : undefined;
@@ -167,12 +231,18 @@ export default function BuildOrchestrator() {
               </option>
             ))}
           </select>
-          <button className="btn-primary text-sm" disabled={launching || !selectedTheme} onClick={() => handleStartBuild(false)}>
-            {launching ? 'Queuing…' : 'Run Build'}
-          </button>
-          <button className="btn-secondary text-sm" disabled={launching || !selectedTheme} onClick={() => handleStartBuild(true)}>
-            {launching ? 'Queuing…' : 'Run Build + Diff'}
-          </button>
+          {mode === 'developer' ? (
+            <>
+              <button className="btn-primary text-sm" disabled={launching || !selectedTheme} onClick={() => handleStartBuild(false)}>
+                {launching ? 'Queuing…' : 'Run Build'}
+              </button>
+              <button className="btn-secondary text-sm" disabled={launching || !selectedTheme} onClick={() => handleStartBuild(true)}>
+                {launching ? 'Queuing…' : 'Run Build + Diff'}
+              </button>
+            </>
+          ) : (
+            <span className="text-xs text-slate-400">Switch to Developer mode to queue builds.</span>
+          )}
         </div>
         {message && <p className="text-xs text-emerald-600">{message}</p>}
         <div className="bg-slate-50 border border-dashed border-slate-200 rounded-xl px-3 py-2 flex flex-wrap items-center gap-3 justify-between">
@@ -335,6 +405,33 @@ export default function BuildOrchestrator() {
               <div className="bg-slate-900 text-slate-100 rounded-xl p-3 font-mono text-xs h-64 overflow-y-auto shadow-inner">
                 {!logs.length ? <p>No logs captured yet.</p> : logs.map((line, idx) => <div key={`${activeSession.id}-log-${idx}`}>{line}</div>)}
               </div>
+              <div className="rounded-xl border border-slate-200 bg-white p-3 space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm font-semibold text-slate-700">Top Buckets (preview-static guidance)</p>
+                  {reportLoading && <span className="text-xs text-slate-400">Loading…</span>}
+                </div>
+                {reportError && <p className="text-xs text-rose-600">{reportError}</p>}
+                {!reportError && !reportLoading && topBuckets.length === 0 && (
+                  <p className="text-xs text-slate-500">No tracked buckets for this session.</p>
+                )}
+                {topBuckets.length > 0 && (
+                  <ul className="divide-y divide-slate-100 text-sm">
+                    {topBuckets.map(({ group, path }) => (
+                      <li key={group.key} className="py-2">
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="font-semibold text-slate-800">
+                            {group.label} ({group.entries.length})
+                          </span>
+                          <code className="text-xs text-slate-500">{path}</code>
+                        </div>
+                        <p className="text-xs text-slate-500">
+                          Inspect <code>{path}</code> under preview-static/{activeSession.theme} for fixes.
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </>
           ) : (
             <p className="text-sm text-slate-500">Select a session to inspect logs.</p>
@@ -350,24 +447,30 @@ export default function BuildOrchestrator() {
             <p className="text-xs text-slate-500">Trigger shared CLI jobs (build / validate / doctor) without leaving the dashboard.</p>
           </div>
           <div className="flex-1" />
-          <select
-            className="border border-slate-200 rounded-lg px-3 py-2 text-sm"
-            value={runMode}
-            onChange={(e) => setRunMode(e.target.value as RunMode)}
-          >
-            <option value="build">Build (full factory)</option>
-            <option value="validate">Validate</option>
-            <option value="doctor">Doctor</option>
-          </select>
-          <input
-            className="border border-slate-200 rounded-lg px-3 py-2 text-sm"
-            placeholder="input folder (optional)"
-            value={inputFolder}
-            onChange={(e) => setInputFolder(e.target.value)}
-          />
-          <button className="btn-secondary text-sm" disabled={jobLoading} onClick={handleRunJob}>
-            {jobLoading ? 'Queuing…' : 'Run Task'}
-          </button>
+          {mode === 'developer' ? (
+            <>
+              <select
+                className="border border-slate-200 rounded-lg px-3 py-2 text-sm"
+                value={runMode}
+                onChange={(e) => setRunMode(e.target.value as RunMode)}
+              >
+                <option value="build">Build (full factory)</option>
+                <option value="validate">Validate</option>
+                <option value="doctor">Doctor</option>
+              </select>
+              <input
+                className="border border-slate-200 rounded-lg px-3 py-2 text-sm"
+                placeholder="input folder (optional)"
+                value={inputFolder}
+                onChange={(e) => setInputFolder(e.target.value)}
+              />
+              <button className="btn-secondary text-sm" disabled={jobLoading} onClick={handleRunJob}>
+                {jobLoading ? 'Queuing…' : 'Run Task'}
+              </button>
+            </>
+          ) : (
+            <span className="text-xs text-slate-400">Switch to Developer mode to run CLI tasks.</span>
+          )}
         </div>
         {jobMessage && <p className="text-xs text-emerald-600">{jobMessage}</p>}
         {jobError && <p className="text-xs text-rose-600">{jobError}</p>}

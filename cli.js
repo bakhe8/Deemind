@@ -13,11 +13,19 @@ import fs from "fs-extra";
 import path from "path";
 import chalk from "chalk";
 import { fileURLToPath } from "url";
+import process from "node:process";
 
 import { runHybridParser } from "./src/deemind-parser/hybrid-runner.js";
 import { mapSemantics } from "./src/deemind-parser/semantic-mapper.js";
 import { persistCanonicalModel, updateCanonicalModel } from "./src/deemind-parser/canonical-writer.js";
 import { adaptToSalla } from "./src/adapter.js";
+try {
+  if (process?.stdout?.setDefaultEncoding) {
+    process.stdout.setDefaultEncoding("utf8");
+  }
+} catch {
+  // no-op
+}
 import { validateTheme, generateBuildManifest } from "./src/validator.js";
 import { validateExtended } from "./tools/validator-extended.js";
 import { prunePartials } from "./tools/partials-prune.js";
@@ -489,10 +497,39 @@ async function enrichBuildManifest({ manifestPath, themeName, outputPath, previe
   const packageFile = path.join(outputPath, `${themeName}.zip`);
   const packageExists = await fs.pathExists(packageFile).catch(() => false);
 
+  let brandMeta = null;
+  try {
+    const canonicalThemePath = path.join(process.cwd(), 'core', 'canonical', themeName, 'theme.json');
+    if (await fs.pathExists(canonicalThemePath)) {
+      const canonicalCfg = await fs.readJson(canonicalThemePath);
+      const brandId = canonicalCfg?.brand;
+      if (brandId) {
+        let brandName = '';
+        const brandFile = path.join(process.cwd(), 'core', 'brands', `${brandId}.json`);
+        if (await fs.pathExists(brandFile)) {
+          const brandData = await fs.readJson(brandFile).catch(() => null);
+          brandName =
+            brandData?.name ||
+            brandData?.identity?.name ||
+            brandData?.meta?.name ||
+            brandId;
+        }
+        brandMeta = {
+          id: brandId,
+          name: brandName || brandId,
+          appliedAt: new Date().toISOString(),
+        };
+      }
+    }
+  } catch {
+    brandMeta = brandMeta || null;
+  }
+
   const manifest = {
     ...base,
     theme: base.theme || themeName,
     buildTime: new Date().toISOString(),
+    brand: brandMeta,
     preview: {
       port: previewPort,
       url: previewUrl,

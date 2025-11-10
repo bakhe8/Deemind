@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useScenarioStream, type ScenarioSession } from '../hooks/useScenarioStream';
-import { fetchScenarioDetail } from '../api/system';
+import { fetchScenarioDetail } from '../api';
 
 type ScenarioDetail = {
   id: string;

@@ -3,6 +3,10 @@
 import fs from 'fs-extra';
 import path from 'path';
 
+if (process.env.NODE_ENV === 'production') {
+  Object.freeze(fs);
+}
+
 function arg(name, fallback) {
   const match = process.argv.find((token) => token.startsWith(`--${name}=`));
   return match ? match.split('=')[1] : fallback;

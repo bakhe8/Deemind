@@ -1,4 +1,4 @@
-﻿import type { ThemeStructure, ThemeReports } from '../api/themes';
+import type { ThemeStructure, ThemeReports } from '../api';
 
 type Stage = {
   key: string;

@@ -6,17 +6,21 @@ import {
   fetchStoreDemos,
   fetchStorePartials,
   applyStorePreset,
-  type StoreDemo,
-  type StorePartial,
   fetchStoreDiff,
   fetchTwilightStatus,
   updateTwilightStatus,
-} from '../api/system';
-import { fetchThemes, fetchThemePreset, type ThemeSummary } from '../api/themes';
-import { startBuild } from '../api/build';
+  fetchThemes,
+  fetchThemePreset,
+  startBuild,
+  fetchBrands,
+  applyBrand,
+  type StoreDemo,
+  type StorePartial,
+  type ThemeSummary,
+  type BrandPreset,
+} from '../api';
 import ThemeStubList from '../components/ThemeStubList';
 import { useRuntimeStub } from '../hooks/useRuntimeStub';
-import { fetchBrands, applyBrand, type BrandPreset } from '../api/brands';
 import { useBrandWatcher } from '../hooks/useBrandWatcher';
 import { usePreviewMatrix } from '../hooks/usePreviewMatrix';
 

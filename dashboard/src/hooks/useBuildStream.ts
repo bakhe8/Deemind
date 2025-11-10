@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { BuildSession } from '../api/build';
-import { fetchBuildSessions } from '../api/build';
+import { fetchBuildSessions, type BuildSession } from '../api';
 import { useDashboardStore } from '../store/useDashboardStore';
 import { SERVICE_URL } from '../utils/constants';
 

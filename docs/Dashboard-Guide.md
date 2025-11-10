@@ -4,6 +4,14 @@ The dashboard is a **read-only control surface**. It never edits files, shells o
 state directly. All actions flow through the service API and every view is backed by artifacts already produced in
 `/output/*`.
 
+### Brand Wizard toggle
+
+Brand DNA files under `core/brands/*.json` are treated as **canonical seed data**. They are hydrated into presets and
+fed back into the manufacturing pipeline, but the dashboard never mutates them directly. The `/api/brands` routes remain
+available by default for the Brand Wizard (“Creative” tab). To temporarily disable this surface (and hide the tab), set
+`ENABLE_BRANDS=false` in `.env`; both the service router and React navigation will respect the flag without further code
+changes.
+
 ### Architecture Diagram
 
 ```mermaid
@@ -22,6 +30,44 @@ flowchart LR
   E --> B
   F --> B
 ```
+
+### Integration Layers
+
+```
+┌──────────────────────────────────────────────┐
+│                 Dashboard UI                │
+│ (React, read-only, fetches /api/* only)     │
+└──────────────────┬───────────────────────────┘
+                   │ REST / JSON
+┌──────────────────┴───────────────────────────┐
+│               Service Layer                 │
+│ (Express + TaskRunner, owns mutations)      │
+└──────────────────┬───────────────────────────┘
+                   │ CLI / File IO
+┌──────────────────┴───────────────────────────┐
+│               Core / Tools                  │
+│ (Canonical, adapters, validators, runtime)  │
+└──────────────────────────────────────────────┘
+```
+
+| Layer         | Responsibilities                                                                            | Allowed Operations                          |
+| ------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| Dashboard UI  | React “control tower” that renders manifests, logs, and previews by calling `/api/*`.       | Fetch JSON/SSE, render data, no FS/CLI.     |
+| Service Layer | Express middleware + task runner that mutates state, triggers CLI builds, handles brands.   | Run Node/CLI commands, write `/output/*`.   |
+| Core / Tools  | Canonical themes, adapters, validators, and runtime scripts invoked by the service runners. | Full filesystem + process access as needed. |
+
+### Mode System & Permissions
+
+The dashboard ships with two presentation modes managed by `ModeContext`:
+
+- **Friendly Mode** — read-only surface for non-technical stakeholders. They can inspect manifests, logs, reports, and
+  previews but every action button is hidden/disabled, so no file writes or CLI jobs can be requested.
+- **Developer Mode** — exposes additional controls (build/package buttons, CLI task runner, preset editors) but still
+  routes everything through the Service API. The UI never shells out or touches the filesystem directly.
+
+Every REST call tags requests with `X-Deemind-Source: dashboard` and `X-Deemind-Mode`. The service honors those tags and
+enforces real mutations server-side. UI-triggered builds are only allowed when `ALLOW_UI_BUILD=true` is present in `.env`
+—leave it unset or set to `false` to hard-block build requests even if someone tampers with the frontend.
 
 ### Core Screens
 

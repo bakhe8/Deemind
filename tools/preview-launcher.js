@@ -6,6 +6,7 @@ import open from 'open';
 const theme = process.argv[2] || 'demo';
 const port = Number(process.env.PREVIEW_PORT || 4100);
 const root = process.cwd();
+const sessionRoot = path.join(root, 'runtime', 'sessions', theme);
 
 function run(command, args = [], opts = {}) {
   return new Promise((resolve, reject) => {
@@ -29,7 +30,11 @@ async function main() {
   console.log('⚡ Launching runtime stub...');
   const stub = spawn(process.execPath, ['server/runtime-stub.js', theme], {
     cwd: root,
-    env: { ...process.env, PREVIEW_PORT: String(port) },
+    env: {
+      ...process.env,
+      PREVIEW_PORT: String(port),
+      RUNTIME_SESSION_ROOT: sessionRoot,
+    },
     stdio: 'inherit',
   });
 

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useDashboardStore } from '../store/useDashboardStore';
-import { fetchStatus } from '../api/system';
+import { fetchStatus } from '../api';
 import { useRuntimeStub } from '../hooks/useRuntimeStub';
 import ModeSwitch from '../components/ModeSwitch';
 

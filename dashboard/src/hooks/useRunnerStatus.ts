@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { fetchStatus } from '../api/system';
+import { fetchStatus } from '../api';
 import type { QueueItem } from '../store/useDashboardStore';
 
 export type RunnerStatus = {

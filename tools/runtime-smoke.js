@@ -13,6 +13,7 @@ const [themeArg, demoArg] = process.argv.slice(2);
 const theme = themeArg || 'demo';
 const demo = demoArg || 'electronics';
 const port = Number(process.env.RUNTIME_SMOKE_PORT || process.env.PREVIEW_PORT || 4195);
+const sessionRoot = path.join(rootDir, 'runtime', 'sessions', theme);
 
 const RESULT_BADGE = {
   pass: (label) => console.log(`✅ ${label}`),
@@ -46,7 +47,7 @@ async function ensureStub() {
   console.log(`⚙️  Starting runtime stub for ${theme} on port ${port}…`);
   const child = spawn(process.execPath, ['server/runtime-stub.js', theme], {
     cwd: rootDir,
-    env: { ...process.env, PREVIEW_PORT: String(port) },
+    env: { ...process.env, PREVIEW_PORT: String(port), RUNTIME_SESSION_ROOT: sessionRoot },
     stdio: ['ignore', 'inherit', 'inherit'],
   });
   const ready = await waitForStub();

@@ -9,7 +9,7 @@ import {
   clearRuntimeWishlist,
   removeRuntimeWishlistItem,
   logoutRuntimeUser,
-} from '../api/system';
+} from '../api';
 import { useRuntimeStub } from '../hooks/useRuntimeStub';
 import RuntimeEventFeed from '../components/RuntimeEventFeed';
 import RuntimeAnalyticsTable from '../components/RuntimeAnalyticsTable';

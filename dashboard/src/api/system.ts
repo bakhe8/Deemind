@@ -1,3 +1,8 @@
+/**
+ * @layer Dashboard (UI-only)
+ * This module must never access filesystem or child_process.
+ * All mutations occur via REST APIs exposed by service/server.ts.
+ */
 import { apiFetch, apiJson } from './client';
 import type { StatusResponse } from '../store/useDashboardStore';
 import type { JobStatus, OutputEntry, ReportSummary, RunRequest } from '../lib/contracts';

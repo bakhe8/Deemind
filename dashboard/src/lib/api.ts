@@ -1,4 +1,9 @@
-import { apiFetch, apiJson } from '../api/client';
+/**
+ * @layer Dashboard (UI-only)
+ * This module must never access filesystem or child_process.
+ * All mutations occur via REST APIs exposed by service/server.ts.
+ */
+import { apiFetch, apiJson } from '../api';
 
 export type ThemeManifestPreview = {
   port: number | null;
@@ -62,7 +67,7 @@ export async function getStatus() {
   return apiJson<StatusPayload>('/api/status');
 }
 
-export async function runCommand(cmd: string, theme: string, args: string[] = []) {
+export async function runCommand(cmd: string, theme?: string, args: string[] = []) {
   return apiJson('/api/run', {
     method: 'POST',
     body: JSON.stringify({ cmd, theme, args }),

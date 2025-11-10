@@ -10,6 +10,7 @@ import dotenv from 'dotenv';
 import { globSync } from 'glob';
 import chokidar from 'chokidar';
 import { execSync, execFileSync, spawn, ChildProcess } from 'child_process';
+import net from 'net';
 import { Readable } from 'stream';
 import crypto from 'crypto';
 import { TaskRunner } from './task-runner.js';
@@ -20,7 +21,8 @@ import type { RunRequest } from '../core/contracts/api.contract.ts';
 import { registerRunRoutes } from './routes/run.js';
 import brandsRouter from './routes/brands.js';
 import { PRESET_METADATA_FILENAME } from '../core/brand/constants.js';
-import { sanitizeThemeName } from './lib/sanitize.js';
+import { sanitizeThemeName } from '../core/utils/sanitize.ts';
+import { readJsonSafe } from '../core/utils/fs.ts';
 
 dotenv.config();
 
@@ -94,6 +96,36 @@ const scenarioFlows = [
   { id: 'wishlist', label: 'Wishlist Loop' },
 ];
 
+const safeReadJson = readJsonSafe;
+
+function resolveRuntimeStateFiles(stateDir: string, theme: string) {
+  const normalized = sanitizeThemeName(theme) || theme || 'demo';
+  const runtimeRoot = path.dirname(stateDir);
+  const sessionFile = path.join(runtimeRoot, 'sessions', normalized, 'state', 'state.json');
+  const legacyFile = path.join(stateDir, `${normalized}.json`);
+  return { normalized, sessionFile, legacyFile };
+}
+
+async function readRuntimeStateFile(theme: string, stateDir: string) {
+  const { sessionFile, legacyFile } = resolveRuntimeStateFiles(stateDir, theme);
+  if (await fs.pathExists(sessionFile)) return fs.readJson(sessionFile);
+  if (await fs.pathExists(legacyFile)) return fs.readJson(legacyFile);
+  return null;
+}
+
+async function writeRuntimeState(theme: string, stateDir: string, nextState: any) {
+  const { sessionFile, legacyFile } = resolveRuntimeStateFiles(stateDir, theme);
+  await fs.ensureDir(path.dirname(sessionFile));
+  await fs.writeJson(sessionFile, nextState, { spaces: 2 });
+  await fs.ensureDir(path.dirname(legacyFile));
+  await fs.writeJson(legacyFile, nextState, { spaces: 2 });
+}
+
+async function clearRuntimeState(theme: string, stateDir: string) {
+  const { sessionFile, legacyFile } = resolveRuntimeStateFiles(stateDir, theme);
+  await Promise.allSettled([fs.remove(sessionFile), fs.remove(legacyFile)]);
+}
+
 async function syncStateFromStub(theme: string, stateDir: string) {
   const stub = getStubState(theme);
   if (!stub) return null;
@@ -107,11 +139,10 @@ async function syncStateFromStub(theme: string, stateDir: string) {
 }
 
 async function mutateOfflineState(theme: string, stateDir: string, mutator: (state: any) => any) {
-  const filePath = path.join(stateDir, `${theme}.json`);
-  if (!(await fs.pathExists(filePath))) {
+  const current = await readRuntimeStateFile(theme, stateDir);
+  if (!current) {
     throw new Error('No runtime state found for theme');
   }
-  const current = await fs.readJson(filePath);
   const cloned = JSON.parse(JSON.stringify(current));
   const next = mutator(cloned);
   await writeRuntimeState(theme, stateDir, next);
@@ -219,13 +250,6 @@ async function applyDefaultTemplates(themeDir: string) {
   return applied;
 }
 
-async function safeReadJson(file) {
-  try {
-    return await fs.readJson(file);
-  } catch (err) {
-    return null;
-  }
-}
 async function getThemeStateSnapshot(theme: string, stateDir: string) {
   const normalized = theme ? theme.toLowerCase() : '';
   const stubState = getStubState(normalized || undefined);
@@ -240,9 +264,9 @@ async function getThemeStateSnapshot(theme: string, stateDir: string) {
       void 0;
     }
   }
-  const filePath = path.join(stateDir, `${effectiveTheme}.json`);
-  if (await fs.pathExists(filePath)) {
-    return fs.readJson(filePath);
+  const snapshot = await readRuntimeStateFile(effectiveTheme, stateDir);
+  if (snapshot) {
+    return snapshot;
   }
   return null;
 }
@@ -425,16 +449,41 @@ async function readScenarioRuns(dir: string, limit = 10) {
   return runs;
 }
 
-function findAvailablePort(preferred?: number) {
+const PORT_SCAN_BASE = 4100;
+const PORT_SCAN_LENGTH = 40;
+
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function isPortFree(port: number) {
+  return new Promise<boolean>((resolve) => {
+    const tester = net
+      .createServer()
+      .once('error', () => resolve(false))
+      .once('listening', () => tester.close(() => resolve(true)))
+      .listen(port, '127.0.0.1');
+  });
+}
+
+async function findAvailablePort(preferred?: number) {
   const usedPorts = new Set(Array.from(stubPool.values()).map((state) => state.port));
-  if (preferred && !usedPorts.has(preferred)) {
-    return preferred;
+  const candidates: number[] = [];
+  if (typeof preferred === 'number' && preferred > 0) candidates.push(preferred);
+  for (let offset = 0; offset < PORT_SCAN_LENGTH; offset += 1) {
+    candidates.push(PORT_SCAN_BASE + offset);
   }
-  const base = 4100;
-  for (let port = base; port < base + 20; port += 1) {
-    if (!usedPorts.has(port)) return port;
+  for (const port of candidates) {
+    if (usedPorts.has(port)) continue;
+    if (await isPortFree(port)) return port;
+    await wait(200);
   }
-  return base + usedPorts.size + 1;
+  let fallback = PORT_SCAN_BASE + candidates.length;
+  while (usedPorts.has(fallback) || !(await isPortFree(fallback))) {
+    fallback += 1;
+    await wait(100);
+  }
+  return fallback;
 }
 
 function getStubState(theme?: string) {
@@ -723,7 +772,28 @@ const auth = makeAuthMiddleware(token);
   };
   app.use(cors(corsOptions));
   app.use(express.json({ limit: '10mb' }));
-  app.use('/api/brands', auth, brandsRouter);
+  app.use((req, _res, next) => {
+    const headerSource = req.headers['x-deemind-source'];
+    const headerMode = req.headers['x-deemind-mode'];
+    const querySource = typeof req.query?.source === 'string' ? req.query.source : undefined;
+    const queryMode = typeof req.query?.mode === 'string' ? req.query.mode : undefined;
+    const source = (typeof headerSource === 'string' && headerSource) || querySource || 'api';
+    const mode = (typeof headerMode === 'string' && headerMode) || queryMode || 'friendly';
+    if (source === 'dashboard') {
+      logger.write(`dashboard request ${req.method} ${req.path}`, {
+        category: 'http',
+        meta: { source, mode, route: req.path },
+      });
+    }
+    next();
+  });
+  const enableBrands =
+    process.env.ENABLE_BRANDS === undefined
+      ? true
+      : String(process.env.ENABLE_BRANDS).toLowerCase() === 'true';
+  if (enableBrands) {
+    app.use('/api/brands', auth, brandsRouter);
+  }
 
   registerRunRoutes({ app, auth, config, runner, rootDir, logger });
 
@@ -738,7 +808,15 @@ const auth = makeAuthMiddleware(token);
   }
 
   runner.on('task-started', (task) => {
-    logger.write(`Task started: ${task?.label}`);
+    logger.write(`Task started: ${task?.label}`, {
+      category: 'runner',
+      theme: task?.meta?.theme,
+      sessionId: task?.meta?.buildId || task?.meta?.scenarioId || task?.id,
+      meta: {
+        label: task?.label,
+        id: task?.id,
+      },
+    });
     if (task?.meta?.buildId) {
       activeBuildId = task.meta.buildId;
       updateBuildSession(task.meta.buildId, { status: 'running', startedAt: new Date().toISOString() });
@@ -748,7 +826,13 @@ const auth = makeAuthMiddleware(token);
     }
   });
   runner.on('task-finished', ({ id, code, meta }) => {
-    logger.write(`Task finished: ${id} exit=${code}`);
+    logger.write(`Task finished: ${id} exit=${code}`, {
+      category: 'runner',
+      level: code === 0 ? 'info' : 'warn',
+      theme: meta?.theme,
+      sessionId: meta?.buildId || meta?.scenarioId || id,
+      meta: { id, exitCode: code },
+    });
     if (meta?.buildId) {
       const status: BuildSessionStatus = code === 0 ? 'succeeded' : 'failed';
       (async () => {
@@ -765,7 +849,13 @@ const auth = makeAuthMiddleware(token);
         if (activeBuildId === meta.buildId) {
           activeBuildId = null;
         }
-      })().catch((err) => logger.write(`build metrics error: ${err instanceof Error ? err.message : String(err)}`));
+      })().catch((err) =>
+        logger.write(`build metrics error: ${err instanceof Error ? err.message : String(err)}`, {
+          level: 'error',
+          category: 'runner',
+          meta: { buildId: meta?.buildId },
+        }),
+      );
     }
     if (meta?.jobId) {
     }
@@ -784,7 +874,7 @@ const auth = makeAuthMiddleware(token);
   });
   runner.on('log', (line) => {
     const text = line.toString().trim();
-    logger.write(text);
+    logger.write(text, { level: 'debug', category: 'runner-output' });
     if (activeBuildId) {
       appendBuildLog(activeBuildId, text);
     }
@@ -956,15 +1046,16 @@ const auth = makeAuthMiddleware(token);
       return res.status(409).json({ error: 'Stub already running for theme', port: existing.port, theme: requestedTheme });
     }
     const preferredPort = req.body?.port ? Number(req.body.port) : undefined;
-    const port = findAvailablePort(preferredPort);
+    const port = await findAvailablePort(preferredPort);
     try {
       execFileSync(process.execPath, ['tools/preview-static.js', requestedTheme], { cwd: rootDir, stdio: 'inherit' });
     } catch (err) {
       console.warn(`preview:seed failed for ${requestedTheme}: ${err instanceof Error ? err.message : String(err)}`);
     }
+    const sessionRoot = path.join(rootDir, 'runtime', 'sessions', requestedTheme);
     const child = spawn(process.execPath, ['server/runtime-stub.js', requestedTheme], {
       cwd: rootDir,
-      env: { ...process.env, PREVIEW_PORT: String(port) },
+      env: { ...process.env, PREVIEW_PORT: String(port), RUNTIME_SESSION_ROOT: sessionRoot },
       stdio: ['ignore', 'pipe', 'pipe'],
     });
     const instance: StubInstance = { process: child, theme: requestedTheme, port, logs: [] };
@@ -994,8 +1085,6 @@ const auth = makeAuthMiddleware(token);
     if (!targetTheme) {
       return res.status(400).json({ error: 'Theme required to reset stub state.' });
     }
-    await fs.ensureDir(stateDir);
-    const stateFile = path.join(stateDir, `${targetTheme}.json`);
     let resetInProcess = false;
     const runningStub = stubPool.get(targetTheme);
     if (runningStub) {
@@ -1011,7 +1100,7 @@ const auth = makeAuthMiddleware(token);
       }
     }
     if (!resetInProcess) {
-      await fs.remove(stateFile);
+      await clearRuntimeState(targetTheme, stateDir);
       recordStubLog(targetTheme, 'state file cleared');
     }
     res.json({ success: true, theme: targetTheme, inPlace: resetInProcess });
@@ -1064,7 +1153,11 @@ const auth = makeAuthMiddleware(token);
         return res.json({ theme, source: 'stub', context: stubContext });
       }
     } catch (error) {
-      logger.write(`runtime context via stub failed: ${error instanceof Error ? error.message : String(error)}`);
+      logger.write(`runtime context via stub failed: ${error instanceof Error ? error.message : String(error)}`, {
+        level: 'warn',
+        category: 'runtime',
+        theme,
+      });
     }
     try {
       const cached = await readCachedContext(theme);
@@ -1128,14 +1221,11 @@ const auth = makeAuthMiddleware(token);
         }
       } catch (mockError) {
         logger.write(
-          `mock context update failed: ${
-            mockError instanceof Error ? mockError.message : String(mockError)
-          }`,
+          `mock context update failed: ${mockError instanceof Error ? mockError.message : String(mockError)}`,
+          { level: 'warn', category: 'runtime', theme: normalizedTheme || targetTheme },
         );
       }
 
-      await fs.ensureDir(stateDir);
-      const stateFile = path.join(stateDir, `${targetTheme}.json`);
       const snapshot = {
         preset: {
           demo: composed.id,
@@ -1150,7 +1240,7 @@ const auth = makeAuthMiddleware(token);
         wishlist: composed.data.wishlist || { items: [] },
         session: { user: null, token: null },
       };
-      await fs.writeJson(stateFile, snapshot, { spaces: 2 });
+      await writeRuntimeState(targetTheme, stateDir, snapshot);
 
       if (targetStub && targetStub.theme === targetTheme) {
         try {
@@ -1579,19 +1669,13 @@ const auth = makeAuthMiddleware(token);
   process.on('SIGTERM', shutdown);
 
   const port = Number(process.env.SERVICE_PORT || config.port || 5757);
-  app.listen(port, () => logger.write(`Service listening on http://localhost:${port}`));
+  app.listen(port, () => logger.write(`Service listening on http://localhost:${port}`, { category: 'service' }));
 }
 
 main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
-async function writeRuntimeState(theme: string, stateDir: string, nextState: any) {
-  const filePath = path.join(stateDir, `${theme}.json`);
-  await fs.ensureDir(path.dirname(filePath));
-  await fs.writeJson(filePath, nextState, { spaces: 2 });
-}
-
 function registerRuntimeStateRoutes(app: express.Express, auth: express.RequestHandler, stateDir: string) {
   app.get('/api/runtime/state', auth, async (req, res) => {
     const theme = sanitizeThemeName(String(req.query.theme || ''));
@@ -1628,11 +1712,10 @@ function registerRuntimeStateRoutes(app: express.Express, auth: express.RequestH
         return res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
       }
     }
-    const filePath = path.join(stateDir, `${theme}.json`);
-    if (!(await fs.pathExists(filePath))) {
+    const current = await readRuntimeStateFile(theme, stateDir);
+    if (!current) {
       return res.status(404).json({ error: 'No runtime state found for theme' });
     }
-    const current = await fs.readJson(filePath);
     current.store = current.store || {};
     current.store.language = language;
     await writeRuntimeState(theme, stateDir, current);

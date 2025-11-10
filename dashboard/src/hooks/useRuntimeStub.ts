@@ -5,8 +5,8 @@ import {
   startStub as startStubApi,
   stopStub as stopStubApi,
   resetStubState as resetStubStateApi,
-} from '../api/system';
-import type { RuntimeStubInfo } from '../api/system';
+  type RuntimeStubInfo,
+} from '../api';
 
 export type StubStatus = { running: boolean; theme: string | null; port: number };
 

@@ -2,13 +2,26 @@ import { useEffect, useMemo, useState } from 'react';
 import type { ThemeRecord } from '../lib/api';
 import { runDeploy, runPackage } from '../lib/api';
 import { useThemesCatalog } from '../hooks/useThemesCatalog';
-import { runRuntimeScenario } from '../api/system';
+import { runRuntimeScenario } from '../api';
 import { useScenarioStream, type ScenarioSession } from '../hooks/useScenarioStream';
+import { useMode } from '../context/ModeContext';
 
 type ActionStatus = {
   message: string;
   variant: 'info' | 'success' | 'error';
 };
+
+function resolvePreviewSrc(baseUrl?: string | null, route?: string): string | undefined {
+  if (!baseUrl) return undefined;
+  if (!route) return baseUrl;
+  try {
+    const normalized = route.startsWith('/') ? route : `/${route}`;
+    const url = new URL(normalized, baseUrl);
+    return url.toString();
+  } catch {
+    return baseUrl;
+  }
+}
 
 function PreviewCard({
   record,
@@ -20,6 +33,7 @@ function PreviewCard({
   busySmoke,
   smokeStatus,
   status,
+  canManage,
 }: {
   record: ThemeRecord;
   onPackage: (theme: string) => void;
@@ -30,11 +44,23 @@ function PreviewCard({
   busySmoke: boolean;
   smokeStatus?: ScenarioSession | null;
   status?: ActionStatus;
+  canManage: boolean;
 }) {
   const manifest = record.manifest;
   const preview = manifest?.preview;
   const hasPreview = Boolean(preview?.url);
   const delivery = manifest?.delivery;
+  const previewRoutes = useMemo(() => {
+    if (!Array.isArray(preview?.routes) || preview.routes.length === 0) return ['/'];
+    return preview.routes;
+  }, [preview?.routes]);
+  const [routeIndex, setRouteIndex] = useState(0);
+  useEffect(() => {
+    setRouteIndex(0);
+  }, [record.name, preview?.url]);
+  const activeRoute = previewRoutes[Math.min(routeIndex, previewRoutes.length - 1)] || '/';
+  const iframeSrc = hasPreview ? resolvePreviewSrc(preview?.url, activeRoute) : undefined;
+
   return (
     <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden flex flex-col">
       <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 bg-slate-50">
@@ -46,30 +72,49 @@ function PreviewCard({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => onPackage(record.name)}
-            disabled={busyPackage}
-            className="rounded-full border border-slate-900 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-900 hover:bg-slate-900 hover:text-white disabled:opacity-50"
-          >
-            {busyPackage ? 'Packaging…' : 'Package'}
-          </button>
-          <button
-            type="button"
-            onClick={() => onDeploy(record.name)}
-            disabled={busyDeploy}
-            className="rounded-full border border-slate-400 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-700 hover:bg-slate-900 hover:text-white disabled:opacity-50"
-          >
-            {busyDeploy ? 'Deploying…' : 'Deploy'}
-          </button>
-          <button
-            type="button"
-            onClick={() => onSmokeTest(record.name)}
-            disabled={busySmoke}
-            className="rounded-full border border-slate-300 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-700 hover:bg-slate-900 hover:text-white disabled:opacity-50"
-          >
-            {busySmoke ? 'Running…' : 'Smoke Test'}
-          </button>
+          {preview?.port ? (
+            <span
+              className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-600"
+              title="Preview server port from manifest"
+            >
+              <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
+              Port&nbsp;{preview.port}
+            </span>
+          ) : (
+            <span className="inline-flex items-center rounded-full border border-dashed border-slate-200 px-3 py-1 text-[11px] uppercase tracking-wide text-slate-400">
+              Port&nbsp;—
+            </span>
+          )}
+          {canManage ? (
+            <>
+              <button
+                type="button"
+                onClick={() => onPackage(record.name)}
+                disabled={busyPackage}
+                className="rounded-full border border-slate-900 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-900 hover:bg-slate-900 hover:text-white disabled:opacity-50"
+              >
+                {busyPackage ? 'Packaging…' : 'Package'}
+              </button>
+              <button
+                type="button"
+                onClick={() => onDeploy(record.name)}
+                disabled={busyDeploy}
+                className="rounded-full border border-slate-400 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-700 hover:bg-slate-900 hover:text-white disabled:opacity-50"
+              >
+                {busyDeploy ? 'Deploying…' : 'Deploy'}
+              </button>
+              <button
+                type="button"
+                onClick={() => onSmokeTest(record.name)}
+                disabled={busySmoke}
+                className="rounded-full border border-slate-300 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-700 hover:bg-slate-900 hover:text-white disabled:opacity-50"
+              >
+                {busySmoke ? 'Running…' : 'Smoke Test'}
+              </button>
+            </>
+          ) : (
+            <span className="text-[11px] text-slate-400">Switch to Developer mode to manage packaging and smoke tests.</span>
+          )}
         </div>
       </div>
       {status?.message && (
@@ -87,7 +132,7 @@ function PreviewCard({
       )}
       {hasPreview ? (
         <iframe
-          src={preview?.url || undefined}
+          src={iframeSrc}
           title={`${record.name}-preview`}
           className="h-[360px] w-full border-0"
           sandbox="allow-same-origin allow-scripts allow-forms"
@@ -98,6 +143,29 @@ function PreviewCard({
         </div>
       )}
       <div className="px-5 py-3 border-t border-slate-100 bg-slate-50 text-xs text-slate-500 flex flex-col gap-1">
+        {hasPreview && previewRoutes.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-600">
+            <span className="uppercase tracking-wide text-slate-400">Route</span>
+            {previewRoutes.length > 1 ? (
+              <select
+                className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                value={routeIndex}
+                onChange={(event) => setRouteIndex(Number(event.target.value))}
+              >
+                {previewRoutes.map((route, idx) => (
+                  <option value={idx} key={`${record.name}-route-${route}`}>
+                    {route}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <span className="rounded-full border border-slate-200 bg-white px-3 py-1 font-semibold text-slate-700">{activeRoute}</span>
+            )}
+            {previewRoutes.length > 1 && (
+              <span className="text-slate-400">({previewRoutes.length} routes)</span>
+            )}
+          </div>
+        )}
         <span>
           URL:{' '}
           {preview?.url ? (
@@ -151,8 +219,21 @@ export default function PreviewDelivery() {
   const [busy, setBusy] = useState<{ theme: string; action: 'package' | 'deploy' | 'smoke' } | null>(null);
   const [statusMap, setStatusMap] = useState<Record<string, ActionStatus>>({});
   const { sessions } = useScenarioStream();
+  const { mode } = useMode();
+  const canManage = mode === 'developer';
+
+  const warnFriendly = (theme: string) => {
+    setStatusMap((prev) => ({
+      ...prev,
+      [theme]: { message: 'Switch to Developer mode to manage builds.', variant: 'info' },
+    }));
+  };
 
   const handlePackage = async (theme: string) => {
+    if (!canManage) {
+      warnFriendly(theme);
+      return;
+    }
     setBusy({ theme, action: 'package' });
     setStatusMap((prev) => ({ ...prev, [theme]: { message: 'Packaging…', variant: 'info' } }));
     try {
@@ -170,6 +251,10 @@ export default function PreviewDelivery() {
   };
 
   const handleDeploy = async (theme: string) => {
+    if (!canManage) {
+      warnFriendly(theme);
+      return;
+    }
     setBusy({ theme, action: 'deploy' });
     setStatusMap((prev) => ({ ...prev, [theme]: { message: 'Deploying via Salla CLI…', variant: 'info' } }));
     try {
@@ -187,6 +272,10 @@ export default function PreviewDelivery() {
   };
 
   const handleSmokeTest = async (theme: string) => {
+    if (!canManage) {
+      warnFriendly(theme);
+      return;
+    }
     setBusy({ theme, action: 'smoke' });
     // Smoke test runs via runtime scenario chain; UI just tracks enqueue state.
     try {
@@ -248,6 +337,7 @@ export default function PreviewDelivery() {
               busySmoke={Boolean(busy && busy.theme === theme.name && busy.action === 'smoke')}
               smokeStatus={scenarioMap[theme.name]}
               status={statusMap[theme.name]}
+              canManage={canManage}
             />
           ))}
         </div>

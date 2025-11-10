@@ -7,10 +7,10 @@
       "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&amp;display=swap",
       "https://cdn.tailwindcss.com",
       "https://cdn.jsdelivr.net/npm/chart.js",
-      "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap",
       "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;family=Noto+Sans+Arabic:wght@300;500&amp;display=swap",
       "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
       "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&amp;family=Noto+Sans+Arabic:wght@300;500&amp;display=swap",
+      "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap",
       "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&amp;display=swap"
     ]
   },
@@ -23,21 +23,29 @@
         "unchanged": false
       },
       {
-        "page": "2.html",
+        "page": "4.html",
         "componentCount": 4,
-        "sharedComponents": ["6877ba15", "1ffc62dd", "04d21c9f"],
+        "sharedComponents": ["d236f56b", "36e308f6", "312b6156"],
         "unchanged": false
       },
       {
-        "page": "3.html",
-        "componentCount": 5,
+        "page": "6.html",
+        "componentCount": 7,
         "sharedComponents": [
-          "b73b5410",
-          "ca8e72dd",
-          "37396029",
-          "9b67c90b",
-          "8f80be8a"
+          "a59fe73c",
+          "0c2945ec",
+          "8a94502e",
+          "5c2b65fa",
+          "80f40611",
+          "3b0c8a01",
+          "7b448b22"
         ],
+        "unchanged": false
+      },
+      {
+        "page": "2.html",
+        "componentCount": 4,
+        "sharedComponents": ["6877ba15", "1ffc62dd", "04d21c9f"],
         "unchanged": false
       },
       {
@@ -53,15 +61,21 @@
         "unchanged": false
       },
       {
-        "page": "4.html",
-        "componentCount": 4,
-        "sharedComponents": ["d236f56b", "36e308f6", "312b6156"],
-        "unchanged": false
-      },
-      {
         "page": "1.html",
         "componentCount": 3,
         "sharedComponents": ["4498f463", "4ff6cb98", "9c7f0fd7"],
+        "unchanged": false
+      },
+      {
+        "page": "3.html",
+        "componentCount": 5,
+        "sharedComponents": [
+          "b73b5410",
+          "ca8e72dd",
+          "37396029",
+          "9b67c90b",
+          "8f80be8a"
+        ],
         "unchanged": false
       },
       {
@@ -83,20 +97,6 @@
         "unchanged": false
       },
       {
-        "page": "6.html",
-        "componentCount": 7,
-        "sharedComponents": [
-          "a59fe73c",
-          "0c2945ec",
-          "8a94502e",
-          "5c2b65fa",
-          "80f40611",
-          "3b0c8a01",
-          "7b448b22"
-        ],
-        "unchanged": false
-      },
-      {
         "page": "sub\\first.html",
         "componentCount": 6,
         "sharedComponents": [
@@ -110,20 +110,14 @@
         "unchanged": false
       },
       {
+        "page": "sub\\cards.html",
+        "componentCount": 0,
+        "sharedComponents": [],
+        "unchanged": false
+      },
+      {
         "page": "sub\\carectars.html",
         "componentCount": 3,
-        "sharedComponents": [],
-        "unchanged": false
-      },
-      {
-        "page": "sub\\book.html",
-        "componentCount": 0,
-        "sharedComponents": [],
-        "unchanged": false
-      },
-      {
-        "page": "sub\\boxing.html",
-        "componentCount": 0,
         "sharedComponents": [],
         "unchanged": false
       },
@@ -134,7 +128,13 @@
         "unchanged": false
       },
       {
-        "page": "sub\\cards.html",
+        "page": "sub\\book.html",
+        "componentCount": 0,
+        "sharedComponents": [],
+        "unchanged": false
+      },
+      {
+        "page": "sub\\boxing.html",
         "componentCount": 0,
         "sharedComponents": [],
         "unchanged": false
@@ -187,6 +187,105 @@
         "classes": "hidden"
       },
       {
+        "id": "d236f56b",
+        "selector": "section",
+        "signature": "py-20.text-center",
+        "page": "4.html",
+        "shared": true,
+        "order": 0,
+        "classes": "text-center py-20"
+      },
+      {
+        "id": "36e308f6",
+        "selector": "section",
+        "signature": "py-16",
+        "page": "4.html",
+        "shared": true,
+        "order": 1,
+        "classes": "py-16"
+      },
+      {
+        "id": "03e9c3b1",
+        "selector": "section",
+        "signature": "bg-white.mt-12.py-16.rounded-2xl.shadow-lg",
+        "page": "4.html",
+        "shared": false,
+        "order": 2,
+        "classes": "py-16 bg-white rounded-2xl shadow-lg mt-12"
+      },
+      {
+        "id": "312b6156",
+        "selector": "section",
+        "signature": "py-16",
+        "page": "4.html",
+        "shared": true,
+        "order": 3,
+        "classes": "py-16"
+      },
+      {
+        "id": "a59fe73c",
+        "selector": "section",
+        "signature": "active.content-section.md:p-8.p-6",
+        "page": "6.html",
+        "shared": true,
+        "order": 0,
+        "classes": "content-section active p-6 md:p-8"
+      },
+      {
+        "id": "0c2945ec",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "6.html",
+        "shared": true,
+        "order": 1,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "8a94502e",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "6.html",
+        "shared": true,
+        "order": 2,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "5c2b65fa",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "6.html",
+        "shared": true,
+        "order": 3,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "80f40611",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "6.html",
+        "shared": true,
+        "order": 4,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "3b0c8a01",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "6.html",
+        "shared": true,
+        "order": 5,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
+        "id": "7b448b22",
+        "selector": "section",
+        "signature": "content-section.md:p-8.p-6",
+        "page": "6.html",
+        "shared": true,
+        "order": 6,
+        "classes": "content-section p-6 md:p-8"
+      },
+      {
         "id": "d223a1f4",
         "selector": "section",
         "signature": "py-16.text-center",
@@ -221,51 +320,6 @@
         "shared": true,
         "order": 3,
         "classes": "py-16"
-      },
-      {
-        "id": "b73b5410",
-        "selector": "section",
-        "signature": "py-20.text-center",
-        "page": "3.html",
-        "shared": true,
-        "order": 0,
-        "classes": "text-center py-20"
-      },
-      {
-        "id": "ca8e72dd",
-        "selector": "section",
-        "signature": "py-16",
-        "page": "3.html",
-        "shared": true,
-        "order": 1,
-        "classes": "py-16"
-      },
-      {
-        "id": "37396029",
-        "selector": "section",
-        "signature": "bg-white.py-16.rounded-2xl.shadow-lg",
-        "page": "3.html",
-        "shared": true,
-        "order": 2,
-        "classes": "py-16 bg-white rounded-2xl shadow-lg"
-      },
-      {
-        "id": "9b67c90b",
-        "selector": "section",
-        "signature": "py-16",
-        "page": "3.html",
-        "shared": true,
-        "order": 3,
-        "classes": "py-16"
-      },
-      {
-        "id": "8f80be8a",
-        "selector": "section",
-        "signature": "bg-gray-800.py-16.rounded-2xl.shadow-lg.text-white",
-        "page": "3.html",
-        "shared": true,
-        "order": 4,
-        "classes": "py-16 bg-gray-800 text-white rounded-2xl shadow-lg"
       },
       {
         "id": "3a1d89b9",
@@ -313,42 +367,6 @@
         "classes": "py-16 bg-gray-800 text-white rounded-2xl shadow-lg"
       },
       {
-        "id": "d236f56b",
-        "selector": "section",
-        "signature": "py-20.text-center",
-        "page": "4.html",
-        "shared": true,
-        "order": 0,
-        "classes": "text-center py-20"
-      },
-      {
-        "id": "36e308f6",
-        "selector": "section",
-        "signature": "py-16",
-        "page": "4.html",
-        "shared": true,
-        "order": 1,
-        "classes": "py-16"
-      },
-      {
-        "id": "03e9c3b1",
-        "selector": "section",
-        "signature": "bg-white.mt-12.py-16.rounded-2xl.shadow-lg",
-        "page": "4.html",
-        "shared": false,
-        "order": 2,
-        "classes": "py-16 bg-white rounded-2xl shadow-lg mt-12"
-      },
-      {
-        "id": "312b6156",
-        "selector": "section",
-        "signature": "py-16",
-        "page": "4.html",
-        "shared": true,
-        "order": 3,
-        "classes": "py-16"
-      },
-      {
         "id": "4498f463",
         "selector": "section",
         "signature": "",
@@ -374,6 +392,51 @@
         "shared": true,
         "order": 2,
         "classes": "hidden"
+      },
+      {
+        "id": "b73b5410",
+        "selector": "section",
+        "signature": "py-20.text-center",
+        "page": "3.html",
+        "shared": true,
+        "order": 0,
+        "classes": "text-center py-20"
+      },
+      {
+        "id": "ca8e72dd",
+        "selector": "section",
+        "signature": "py-16",
+        "page": "3.html",
+        "shared": true,
+        "order": 1,
+        "classes": "py-16"
+      },
+      {
+        "id": "37396029",
+        "selector": "section",
+        "signature": "bg-white.py-16.rounded-2xl.shadow-lg",
+        "page": "3.html",
+        "shared": true,
+        "order": 2,
+        "classes": "py-16 bg-white rounded-2xl shadow-lg"
+      },
+      {
+        "id": "9b67c90b",
+        "selector": "section",
+        "signature": "py-16",
+        "page": "3.html",
+        "shared": true,
+        "order": 3,
+        "classes": "py-16"
+      },
+      {
+        "id": "8f80be8a",
+        "selector": "section",
+        "signature": "bg-gray-800.py-16.rounded-2xl.shadow-lg.text-white",
+        "page": "3.html",
+        "shared": true,
+        "order": 4,
+        "classes": "py-16 bg-gray-800 text-white rounded-2xl shadow-lg"
       },
       {
         "id": "fba8ce07",
@@ -472,69 +535,6 @@
         "page": "sub\\index.html",
         "shared": true,
         "order": 10,
-        "classes": "content-section p-6 md:p-8"
-      },
-      {
-        "id": "a59fe73c",
-        "selector": "section",
-        "signature": "active.content-section.md:p-8.p-6",
-        "page": "6.html",
-        "shared": true,
-        "order": 0,
-        "classes": "content-section active p-6 md:p-8"
-      },
-      {
-        "id": "0c2945ec",
-        "selector": "section",
-        "signature": "content-section.md:p-8.p-6",
-        "page": "6.html",
-        "shared": true,
-        "order": 1,
-        "classes": "content-section p-6 md:p-8"
-      },
-      {
-        "id": "8a94502e",
-        "selector": "section",
-        "signature": "content-section.md:p-8.p-6",
-        "page": "6.html",
-        "shared": true,
-        "order": 2,
-        "classes": "content-section p-6 md:p-8"
-      },
-      {
-        "id": "5c2b65fa",
-        "selector": "section",
-        "signature": "content-section.md:p-8.p-6",
-        "page": "6.html",
-        "shared": true,
-        "order": 3,
-        "classes": "content-section p-6 md:p-8"
-      },
-      {
-        "id": "80f40611",
-        "selector": "section",
-        "signature": "content-section.md:p-8.p-6",
-        "page": "6.html",
-        "shared": true,
-        "order": 4,
-        "classes": "content-section p-6 md:p-8"
-      },
-      {
-        "id": "3b0c8a01",
-        "selector": "section",
-        "signature": "content-section.md:p-8.p-6",
-        "page": "6.html",
-        "shared": true,
-        "order": 5,
-        "classes": "content-section p-6 md:p-8"
-      },
-      {
-        "id": "7b448b22",
-        "selector": "section",
-        "signature": "content-section.md:p-8.p-6",
-        "page": "6.html",
-        "shared": true,
-        "order": 6,
         "classes": "content-section p-6 md:p-8"
       },
       {
@@ -774,10 +774,10 @@
       "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&amp;display=swap",
       "https://cdn.tailwindcss.com",
       "https://cdn.jsdelivr.net/npm/chart.js",
-      "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap",
       "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;family=Noto+Sans+Arabic:wght@300;500&amp;display=swap",
       "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
       "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&amp;family=Noto+Sans+Arabic:wght@300;500&amp;display=swap",
+      "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap",
       "https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&amp;display=swap"
     ],
     "cssMapSample": {
@@ -786,24 +786,8 @@
           "position": "relative"
         }
       },
-      "2.html": {},
-      "3.html": {
-        ".chart-container": {
-          "position": "relative"
-        }
-      },
-      "5.html": {
-        ".chart-container": {
-          "position": "relative"
-        }
-      },
       "4.html": {},
-      "1.html": {
-        ".chart-container": {
-          "position": "relative"
-        }
-      },
-      "sub\\index.html": {
+      "6.html": {
         ".content-section": {
           "display": "none"
         },
@@ -826,7 +810,23 @@
           "position": "absolute"
         }
       },
-      "6.html": {
+      "2.html": {},
+      "5.html": {
+        ".chart-container": {
+          "position": "relative"
+        }
+      },
+      "1.html": {
+        ".chart-container": {
+          "position": "relative"
+        }
+      },
+      "3.html": {
+        ".chart-container": {
+          "position": "relative"
+        }
+      },
+      "sub\\index.html": {
         ".content-section": {
           "display": "none"
         },
@@ -870,6 +870,12 @@
           "position": "absolute"
         }
       },
+      "sub\\cards.html": {
+        ".modal-overlay": {
+          "position": "fixed",
+          "display": "none"
+        }
+      },
       "sub\\carectars.html": {
         ".figure-art": {
           "display": "flex",
@@ -896,19 +902,6 @@
           "display": "inline-block"
         }
       },
-      "sub\\book.html": {},
-      "sub\\boxing.html": {
-        ".box-face": {
-          "position": "absolute",
-          "display": "flex"
-        },
-        ".front-face": {
-          "flex-direction": "column"
-        },
-        ".back-face": {
-          "flex-direction": "column"
-        }
-      },
       "sub\\1.html": {
         ".section-content": {
           "display": "none"
@@ -920,10 +913,17 @@
           "position": "relative"
         }
       },
-      "sub\\cards.html": {
-        ".modal-overlay": {
-          "position": "fixed",
-          "display": "none"
+      "sub\\book.html": {},
+      "sub\\boxing.html": {
+        ".box-face": {
+          "position": "absolute",
+          "display": "flex"
+        },
+        ".front-face": {
+          "flex-direction": "column"
+        },
+        ".back-face": {
+          "flex-direction": "column"
         }
       },
       "sub\\cat\\index.html": {
@@ -956,47 +956,43 @@
         "hints": ["product", "header"]
       },
       {
-        "page": "2.html",
-        "hints": ["product", "footer", "header"]
-      },
-      {
-        "page": "3.html",
-        "hints": ["product", "hero", "footer", "header"]
-      },
-      {
-        "page": "5.html",
-        "hints": ["product", "hero", "footer", "header"]
-      },
-      {
         "page": "4.html",
         "hints": ["hero", "footer", "header"]
-      },
-      {
-        "page": "1.html",
-        "hints": ["product", "header"]
-      },
-      {
-        "page": "sub\\index.html",
-        "hints": ["product"]
       },
       {
         "page": "6.html",
         "hints": ["product", "header"]
       },
       {
+        "page": "2.html",
+        "hints": ["product", "footer", "header"]
+      },
+      {
+        "page": "5.html",
+        "hints": ["product", "hero", "footer", "header"]
+      },
+      {
+        "page": "1.html",
+        "hints": ["product", "header"]
+      },
+      {
+        "page": "3.html",
+        "hints": ["product", "hero", "footer", "header"]
+      },
+      {
+        "page": "sub\\index.html",
+        "hints": ["product"]
+      },
+      {
         "page": "sub\\first.html",
         "hints": ["product", "header"]
       },
       {
+        "page": "sub\\cards.html",
+        "hints": ["header"]
+      },
+      {
         "page": "sub\\carectars.html",
-        "hints": ["header"]
-      },
-      {
-        "page": "sub\\book.html",
-        "hints": ["header"]
-      },
-      {
-        "page": "sub\\boxing.html",
         "hints": ["header"]
       },
       {
@@ -1004,7 +1000,11 @@
         "hints": ["product", "header"]
       },
       {
-        "page": "sub\\cards.html",
+        "page": "sub\\book.html",
+        "hints": ["header"]
+      },
+      {
+        "page": "sub\\boxing.html",
         "hints": ["header"]
       },
       {

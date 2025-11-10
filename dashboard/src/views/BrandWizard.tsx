@@ -1,9 +1,10 @@
 // @reuse-from: dashboard/src/lib/api-brand.ts
 // @description: Standalone creative surface for importing, previewing, and applying brand DNA.
 import { useEffect, useState } from 'react';
-import { applyBrand, getBrand, importBrand, listBrands } from '../lib/api-brand';
+import { applyBrand, getBrand, importBrand, listBrands, type BrandSummary } from '../lib/api-brand';
+import { triggerBuild } from '../lib/api';
 
-type BrandListItem = { id: string; file: string; meta: Record<string, any> };
+type BrandListItem = BrandSummary;
 
 export default function BrandWizardView() {
   const [items, setItems] = useState<BrandListItem[]>([]);
@@ -66,7 +67,9 @@ export default function BrandWizardView() {
     try {
       setBusy(true);
       await applyBrand(selected, theme);
-      setToast(`Applied '${selected}' → ${theme}`);
+      setToast(`Applied '${selected}' → ${theme}. Queuing build…`);
+      await triggerBuild(theme, ['--auto']);
+      setToast(`Applied '${selected}' and queued build for ${theme}.`);
     } catch (error) {
       setToast(error instanceof Error ? error.message : 'Apply failed');
     } finally {
@@ -100,7 +103,7 @@ export default function BrandWizardView() {
                 }`}
                 onClick={() => setSelected(item.id)}
               >
-                <p className="font-semibold text-slate-900">{item.id}</p>
+                <p className="font-semibold text-slate-900">{item.meta?.name || item.id}</p>
                 <p className="text-xs text-slate-500">
                   colors: {item.meta?.colors} · typography: {item.meta?.typography}
                 </p>

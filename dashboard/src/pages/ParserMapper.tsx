@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import StatsCard from '../components/StatsCard';
 import LogViewer from '../components/LogViewer';
-import { fetchStatus, fetchReportsList } from '../api/system';
+import { fetchStatus, fetchReportsList } from '../api';
 import StubStatusCard from '../components/StubStatusCard';
 import type { StatusResponse } from '../store/useDashboardStore';
 

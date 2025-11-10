@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import StatsCard from '../components/StatsCard';
-import { fetchThemes, fetchThemeReports, type ThemeSummary } from '../api/themes';
+import { fetchThemes, fetchThemeReports, type ThemeSummary } from '../api';
 import StubStatusCard from '../components/StubStatusCard';
 import RuntimeEventFeed from '../components/RuntimeEventFeed';
 import ScenarioRunsPanel from '../components/ScenarioRunsPanel';
